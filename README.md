@@ -10,7 +10,7 @@ if (!(Test-Path .env)) { Copy-Item .env.example .env }
 npm run dev
 ```
 
-The API is at `http://localhost:8000`. Check `http://localhost:8000/health` to see if it is running. Run tests with `npm test`.
+Make sure MongoDB is running locally, or set `MONGODB_URI` in `.env` to your MongoDB Atlas connection string. The API is at `http://localhost:8000`; check `/health` to see if it is running. Run `npm test` for the local checks. To run the database-backed API tests, set `MONGODB_TEST_URI` to a separate test database URI before running the tests; those tests clear their collections.
 
 The default CORS setting allows Vite at `localhost:5173` and `127.0.0.1:5173`. If your frontend uses another address, add it to `CORS_ORIGIN` in `.env`, separated by commas. Restart the API after changing it.
 
@@ -55,7 +55,7 @@ The first stage includes accounts, jobs, public job links, CV applications, recr
 
 ## Data and configuration
 
-The app uses `hirelume.db` by default. **Back it up before running the server**; the app creates missing tables but does not migrate existing tables. Set `DATABASE_URL` to use another SQLite file or PostgreSQL.
+The app connects to MongoDB using `MONGODB_URI`. The example uses a local MongoDB server. For team development, use a shared MongoDB Atlas database and keep its connection string in `.env`, never in Git. The old local SQLite database is not used; it was empty when we switched.
 
 Set a strong `SECRET_KEY` and the deployed frontend's origin in `CORS_ORIGIN` before deployment. Never commit `.env`, database files, uploaded CVs, or credentials.
 

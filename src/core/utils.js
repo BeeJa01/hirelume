@@ -5,7 +5,7 @@ const token = (bytes = 32) => randomBytes(bytes).toString('base64url');
 const asyncRoute = (handler) => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 function publicUser(user) {
-  return { id: user.id, name: user.name, email: user.email, role: user.role };
+  return { id: String(user._id ?? user.id), name: user.name, email: user.email, role: user.role };
 }
 
 function validate(schema, input) {

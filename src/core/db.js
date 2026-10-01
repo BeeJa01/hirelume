@@ -1,121 +1,87 @@
-const path = require('node:path');
-const knexFactory = require('knex');
+const mongoose = require('mongoose');
 const { config } = require('./config');
 
-const isPostgres = /^postgres(?:ql)?:\/\//i.test(config.databaseUrl);
+const { Schema } = mongoose;
 
-function sqliteFilename(databaseUrl) {
-  if (!databaseUrl.startsWith('sqlite://')) return path.resolve(databaseUrl);
-  let filename = decodeURIComponent(databaseUrl.slice('sqlite://'.length));
-  if (filename.startsWith('/')) filename = filename.slice(1);
-  if (process.platform === 'win32' && /^\/[a-z]:\//i.test(filename)) filename = filename.slice(1);
-  return path.resolve(filename);
+const userSchema = new Schema({
+  name: { type: String, required: true, trim: true, maxlength: 120 },
+  email: { type: String, required: true, unique: true, lowercase: true, trim: true, maxlength: 255 },
+  password_hash: { type: String, required: true },
+  role: { type: String, required: true, enum: ['recruiter', 'job_seeker'] },
+}, { timestamps: { createdAt: 'created_at', updatedAt: false } });
+
+const requirementSchema = new Schema({
+  text: { type: String, required: true, trim: true, maxlength: 500 },
+  requirement_type: { type: String, required: true, enum: ['required', 'nice_to_have'], default: 'required' },
+  position: { type: Number, required: true, default: 0 },
+}, { _id: true });
+
+const statusHistorySchema = new Schema({
+  actor_user_id: { type: Schema.Types.ObjectId, ref: 'User', required: true },
+  old_status: { type: String, required: true },
+  new_status: { type: String, required: true },
+  created_at: { type: Date, default: Date.now },
+}, { _id: false });
+
+const jobSchema = new Schema({
+  recruiter_id: { type: Schema.Types.ObjectId, ref: 'User', required: true, index: true },
+  title: { type: String, required: true, trim: true, maxlength: 200 },
+  description: { type: String, required: true },
+  feedback_enabled: { type: Boolean, default: true },
+  blind_mode: { type: Boolean, default: false },
+  requirements_locked: { type: Boolean, default: false },
+  requirements: { type: [requirementSchema], default: [] },
+  status: { type: String, enum: ['open', 'closed'], default: 'open' },
+  public_token: { type: String, required: true, unique: true },
+  closed_at: { type: Date, default: null },
+}, { timestamps: { createdAt: 'created_at', updatedAt: 'updated_at' } });
+
+const applicationSchema = new Schema({
+  job_id: { type: Schema.Types.ObjectId, ref: 'Job', required: true, index: true },
+  name: { type: String, required: true, trim: true, maxlength: 160 },
+  email: { type: String, required: true, lowercase: true, trim: true, maxlength: 255 },
+  phone: { type: String, required: true, trim: true, maxlength: 50 },
+  cv_filename: { type: String, required: true, maxlength: 255 },
+  cv_path: { type: String, required: true, maxlength: 500 },
+  cv_locked: { type: Boolean, default: true },
+  consent_given: { type: Boolean, default: false },
+  consent_version: { type: String, required: true, maxlength: 50 },
+  consent_at: { type: Date, default: Date.now },
+  status: { type: String, enum: ['shortlisted', 'rejected', 'undecided'], default: 'undecided' },
+  status_history: { type: [statusHistorySchema], default: [] },
+  analysis_status: { type: String, default: 'pending' },
+  analysis_attempts: { type: Number, default: 0 },
+  private_result_token: { type: String, required: true, unique: true, index: true },
+  analysis_score: { type: Number, default: null },
+  match_level: { type: String, default: null },
+  reason: { type: String, default: null },
+  needs_review: { type: Boolean, default: false },
+  applied_at: { type: Date, default: Date.now },
+  analysis_updated_at: { type: Date, default: null },
+}, { timestamps: false });
+applicationSchema.index({ job_id: 1, email: 1 }, { unique: true });
+
+const analysisResultSchema = new Schema({
+  application_id: { type: Schema.Types.ObjectId, ref: 'Application', required: true, index: true },
+  score: { type: Number, required: true },
+  match_level: { type: String, required: true },
+  reason: { type: String, required: true },
+  result_json: { type: String, required: true },
+  prompt_version: { type: String, required: true },
+}, { timestamps: { createdAt: 'created_at', updatedAt: false } });
+
+const User = mongoose.models.User || mongoose.model('User', userSchema);
+const Job = mongoose.models.Job || mongoose.model('Job', jobSchema);
+const Application = mongoose.models.Application || mongoose.model('Application', applicationSchema);
+const AnalysisResult = mongoose.models.AnalysisResult || mongoose.model('AnalysisResult', analysisResultSchema);
+
+async function connectDatabase() {
+  await mongoose.connect(config.mongoUri);
+  await Promise.all([User, Job, Application, AnalysisResult].map((model) => model.init()));
 }
 
-const knex = knexFactory({
-  client: isPostgres ? 'pg' : 'better-sqlite3',
-  connection: isPostgres ? config.databaseUrl : { filename: sqliteFilename(config.databaseUrl) },
-  useNullAsDefault: !isPostgres,
-  pool: isPostgres ? { min: 0, max: 10 } : undefined,
-  acquireConnectionTimeout: 10000,
-});
-
-async function initializeDatabase() {
-  if (!isPostgres) await knex.raw('PRAGMA foreign_keys = ON');
-
-  if (!(await knex.schema.hasTable('users'))) {
-    await knex.schema.createTable('users', (table) => {
-      table.increments('id').primary();
-      table.string('name', 120).notNullable();
-      table.string('email', 255).notNullable().unique();
-      table.string('password_hash', 255).notNullable();
-      table.string('role', 30).notNullable();
-      table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
-      table.index('email');
-    });
-  }
-  if (!(await knex.schema.hasTable('jobs'))) {
-    await knex.schema.createTable('jobs', (table) => {
-      table.increments('id').primary();
-      table.integer('recruiter_id').unsigned().notNullable().references('id').inTable('users');
-      table.string('title', 200).notNullable();
-      table.text('description').notNullable();
-      table.boolean('feedback_enabled').notNullable().defaultTo(true);
-      table.boolean('blind_mode').notNullable().defaultTo(false);
-      table.boolean('requirements_locked').notNullable().defaultTo(false);
-      table.string('status', 20).notNullable().defaultTo('open');
-      table.string('public_token', 64).notNullable().unique();
-      table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
-      table.timestamp('updated_at').notNullable().defaultTo(knex.fn.now());
-      table.timestamp('closed_at').nullable();
-      table.index('recruiter_id');
-      table.index('public_token');
-    });
-  }
-  if (!(await knex.schema.hasTable('requirements'))) {
-    await knex.schema.createTable('requirements', (table) => {
-      table.increments('id').primary();
-      table.integer('job_id').unsigned().notNullable().references('id').inTable('jobs').onDelete('CASCADE');
-      table.string('text', 500).notNullable();
-      table.string('requirement_type', 20).notNullable().defaultTo('required');
-      table.integer('position').notNullable().defaultTo(0);
-      table.index('job_id');
-    });
-  }
-  if (!(await knex.schema.hasTable('applications'))) {
-    await knex.schema.createTable('applications', (table) => {
-      table.increments('id').primary();
-      table.integer('job_id').unsigned().notNullable().references('id').inTable('jobs');
-      table.string('name', 160).notNullable();
-      table.string('email', 255).notNullable();
-      table.string('phone', 50).notNullable();
-      table.string('cv_filename', 255).notNullable();
-      table.string('cv_path', 500).notNullable();
-      table.boolean('cv_locked').notNullable().defaultTo(true);
-      table.boolean('consent_given').notNullable().defaultTo(false);
-      table.string('consent_version', 50).notNullable();
-      table.timestamp('consent_at').notNullable().defaultTo(knex.fn.now());
-      table.string('status', 30).notNullable().defaultTo('undecided');
-      table.string('analysis_status', 30).notNullable().defaultTo('pending');
-      table.integer('analysis_attempts').notNullable().defaultTo(0);
-      table.string('private_result_token', 96).notNullable().unique();
-      table.float('analysis_score').nullable();
-      table.string('match_level', 30).nullable();
-      table.text('reason').nullable();
-      table.boolean('needs_review').notNullable().defaultTo(false);
-      table.timestamp('applied_at').notNullable().defaultTo(knex.fn.now());
-      table.timestamp('analysis_updated_at').nullable();
-      table.unique(['job_id', 'email']);
-      table.index('job_id');
-      table.index('email');
-      table.index('private_result_token');
-    });
-  }
-  if (!(await knex.schema.hasTable('analysis_results'))) {
-    await knex.schema.createTable('analysis_results', (table) => {
-      table.increments('id').primary();
-      table.integer('application_id').unsigned().notNullable().references('id').inTable('applications').onDelete('CASCADE');
-      table.float('score').notNullable();
-      table.string('match_level', 30).notNullable();
-      table.text('reason').notNullable();
-      table.text('result_json').notNullable();
-      table.string('prompt_version', 50).notNullable();
-      table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
-      table.index('application_id');
-    });
-  }
-  if (!(await knex.schema.hasTable('status_audits'))) {
-    await knex.schema.createTable('status_audits', (table) => {
-      table.increments('id').primary();
-      table.integer('application_id').unsigned().notNullable().references('id').inTable('applications').onDelete('CASCADE');
-      table.integer('actor_user_id').unsigned().notNullable().references('id').inTable('users');
-      table.string('old_status', 30).notNullable();
-      table.string('new_status', 30).notNullable();
-      table.timestamp('created_at').notNullable().defaultTo(knex.fn.now());
-      table.index('application_id');
-      table.index('actor_user_id');
-    });
-  }
+async function closeDatabase() {
+  await mongoose.disconnect();
 }
 
-module.exports = { knex, initializeDatabase, sqliteFilename };
+module.exports = { mongoose, User, Job, Application, AnalysisResult, connectDatabase, closeDatabase };

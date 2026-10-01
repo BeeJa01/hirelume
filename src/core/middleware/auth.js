@@ -1,5 +1,5 @@
 const jwt = require('jsonwebtoken');
-const { knex } = require('../db');
+const { User } = require('../db');
 const { config } = require('../config');
 
 async function authenticate(req, res, next) {
@@ -9,7 +9,7 @@ async function authenticate(req, res, next) {
   }
   try {
     const payload = jwt.verify(token, config.secretKey, { algorithms: ['HS256'] });
-    const user = await knex('users').where({ id: Number(payload.sub) }).first();
+    const user = await User.findById(payload.sub).lean();
     if (!user) return res.status(401).json({ detail: 'User not found' });
     req.user = user;
     next();

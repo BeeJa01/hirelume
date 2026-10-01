@@ -1,15 +1,15 @@
 const express = require('express');
-const { knex } = require('../core/db');
+const { Job, Application, AnalysisResult } = require('../core/db');
 const { asyncRoute } = require('../core/utils');
 
 const router = express.Router();
 
 router.get('/:privateToken', asyncRoute(async (req, res) => {
-  const application = await knex('applications').where({ private_result_token: req.params.privateToken }).first();
+  const application = await Application.findOne({ private_result_token: req.params.privateToken }).lean();
   if (!application) return res.status(404).json({ detail: 'INVALID_RESULT_TOKEN' });
-  const job = await knex('jobs').where({ id: application.job_id }).first();
+  const job = await Job.findById(application.job_id).select('feedback_enabled').lean();
   const payload = {
-    application_id: application.id,
+    application_id: String(application._id),
     analysis_status: application.analysis_status,
     feedback_enabled: Boolean(job?.feedback_enabled),
   };
@@ -19,7 +19,7 @@ router.get('/:privateToken', asyncRoute(async (req, res) => {
       : 'Analysis unavailable';
     return res.json(payload);
   }
-  const result = await knex('analysis_results').where({ application_id: application.id }).orderBy('id', 'desc').first();
+  const result = await AnalysisResult.findOne({ application_id: application._id }).sort({ created_at: -1 }).lean();
   if (!result) {
     payload.analysis_status = 'failed';
     payload.message = 'Analysis result unavailable';

@@ -1,31 +1,32 @@
 const express = require('express');
 const fs = require('node:fs');
 const path = require('node:path');
+const mongoose = require('mongoose');
 const { z } = require('zod');
-const { knex } = require('../core/db');
+const { Job, Application, AnalysisResult } = require('../core/db');
 const { authenticate, requireRole } = require('../core/middleware/auth');
-const { asyncRoute, now, validate } = require('../core/utils');
+const { asyncRoute, validate } = require('../core/utils');
 const { storedFilePath } = require('../privacy-files/storage');
 
 const router = express.Router();
 const statusSchema = z.object({ status: z.enum(['shortlisted', 'rejected', 'undecided']) });
 
 async function ownedApplication(applicationId, recruiterId) {
-  return knex('applications')
-    .join('jobs', 'applications.job_id', 'jobs.id')
-    .select('applications.*')
-    .where({ 'applications.id': applicationId, 'jobs.recruiter_id': recruiterId })
-    .first();
+  if (!mongoose.isValidObjectId(applicationId)) return null;
+  const application = await Application.findById(applicationId).lean();
+  if (!application) return null;
+  const job = await Job.findOne({ _id: application.job_id, recruiter_id: recruiterId }).select('_id').lean();
+  return job ? application : null;
 }
 
 router.use(authenticate, requireRole('recruiter'));
 
 router.get('/:applicationId', asyncRoute(async (req, res) => {
-  const application = await ownedApplication(Number(req.params.applicationId), req.user.id);
+  const application = await ownedApplication(req.params.applicationId, req.user._id);
   if (!application) return res.status(404).json({ detail: 'APPLICATION_NOT_FOUND' });
-  const result = await knex('analysis_results').where({ application_id: application.id }).orderBy('id', 'desc').first();
+  const result = await AnalysisResult.findOne({ application_id: application._id }).sort({ created_at: -1 }).lean();
   res.json({
-    id: application.id,
+    id: String(application._id),
     name: application.name,
     email: application.email,
     phone: application.phone,
@@ -35,8 +36,8 @@ router.get('/:applicationId', asyncRoute(async (req, res) => {
     score: application.analysis_score,
     match_level: application.match_level,
     reason: application.reason,
-    needs_review: Boolean(application.needs_review),
-    cv_locked: Boolean(application.cv_locked),
+    needs_review: application.needs_review,
+    cv_locked: application.cv_locked,
     applied_at: application.applied_at,
     analysis_updated_at: application.analysis_updated_at,
     analysis: result ? JSON.parse(result.result_json) : null,
@@ -44,7 +45,7 @@ router.get('/:applicationId', asyncRoute(async (req, res) => {
 }));
 
 router.get('/:applicationId/cv', asyncRoute(async (req, res) => {
-  const application = await ownedApplication(Number(req.params.applicationId), req.user.id);
+  const application = await ownedApplication(req.params.applicationId, req.user._id);
   if (!application) return res.status(404).json({ detail: 'APPLICATION_NOT_FOUND' });
   const cvPath = storedFilePath(application.cv_path);
   if (!cvPath || !fs.existsSync(cvPath)) return res.status(404).json({ detail: 'CV_NOT_FOUND' });
@@ -52,33 +53,30 @@ router.get('/:applicationId/cv', asyncRoute(async (req, res) => {
 }));
 
 router.patch('/:applicationId/status', asyncRoute(async (req, res) => {
-  const input = validate(statusSchema, req.body);
-  const application = await ownedApplication(Number(req.params.applicationId), req.user.id);
+  const { status } = validate(statusSchema, req.body);
+  const application = await ownedApplication(req.params.applicationId, req.user._id);
   if (!application) return res.status(404).json({ detail: 'APPLICATION_NOT_FOUND' });
-  if (application.status !== input.status) {
-    await knex.transaction(async (trx) => {
-      await trx('status_audits').insert({
-        application_id: application.id,
-        actor_user_id: req.user.id,
-        old_status: application.status,
-        new_status: input.status,
-        created_at: now(),
-      });
-      await trx('applications').where({ id: application.id }).update({ status: input.status });
-    });
+  if (application.status !== status) {
+    await Application.updateOne(
+      { _id: application._id, status: application.status },
+      {
+        $set: { status },
+        $push: { status_history: { actor_user_id: req.user._id, old_status: application.status, new_status: status } },
+      },
+    );
   }
-  res.json({ id: application.id, status: input.status });
+  res.json({ id: String(application._id), status });
 }));
 
 router.get('/:applicationId/status-history', asyncRoute(async (req, res) => {
-  const application = await ownedApplication(Number(req.params.applicationId), req.user.id);
+  const application = await ownedApplication(req.params.applicationId, req.user._id);
   if (!application) return res.status(404).json({ detail: 'APPLICATION_NOT_FOUND' });
-  const rows = await knex('status_audits').where({ application_id: application.id }).orderBy('created_at', 'desc');
-  res.json(rows.map((row) => ({
-    old_status: row.old_status,
-    new_status: row.new_status,
-    actor_user_id: row.actor_user_id,
-    created_at: row.created_at,
+  const history = [...application.status_history].sort((a, b) => new Date(b.created_at) - new Date(a.created_at));
+  res.json(history.map((entry) => ({
+    old_status: entry.old_status,
+    new_status: entry.new_status,
+    actor_user_id: String(entry.actor_user_id),
+    created_at: entry.created_at,
   })));
 }));
 

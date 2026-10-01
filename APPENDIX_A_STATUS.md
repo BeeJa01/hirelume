@@ -1,6 +1,6 @@
 # Backend status
 
-The first stage is built with Node.js and Express. It covers accounts, jobs, public applications, CV uploads, and recruiter review.
+The first stage uses Node.js, Express, and MongoDB. It covers accounts, jobs, public applications, CV uploads, and recruiter review.
 
 | Feature | Status |
 |---|---|

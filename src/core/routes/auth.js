@@ -2,10 +2,10 @@ const express = require('express');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { z } = require('zod');
-const { knex } = require('../db');
+const { User } = require('../db');
 const { config } = require('../config');
 const { authenticate } = require('../middleware/auth');
-const { asyncRoute, now, publicUser, validate } = require('../utils');
+const { asyncRoute, publicUser, validate } = require('../utils');
 
 const router = express.Router();
 const registerSchema = z.object({
@@ -18,7 +18,7 @@ const loginSchema = z.object({ email: z.string().email(), password: z.string() }
 
 function authResponse(user) {
   const accessToken = jwt.sign({}, config.secretKey, {
-    subject: String(user.id),
+    subject: String(user._id),
     algorithm: 'HS256',
     expiresIn: `${config.accessTokenExpireMinutes}m`,
   });
@@ -28,28 +28,26 @@ function authResponse(user) {
 router.post('/register', asyncRoute(async (req, res) => {
   const input = validate(registerSchema, req.body);
   const email = input.email.toLowerCase();
-  if (await knex('users').where({ email }).first()) return res.status(409).json({ detail: 'Account already exists' });
-  let user;
+  if (await User.exists({ email })) return res.status(409).json({ detail: 'Account already exists' });
   try {
-    [user] = await knex('users').insert({
+    const user = await User.create({
       name: input.name,
       email,
       password_hash: await bcrypt.hash(input.password, 12),
       role: input.role,
-      created_at: now(),
-    }).returning('*');
+    });
+    return res.json(authResponse(user));
   } catch (error) {
-    if (error.code === 'SQLITE_CONSTRAINT_UNIQUE' || error.code === '23505') {
+    if (error.code === 11000) {
       return res.status(409).json({ detail: 'Account already exists' });
     }
     throw error;
   }
-  return res.json(authResponse(user));
 }));
 
 router.post('/login', asyncRoute(async (req, res) => {
   const input = validate(loginSchema, req.body);
-  const user = await knex('users').where({ email: input.email.toLowerCase() }).first();
+  const user = await User.findOne({ email: input.email.toLowerCase() });
   if (!user || !(await bcrypt.compare(input.password, user.password_hash))) {
     return res.status(401).json({ detail: 'Unable to sign in with those details' });
   }

@@ -1,6 +1,6 @@
 # API reference
 
-Base URL: `http://localhost:8000/api`
+Base URL: `http://localhost:8000/api`. The backend stores data in MongoDB.
 
 Private routes need the JWT returned by `/auth/register` or `/auth/login`:
 

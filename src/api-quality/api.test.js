@@ -6,25 +6,34 @@ const os = require('node:os');
 const path = require('node:path');
 
 const temporaryDirectory = fsSync.mkdtempSync(path.join(os.tmpdir(), 'hirelume-api-'));
-process.env.DATABASE_URL = path.join(temporaryDirectory, 'test.db');
 process.env.UPLOAD_DIR = path.join(temporaryDirectory, 'uploads');
 process.env.SECRET_KEY = 'test-secret-for-automated-tests';
+const integrationEnabled = Boolean(process.env.MONGODB_TEST_URI);
+if (integrationEnabled) process.env.MONGODB_URI = process.env.MONGODB_TEST_URI;
 
-const { knex, initializeDatabase, sqliteFilename } = require('../core/db');
-const { storedFilePath } = require('../privacy-files/storage');
+let models;
 const request = require('supertest');
 const { app } = require('../core/app');
+const { storedFilePath } = require('../privacy-files/storage');
 
-before(async () => initializeDatabase());
+before(async () => {
+  if (!integrationEnabled) return;
+  models = require('../core/db');
+  await models.connectDatabase();
+});
 
-beforeEach(async () => {
-  for (const table of ['status_audits', 'analysis_results', 'applications', 'requirements', 'jobs', 'users']) {
-    await knex(table).del();
-  }
+beforeEach(async (context) => {
+  if (!integrationEnabled) return;
+  await Promise.all([
+    models.AnalysisResult.deleteMany({}),
+    models.Application.deleteMany({}),
+    models.Job.deleteMany({}),
+    models.User.deleteMany({}),
+  ]);
 });
 
 after(async () => {
-  await knex.destroy();
+  if (models) await models.closeDatabase();
   await fs.rm(temporaryDirectory, { recursive: true, force: true });
 });
 
@@ -60,7 +69,7 @@ function apply(publicToken, email = 'candidate@example.com') {
     .attach('cv', Buffer.from('%PDF-1.4 test'), 'resume.pdf');
 }
 
-test('recruiter can create a job, receive an application, and manage its status', async () => {
+test('recruiter can create a job, receive an application, and manage its status', { skip: !integrationEnabled }, async () => {
   const accessToken = await register();
   const job = await createJob(accessToken);
   const publicJob = await request(app).get(`/api/public/jobs/${job.public_token}`);
@@ -87,7 +96,7 @@ test('recruiter can create a job, receive an application, and manage its status'
   assert.equal(result.body.analysis_status, 'pending');
 });
 
-test('registration validates passwords and duplicate applications are rejected', async () => {
+test('registration validates passwords and duplicate applications are rejected', { skip: !integrationEnabled }, async () => {
   const invalid = await request(app).post('/api/auth/register').send({
     name: 'Recruiter', email: 'long@example.com', password: 'x'.repeat(73), role: 'recruiter',
   });
@@ -98,7 +107,7 @@ test('registration validates passwords and duplicate applications are rejected',
   assert.equal((await apply(job.public_token)).status, 409);
 });
 
-test('application rejects invalid consent and CV files', async () => {
+test('application rejects invalid consent and CV files', { skip: !integrationEnabled }, async () => {
   const job = await createJob(await register());
   const url = `/api/public/jobs/${job.public_token}/applications`;
   const fields = { name: 'Candidate', email: 'candidate@example.com', phone: '555-0100', consent_version: 'v1' };
@@ -117,7 +126,7 @@ test('application rejects invalid consent and CV files', async () => {
   assert.equal(oversized.status, 413);
 });
 
-test('another recruiter cannot read a job or its applicant', async () => {
+test('another recruiter cannot read a job or its applicant', { skip: !integrationEnabled }, async () => {
   const job = await createJob(await register());
   const application = await apply(job.public_token);
   assert.equal(application.status, 200);
@@ -127,11 +136,10 @@ test('another recruiter cannot read a job or its applicant', async () => {
   assert.equal((await request(app).get(`/api/applications/${application.body.application_id}`).set(headers)).status, 404);
 });
 
-test('health and SQLite path configuration work', async () => {
+test('health endpoint responds', async () => {
   const response = await request(app).get('/health');
   assert.equal(response.status, 200);
   assert.equal(response.body.status, 'ok');
-  assert.equal(sqliteFilename('sqlite:///./hirelume.db'), path.resolve('hirelume.db'));
 });
 
 test('local frontend origin is allowed by CORS', async () => {

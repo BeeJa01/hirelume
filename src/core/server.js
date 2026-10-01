@@ -1,6 +1,6 @@
 const { app } = require('./app');
 const { config } = require('./config');
-const { initializeDatabase, knex } = require('./db');
+const { connectDatabase, closeDatabase } = require('./db');
 
 async function start() {
   if (process.env.NODE_ENV === 'production') {
@@ -10,10 +10,10 @@ async function start() {
     if (!process.env.CORS_ORIGIN) throw new Error('Set CORS_ORIGIN to the frontend URL before starting in production');
   }
 
-  await initializeDatabase();
+  await connectDatabase();
   const server = app.listen(config.port, () => console.log(`Hirelume API listening on port ${config.port}`));
   const shutdown = () => server.close(async () => {
-    await knex.destroy();
+    await closeDatabase();
     process.exit(0);
   });
   process.on('SIGINT', shutdown);

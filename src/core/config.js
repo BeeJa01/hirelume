@@ -2,7 +2,7 @@ require('dotenv').config();
 
 const config = {
   port: Number(process.env.PORT || 8000),
-  databaseUrl: process.env.DATABASE_URL || './hirelume.db',
+  mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/hirelume',
   uploadDirectory: process.env.UPLOAD_DIR || 'uploads',
   secretKey: process.env.SECRET_KEY || 'change-this-in-production',
   accessTokenExpireMinutes: Number(process.env.ACCESS_TOKEN_EXPIRE_MINUTES || 1440),
