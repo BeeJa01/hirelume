@@ -1,136 +1,68 @@
-# Hirelume API Contract Backend Working Draft
+# API reference
 
-Version: 0.2.0
+Base URL: `http://localhost:8000/api`
 
-## Base
+Private routes need the JWT returned by `/auth/register` or `/auth/login`:
 
-- Base path: `/api`
-- Authentication: JWT Bearer for recruiter/job-seeker protected routes.
-- Public Flow 1 job/application routes do not require login.
-- JSON is used for normal requests/responses.
-- Multipart form data is used for CV/screenshot uploads.
+```text
+Authorization: Bearer <access_token>
+```
 
-## Endpoints
+## Routes
 
-| Method | Endpoint | Purpose |
-|---|---|---|
-| POST | `/auth/register` | Register recruiter/job seeker |
-| POST | `/auth/login` | Login |
-| GET | `/auth/me` | Return current authenticated user |
-| POST | `/jobs` | Create job |
-| GET | `/jobs` | List recruiter's jobs |
-| GET | `/jobs/{job_id}` | Get job |
-| PATCH | `/jobs/{job_id}` | Edit job and requirements before first application |
-| POST | `/jobs/{job_id}/close` | Close job |
-| POST | `/jobs/{job_id}/reopen` | Reopen job |
-| GET | `/public/jobs/{token}` | Open public job link |
-| POST | `/public/jobs/{token}/applications` | Submit no-login application + consent + CV |
-| GET | `/jobs/{job_id}/applications` | Get ranked applicants |
-| GET | `/applications/{id}` | Get applicant detail |
-| GET | `/applications/{id}/cv` | Private recruiter CV access |
-| PATCH | `/applications/{id}/status` | Shortlist/reject/undecide |
-| GET | `/applications/{id}/status-history` | Status audit history |
-| GET | `/results/{private_token}` | Applicant private result |
-| POST | `/flow2/analyses` | Start Flow 2 analysis |
-| GET | `/flow2/analyses/{id}` | Get Flow 2 analysis status/result |
-| POST | `/ratings` | Submit result rating |
-| POST | `/events` | Record analytics event |
+| Method | Path | Access | Purpose |
+|---|---|---|---|
+| POST | `/auth/register` | Public | Create an account |
+| POST | `/auth/login` | Public | Sign in |
+| GET | `/auth/me` | Signed in | Get the current user |
+| POST | `/jobs` | Recruiter | Create a job |
+| GET | `/jobs` | Recruiter | List the recruiter's jobs |
+| GET | `/jobs/{id}` | Recruiter | Get a job |
+| PATCH | `/jobs/{id}` | Recruiter | Edit a job |
+| POST | `/jobs/{id}/close` | Recruiter | Close a job |
+| POST | `/jobs/{id}/reopen` | Recruiter | Reopen a job |
+| GET | `/jobs/{id}/applications` | Recruiter | List applicants |
+| GET | `/public/jobs/{token}` | Public | View a job |
+| POST | `/public/jobs/{token}/applications` | Public | Apply with a CV |
+| GET | `/applications/{id}` | Recruiter | View an applicant |
+| GET | `/applications/{id}/cv` | Recruiter | Download the applicant's CV |
+| PATCH | `/applications/{id}/status` | Recruiter | Change applicant status |
+| GET | `/applications/{id}/status-history` | Recruiter | View status changes |
+| GET | `/results/{token}` | Private link | Check application result status |
 
-## Job requirements
+## Create a job
 
-Requirements use `required` or `nice_to_have`. Once the first application is created, requirements are locked. Title/description and feedback settings remain editable according to the product rules.
+Send JSON. Each job needs at least one requirement.
 
-## Application
+```json
+{
+  "title": "Backend Engineer",
+  "description": "Build backend services.",
+  "requirements": [
+    { "text": "Node.js experience", "requirement_type": "required" }
+  ],
+  "feedback_enabled": true,
+  "blind_mode": false
+}
+```
 
-Required fields:
+## Submit an application
 
-- name
-- email
-- phone
-- consent
-- consent_version
-- CV (PDF/DOCX)
+Send `multipart/form-data` with these fields:
 
-MVP CV limit: 5 MB. Duplicate applications are rejected per job/email. CV is locked after submission.
+- `name`
+- `email`
+- `phone`
+- `consent` (`true` or `false`)
+- `consent_version`
+- `cv` (PDF or DOCX, up to 5 MB)
 
-## Analysis lifecycle
+The response includes `application_id`, `analysis_status`, and a private `result_token`. Analysis is not part of the current stage, so the status remains pending.
 
-Supported states:
+## Common errors
 
-`pending` → `processing` → `completed`
+Errors return JSON with a `detail` field. Common status codes are `400` for invalid input, `401` for missing or invalid login, `403` for the wrong role, `404` for a missing or inaccessible item, `409` for duplicates or closed jobs, `413` for oversized CVs, and `422` for request validation errors.
 
-Failure/operational states may include:
+## Not in this stage
 
-`failed`, `queued`, `needs_review`
-
-The backend stores analysis attempts and exposes the current status. Automatic worker retry/queue processing remains a follow-up implementation item.
-
-## Private result
-
-Each application receives a cryptographically random private result token. The token is used by `/api/results/{private_token}`. Recruiter endpoints remain ownership-scoped.
-
-## Error codes
-
-The API should use stable machine-readable codes such as:
-
-- `AUTH_REQUIRED`
-- `INVALID_CREDENTIALS`
-- `JOB_NOT_FOUND`
-- `JOB_CLOSED`
-- `DUPLICATE_APPLICATION`
-- `CONSENT_REQUIRED`
-- `CV_UNSUPPORTED_FORMAT`
-- `CV_TOO_LARGE`
-- `CV_EMPTY`
-- `APPLICATION_NOT_FOUND`
-- `CV_NOT_FOUND`
-- `INVALID_RESULT_TOKEN`
-- `ANALYSIS_PENDING`
-- `AI_FAILURE`
-- `RATE_LIMITED`
-
-## AI boundary
-
-Gemini is accessed only through `app/services/ai_service.py`.
-
-Required implementation constraints from the Product Definition Pack:
-
-- structured JSON response
-- versioned prompts
-- low randomness for rating
-- maximum two AI calls per analysis
-- final score calculated in backend code
-- current provider terms/limits and data protections must be confirmed before real applicant data is used
-- use test data while protections are not confirmed
-
-## Implementation status
-
-Implemented:
-
-- authentication
-- recruiter ownership checks
-- job CRUD/close/reopen
-- requirements and requirement lock
-- public job link
-- no-login application + consent + CV validation
-- private result token
-- recruiter applicant list/detail
-- private CV access
-- recruiter status audit
-- private result endpoint
-- Flow 2 request/status scaffold
-- ratings/events scaffolds
-- Gemini service boundary
-
-Not implemented yet:
-
-- real CV text extraction and readability checks
-- real Gemini calls after provider/data-protection confirmation
-- background analysis worker and automatic retry up to the product limit
-- complete structured AI response validation
-- final ranking/explanation implementation
-- blind-mode preprocessing
-- Flow 2 persisted analysis records and daily quota enforcement
-- production object storage/private file delivery
-- database migrations
-- automated tests
+AI analysis (Gemini/Groq), Flow 2, ratings, and analytics are not implemented yet. See [APPENDIX_A_STATUS.md](APPENDIX_A_STATUS.md).
