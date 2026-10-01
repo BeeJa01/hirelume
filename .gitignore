@@ -1,22 +1,13 @@
 .env
-.venv/
-venv/
 node_modules/
 coverage/
-__pycache__/
-*.py[cod]
-.pytest_cache/
-.coverage
-htmlcov/
-.mypy_cache/
-.ruff_cache/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
 
-# Local databases and uploaded applicant files are private runtime data.
-*.db
-*.sqlite
-*.sqlite3
-uploads/**
-!uploads/**/.gitkeep
+# Uploaded applicant files are private runtime data.
+private/cvs/**
+!private/cvs/.gitkeep
 
 # Editor and operating-system files.
 .vscode/

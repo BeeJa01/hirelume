@@ -1,6 +1,6 @@
 # Backend status
 
-The first stage uses Node.js, Express, and MongoDB. It covers accounts, jobs, public applications, CV uploads, and recruiter review.
+The first stage uses Node.js, Express, and MongoDB. It covers accounts, jobs, public applications, CV uploads, and recruiter review. CV storage is local under `private/cvs`; text extraction and blind-mode processing are not implemented yet.
 
 | Feature | Status |
 |---|---|
