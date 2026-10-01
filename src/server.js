@@ -1,28 +1,22 @@
-const { app } = require('./app');
-const { port, secretKey, corsOrigins } = require('./config');
-const { connectDatabase, closeDatabase } = require('./config/db');
+require("dotenv").config();
 
-async function start() {
-  if (process.env.NODE_ENV === 'production') {
-    if (!process.env.SECRET_KEY || secretKey === 'change-this-in-production') {
-      throw new Error('Set a strong SECRET_KEY before starting in production');
-    }
-    if (!process.env.CORS_ORIGIN || !corsOrigins.length) {
-      throw new Error('Set CORS_ORIGIN to the frontend URL before starting in production');
-    }
-  }
+const app = require("./app");
+const connectDB = require("./config/db");
 
-  await connectDatabase();
-  const server = app.listen(port, () => console.log(`Hirelume API listening on port ${port}`));
-  const shutdown = () => server.close(async () => {
-    await closeDatabase();
-    process.exit(0);
+const {
+  ensureCvDirectory,
+} = require("./services/fileStorage");
+
+const PORT = process.env.PORT || 5000;
+
+const startServer = async () => {
+  await connectDB();
+
+  ensureCvDirectory();
+
+  app.listen(PORT, () => {
+    console.log(`Server running on port ${PORT}`);
   });
-  process.on('SIGINT', shutdown);
-  process.on('SIGTERM', shutdown);
-}
+};
 
-start().catch((error) => {
-  console.error('Failed to start Hirelume API:', error);
-  process.exit(1);
-});
+startServer();

@@ -1,27 +1,36 @@
-const fs = require('node:fs/promises');
-const path = require('node:path');
-const { uploadDirectory } = require('../config');
-const { token } = require('../utils');
+const fs = require("fs");
+const path = require("path");
+const crypto = require("crypto");
 
-function storedFilePath(filePath) {
-  const root = path.resolve(uploadDirectory);
-  const target = path.resolve(filePath);
-  const relative = path.relative(root, target);
-  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) return null;
-  return target;
+const privateCvDirectory = path.join(
+  process.cwd(),
+  "private",
+  "cvs"
+);
+
+function ensureCvDirectory() {
+  if (!fs.existsSync(privateCvDirectory)) {
+    fs.mkdirSync(privateCvDirectory, {
+      recursive: true,
+    });
+  }
 }
 
-async function saveCv(buffer, extension) {
-  const directory = path.resolve(uploadDirectory);
-  await fs.mkdir(directory, { recursive: true });
-  const filePath = path.join(directory, `${token(16)}${extension}`);
-  await fs.writeFile(filePath, buffer, { flag: 'wx' });
-  return filePath;
+function generateStoredFilename(originalName) {
+  const extension = path.extname(originalName).toLowerCase();
+
+  const randomName = crypto.randomBytes(32).toString("hex");
+
+  return `${randomName}${extension}`;
 }
 
-async function removeCv(filePath) {
-  const safePath = storedFilePath(filePath);
-  if (safePath) await fs.unlink(safePath).catch(() => {});
+function getCvStoragePath(filename) {
+  return path.join(privateCvDirectory, filename);
 }
 
-module.exports = { saveCv, removeCv, storedFilePath };
+module.exports = {
+  privateCvDirectory,
+  ensureCvDirectory,
+  generateStoredFilename,
+  getCvStoragePath,
+};

@@ -1,21 +1,29 @@
-const jwt = require('jsonwebtoken');
-const { User } = require('../models');
-const { secretKey } = require('../config');
+const jwt = require("jsonwebtoken");
 
-async function authenticate(req, res, next) {
-  const [scheme, token] = (req.get('authorization') || '').split(' ');
-  if (scheme?.toLowerCase() !== 'bearer' || !token) {
-    return res.status(401).json({ detail: 'Not authenticated' });
-  }
+const authenticate = (req, res, next) => {
   try {
-    const payload = jwt.verify(token, secretKey, { algorithms: ['HS256'] });
-    const user = await User.findById(payload.sub).lean();
-    if (!user) return res.status(401).json({ detail: 'User not found' });
-    req.user = user;
-    next();
-  } catch {
-    return res.status(401).json({ detail: 'Invalid or expired token' });
-  }
-}
+    const authHeader = req.headers.authorization;
 
-module.exports = { authenticate };
+    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+      return res.status(401).json({
+        message: "Authentication required",
+      });
+    }
+
+    const token = authHeader.split(" ")[1];
+
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+
+    req.user = decoded;
+
+    next();
+  } catch (error) {
+    console.error("Authentication error:", error);
+
+    return res.status(401).json({
+      message: "Invalid or expired token",
+    });
+  }
+};
+
+module.exports = authenticate;
