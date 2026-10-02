@@ -16,8 +16,8 @@ app.get('/health', (req, res) => res.json({ status: 'ok', service: 'hirelume-bac
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
-app.use('/api', cvRoutes);
+app.use('/api/cvs', cvRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-module.exports = { app };
+module.exports = app;

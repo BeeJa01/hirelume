@@ -1,14 +1,15 @@
-const mongoose = require('mongoose');
-const { mongoUri } = require('./index');
-require('../models');
+const mongoose = require("mongoose");
 
-async function connectDatabase() {
-  await mongoose.connect(mongoUri);
-  await Promise.all(Object.values(mongoose.models).map((model) => model.init()));
-}
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI);
 
-async function closeDatabase() {
-  await mongoose.disconnect();
-}
+    console.log("MongoDB connected");
+  } catch (error) {
+    console.error("MongoDB connection failed:", error.message);
 
-module.exports = { mongoose, connectDatabase, closeDatabase };
+    process.exit(1);
+  }
+};
+
+module.exports = connectDB;
