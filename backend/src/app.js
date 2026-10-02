@@ -20,4 +20,4 @@ app.use('/api/cvs', cvRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
-module.exports = app;
+module.exports = { app };
