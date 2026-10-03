@@ -1,87 +1,93 @@
 import React, { useState } from 'react';
-import { styles } from '@/style';
 import {
+  View,
   Text,
   TextInput,
-  View,
   TouchableOpacity,
   KeyboardTypeOptions,
   StyleProp,
   ViewStyle,
 } from 'react-native';
+import { styles } from '@/style';
 import { Ionicons } from '@expo/vector-icons';
 
 type SpecialInputProps = {
+  label?: string;
   placeholder?: string;
   placeholderTextColor?: string;
-  label?: string;
-  secureTextEntry?: boolean;
   value?: string;
   onChangeText?: (text: string) => void;
-  borderColor?: string;
+  secureTextEntry?: boolean;
+  helperText?: string;
+  error?: string;
   keyboardType?: KeyboardTypeOptions;
   autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
   containerStyle?: StyleProp<ViewStyle>;
-  error?: string;
+  borderColor?: string;
 };
 
 export const SpecialInput = ({
-  placeholder = 'type here...',
-  placeholderTextColor = '#94A3B8',
   label,
-  secureTextEntry = false,
+  placeholder = 'type here...',
+  placeholderTextColor = '#9CA3AF',
   value,
   onChangeText,
-  borderColor,
+  secureTextEntry = false,
+  helperText,
+  error,
   keyboardType = 'default',
   autoCapitalize = 'none',
   containerStyle,
-  error,
+  borderColor,
 }: SpecialInputProps) => {
-  const [isSecure, setIsSecure] = useState(secureTextEntry);
   const [isFocused, setIsFocused] = useState(false);
+  const [isSecure, setIsSecure] = useState(secureTextEntry);
 
   return (
-    <View style={[{ marginBottom: 14 }, containerStyle]}>
+    <View style={[styles.fieldGroup, containerStyle]}>
       {label ? <Text style={styles.label}>{label}</Text> : null}
 
-      <View style={styles.inputWrapper}>
+      <View style={{ position: 'relative', justifyContent: 'center' }}>
         <TextInput
           placeholder={placeholder}
           placeholderTextColor={placeholderTextColor}
-          secureTextEntry={isSecure}
           value={value}
           onChangeText={onChangeText}
+          secureTextEntry={isSecure}
           keyboardType={keyboardType}
           autoCapitalize={autoCapitalize}
           onFocus={() => setIsFocused(true)}
           onBlur={() => setIsFocused(false)}
           style={[
             styles.input,
-            secureTextEntry && styles.inputWithIcon,
             borderColor ? { borderColor } : null,
-            isFocused && { borderColor: '#4F46E5', backgroundColor: '#FFFFFF' },
+            isFocused && styles.inputFocused,
             error ? { borderColor: '#EF4444' } : null,
+            secureTextEntry && { paddingRight: 40 },
           ]}
         />
 
         {secureTextEntry ? (
           <TouchableOpacity
-            style={styles.eyeIcon}
+            style={{ position: 'absolute', right: 12, height: '100%', justifyContent: 'center' }}
             onPress={() => setIsSecure(!isSecure)}
             hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
           >
             <Ionicons
-              name={isSecure ? 'eye-outline' : 'eye-off-outline'}
-              size={20}
-              color="#64748B"
+              name={isSecure ? 'eye-off-outline' : 'eye-outline'}
+              size={18}
+              color="#9CA3AF"
             />
           </TouchableOpacity>
         ) : null}
       </View>
 
+      {helperText && !error ? (
+        <Text style={styles.helperText}>{helperText}</Text>
+      ) : null}
+
       {error ? (
-        <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4, marginLeft: 2 }}>
+        <Text style={{ color: '#EF4444', fontSize: 12, marginTop: 4 }}>
           {error}
         </Text>
       ) : null}

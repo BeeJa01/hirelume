@@ -36,17 +36,17 @@ export const SpecialButton = ({
       onPress={onPress}
       disabled={disabled || loading}
       style={[
-        isPrimary ? styles.button : styles.secondaryButton,
+        isPrimary ? styles.buttonPrimary : styles.buttonSecondary,
         disabled && { opacity: 0.6 },
         style,
       ]}
     >
       {loading ? (
-        <ActivityIndicator color={isPrimary ? '#FFFFFF' : '#4F46E5'} size="small" />
+        <ActivityIndicator color={isPrimary ? '#FFFFFF' : '#111827'} size="small" />
       ) : (
         <Text
           style={[
-            isPrimary ? styles.buttonText : styles.secondaryButtonText,
+            isPrimary ? styles.buttonPrimaryText : styles.buttonSecondaryText,
             textStyle,
           ]}
         >
