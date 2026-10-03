@@ -46,8 +46,13 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
       setLoading(false);
       Alert.alert(
         'Welcome Back',
-        `Logged in successfully as ${email}.\nYour analyses are loaded.`,
-        [{ text: 'OK' }]
+        `Logged in successfully as ${email || 'tobi.ogunleye@email.com'}.\nYour analyses are loaded.`,
+        [
+          {
+            text: 'Continue',
+            onPress: () => navigation.navigate('Home'),
+          },
+        ]
       );
     }, 600);
   };
