@@ -26,6 +26,7 @@ function authResponse(user) {
 }
 
 const register = asyncRoute(async (req, res) => {
+  console.log("REGISTER BODY:", req.body);
   const input = validate(registerSchema, req.body);
   try {
     const user = await User.create({ ...input, email: input.email.toLowerCase(), password_hash: await bcrypt.hash(input.password, 12) });
@@ -37,6 +38,7 @@ const register = asyncRoute(async (req, res) => {
 });
 
 const login = asyncRoute(async (req, res) => {
+  console.log("LOGIN BODY:", req.body);
   const input = validate(loginSchema, req.body);
   const user = await User.findOne({ email: input.email.toLowerCase() });
   if (!user || !(await bcrypt.compare(input.password, user.password_hash))) {
@@ -45,8 +47,16 @@ const login = asyncRoute(async (req, res) => {
   res.json(authResponse(user));
 });
 
-function currentUser(req, res) {
-  res.json(publicUser(req.user));
+async function currentUser(req, res) {
+  const user = await User.findById(req.user.sub);
+
+  if (!user) {
+    return res.status(404).json({
+      detail: "User not found",
+    });
+  }
+
+  res.json(publicUser(user));
 }
 
 module.exports = { register, login, currentUser };

@@ -13,6 +13,10 @@ app.use(cors({ origin: corsOrigins }));
 app.use(express.json({ limit: '1mb' }));
 
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'hirelume-backend', version: '0.3.0' }));
+app.post('/test-body', (req, res) => {
+  console.log('TEST BODY:', req.body);
+  res.json({ received: req.body });
+});
 app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
