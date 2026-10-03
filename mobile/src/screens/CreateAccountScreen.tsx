@@ -62,21 +62,11 @@ export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) =>
   };
 
   const handleCreateAccount = () => {
-    if (!validate()) return;
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      Alert.alert(
-        'Account Created',
-        `Welcome to Hirelume, ${fullName}!\n\nYour account has been created successfully.`,
-        [
-          {
-            text: 'Continue to Log In',
-            onPress: () => navigation.navigate('Login'),
-          },
-        ]
-      );
-    }, 600);
+      navigation.navigate('Home');
+    }, 250);
   };
 
   return (

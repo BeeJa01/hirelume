@@ -40,21 +40,11 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
   };
 
   const handleLogin = () => {
-    if (!validate()) return;
     setLoading(true);
     setTimeout(() => {
       setLoading(false);
-      Alert.alert(
-        'Welcome Back',
-        `Logged in successfully as ${email || 'tobi.ogunleye@email.com'}.\nYour analyses are loaded.`,
-        [
-          {
-            text: 'Continue',
-            onPress: () => navigation.navigate('Home'),
-          },
-        ]
-      );
-    }, 600);
+      navigation.navigate('Home');
+    }, 250);
   };
 
   return (

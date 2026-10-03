@@ -5,6 +5,7 @@ import {
   SafeAreaView,
   StatusBar,
   ScrollView,
+  TouchableOpacity,
 } from 'react-native';
 import { styles } from '@/style';
 import { HireLumeLogo } from '@/components/HireLumeLogo';
@@ -29,7 +30,11 @@ export const WelcomeScreen = ({ navigation }: WelcomeScreenProps) => {
           </View>
 
           {/* AI Job Match Demo Card */}
-          <View style={styles.welcomeCard}>
+          <TouchableOpacity
+            style={styles.welcomeCard}
+            activeOpacity={0.9}
+            onPress={() => navigation.navigate('Home')}
+          >
             <View style={styles.welcomeCardHeader}>
               <View style={styles.scoreBadgeContainer}>
                 <Text style={styles.scoreNumber}>67</Text>
@@ -62,7 +67,7 @@ export const WelcomeScreen = ({ navigation }: WelcomeScreenProps) => {
                 Name a CRM tool you have used, or one you...
               </Text>
             </View>
-          </View>
+          </TouchableOpacity>
 
           {/* Hero Typography */}
           <View style={{ marginTop: 12 }}>
