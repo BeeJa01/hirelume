@@ -1,0 +1,15 @@
+const express = require("express");
+
+const router = express.Router();
+
+const authenticate = require("../middleware/auth");
+const { fitCheck } = require("../controllers/aiController");
+
+// AI Fit Check
+router.post(
+  "/fit-check/:jobId",
+  authenticate,
+  fitCheck
+);
+
+module.exports = router;
