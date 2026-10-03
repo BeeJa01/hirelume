@@ -1,0 +1,33 @@
+*   [33m303992d[m[33m ([m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m Merge pull request #13 from BeeJa01/funbi
+[31m|[m[32m\[m  
+[31m|[m *   [33m48b0391[m[33m ([m[1;31morigin/funbi[m[33m)[m Merge pull request #11 from BeeJa01/main
+[31m|[m [33m|[m[31m\[m  
+[31m|[m [33m|[m[31m/[m  
+[31m|[m[31m/[m[33m|[m   
+* [33m|[m   [33mff23cb8[m Merge pull request #9 from BeeJa01/feature/mobile-app
+[35m|[m[36m\[m [33m\[m  
+* [36m\[m [33m\[m   [33m45b82d4[m Merge branch 'main' of https://github.com/BeeJa01/hirelume
+[1;31m|[m[1;32m\[m [36m\[m [33m\[m  
+* [1;32m|[m [36m|[m [33m|[m [33mafb5376[m Add mobile navigation
+ [1;32m/[m [36m/[m [33m/[m  
+[1;32m|[m [36m|[m [33m|[m * [33m8be4a9b[m[33m ([m[1;31morigin/feature/mobile-app[m[33m)[m feat(mobile): rebuild Splash, Welcome, CreateAccount and Login screens to match UI designs
+[1;32m|[m [36m|[m [33m|[m * [33maa8878f[m feat(mobile): add web support for browser preview
+[1;32m|[m [36m|[m [33m|[m[36m/[m  
+[1;32m|[m [36m|[m[36m/[m[33m|[m   
+[1;32m|[m * [33m|[m [33m75388bc[m feat(mobile): setup React Native Expo project with Splash and Authentication pages
+[1;32m|[m[1;32m/[m [33m/[m  
+* [33m|[m [33m54085dc[m[33m ([m[1;31morigin/Donald/Register-Login[m[33m)[m Merge pull request #8 from BeeJa01/funbi
+[1;34m|[m[33m\[m[33m|[m 
+[1;34m|[m * [33m7b783e2[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfunbi[m[33m)[m Fix indentation for app import in server.js
+[1;34m|[m * [33m0d682e9[m Refactor code structure for improved readability and maintainability
+[1;34m|[m[1;34m/[m  
+*   [33md34653a[m Merge pull request #7 from BeeJa01/funbi
+[1;36m|[m[31m\[m  
+[1;36m|[m * [33m0e6a537[m miss
+[1;36m|[m[1;36m/[m  
+*   [33m191cab1[m Merge pull request #6 from BeeJa01/funbi
+[32m|[m[33m\[m  
+[32m|[m *   [33mfe20ba0[m Merge branch 'main' of https://github.com/BeeJa01/hirelume into funbi
+[32m|[m [34m|[m[32m\[m  
+[32m|[m [34m|[m[32m/[m  
+[32m|[m[32m/[m[34m|[m   
