@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your jobs | HireLume</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+      --color-brand: #2563eb;
+      --color-brand-dark: #1d4ed8;
+      --color-line: #e2e8f0;
+    }
+    @layer components {
+      .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand; }
+      .card { @apply rounded-xl border border-line bg-white; }
+    }
+  </style>
+  <style>
+    .icon { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</head>
+
+<body class="bg-[#f8fafc] font-sans text-black antialiased">
+
+  <!-- Icon sprite (use with <svg class="icon size-5"><use href="#i-name"/></svg>) -->
+  <svg width="0" height="0" class="absolute" aria-hidden="true">
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></symbol>
+    <symbol id="i-plus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8v8" /></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" /><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M16 4.5a3.5 3.5 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6" /></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" /></symbol>
+    <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M5 22h14M5 2h14M17 22v-4.2a2 2 0 0 0-.6-1.4L12 12l-4.4 4.4a2 2 0 0 0-.6 1.4V22M7 2v4.2a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="m8 12 3 3 5-6" /></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h10" /></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+  </svg>
+
+  <div class="lg:flex lg:min-h-screen">
+
+    <!-- Sidebar (desktop only) -->
+    <aside class="hidden w-64 shrink-0 flex-col border-r border-line bg-white lg:sticky lg:top-0 lg:flex lg:h-screen">
+      <a href="/" class="px-6 py-6" aria-label="HireLume home">
+        <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+      </a>
+
+      <p class="px-6 text-xs font-bold uppercase tracking-wide text-gray-500">Recruiter</p>
+      <nav aria-label="Dashboard" class="mt-3 space-y-1 px-4">
+        <a href="/jobs" aria-current="page" class="flex items-center gap-3 rounded-lg border border-brand/30 bg-blue-50 px-3 py-2.5 text-sm font-semibold text-brand">
+          <svg class="icon size-5" aria-hidden="true"><use href="#i-briefcase" /></svg>Jobs
+        </a>
+        <a href="/jobs/new" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+          <svg class="icon size-5" aria-hidden="true"><use href="#i-plus-circle" /></svg>Create job
+        </a>
+        <a href="/applicants" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+          <svg class="icon size-5" aria-hidden="true"><use href="#i-users" /></svg>Applicants
+        </a>
+        <a href="/help" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+          <svg class="icon size-5" aria-hidden="true"><use href="#i-help" /></svg>Help
+        </a>
+      </nav>
+
+      <div class="mt-auto flex items-center gap-3 border-t border-line p-4">
+        <span class="grid size-9 shrink-0 place-items-center rounded-full bg-gray-200 text-xs font-semibold">AO</span>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold">Adaeze Okonkwo</p>
+          <p class="truncate text-xs text-gray-500">Sunrise Logistics Ltd</p>
+        </div>
+        <a href="/logout" aria-label="Log out" class="text-gray-500 hover:text-black"><svg class="icon size-5" aria-hidden="true"><use href="#i-logout" /></svg></a>
+      </div>
+    </aside>
+
+    <div class="min-w-0 flex-1">
+
+      <!-- Top bar -->
+      <header class="relative border-b border-line bg-white">
+        <div class="flex h-16 items-center justify-between px-5 sm:px-8">
+          <a href="/" class="lg:hidden" aria-label="HireLume home">
+            <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+          </a>
+          <p class="font-display hidden text-sm font-semibold lg:block">Jobs</p>
+
+          <div class="flex items-center gap-3">
+            <a href="/jobs/new" class="btn-primary hidden lg:inline-flex"><svg class="icon size-4" aria-hidden="true"><use href="#i-plus" /></svg>Create job</a>
+            <a href="/help" aria-label="Help" class="hidden size-10 place-items-center rounded-lg border border-line text-gray-500 hover:bg-[#f8fafc] lg:grid"><svg class="icon size-5" aria-hidden="true"><use href="#i-help" /></svg></a>
+            <button type="button" class="flex items-center gap-2" aria-label="Account menu">
+              <span class="grid size-9 place-items-center rounded-full bg-gray-200 text-xs font-semibold">AO</span>
+              <span class="hidden text-sm font-semibold lg:inline">Adaeze</span>
+              <svg class="icon hidden size-4 text-gray-500 lg:block" aria-hidden="true"><use href="#i-chevron" /></svg>
+            </button>
+            <button id="menu-btn" type="button" class="grid size-10 place-items-center rounded-lg border border-line lg:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu">
+              <svg class="icon size-5" aria-hidden="true"><use href="#i-menu" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <nav id="nav-menu" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-line bg-white px-5 py-4 text-sm text-gray-500 sm:px-8 lg:hidden!">
+          <a href="/jobs" class="font-semibold text-brand">Jobs</a>
+          <a href="/jobs/new" class="hover:text-black">Create job</a>
+          <a href="/applicants" class="hover:text-black">Applicants</a>
+          <a href="/help" class="hover:text-black">Help</a>
+          <a href="/logout" class="hover:text-black">Log out</a>
+        </nav>
+      </header>
+
+      <main class="px-5 py-6 sm:px-8 lg:py-8">
+        <!-- Page heading -->
+        <div class="flex flex-col gap-4 lg:flex-row lg:items-start lg:justify-between">
+          <div>
+            <h1 class="font-display text-2xl font-bold lg:text-3xl">Your jobs</h1>
+            <p class="mt-1 text-sm text-gray-500">Create a job once, share one link, and review ranked applicants.</p>
+          </div>
+          <a href="/jobs/new" class="btn-primary w-full lg:w-auto"><svg class="icon size-4" aria-hidden="true"><use href="#i-plus-circle" /></svg>Create job</a>
+        </div>
+
+        <!-- Stats (filled by JS) -->
+        <section id="stats" aria-label="Summary" class="mt-6 grid grid-cols-2 gap-3 lg:grid-cols-4 lg:gap-4"></section>
+
+        <!-- All jobs -->
+        <section aria-labelledby="all-jobs" class="mt-8 lg:overflow-hidden lg:rounded-xl lg:border lg:border-line lg:bg-white">
+          <div class="flex flex-col gap-3 lg:flex-row lg:items-center lg:justify-between lg:p-5">
+            <h2 id="all-jobs" class="font-display text-lg font-semibold">All jobs</h2>
+            <div class="relative w-full lg:w-72">
+              <svg class="icon pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-500" aria-hidden="true"><use href="#i-search" /></svg>
+              <label for="search" class="sr-only">Search jobs</label>
+              <input id="search" type="search" placeholder="Search jobs"
+                     class="w-full rounded-lg border border-line bg-white py-2.5 pl-9 pr-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 lg:text-sm" />
+            </div>
+          </div>
+
+          <!-- Desktop table header -->
+          <div class="hidden grid-cols-[2.2fr_1fr_1fr_1.4fr_1.2fr_1.8fr] gap-4 border-y border-line bg-[#f8fafc] px-5 py-3 text-xs font-medium text-gray-500 lg:grid">
+            <span>Job</span><span>Status</span><span>Applicants</span><span>Top match</span><span>Created</span><span class="text-right">Link</span>
+          </div>
+
+          <ul id="rows-desktop" class="hidden lg:block"></ul>
+          <ul id="rows-mobile" class="mt-4 space-y-3 lg:hidden"></ul>
+        </section>
+      </main>
+    </div>
+  </div>
+
+ <script>
+  // Sample data. Later: replace with a fetch() to the Node.js API.
+  const jobs = [
+    { id: 1, title: "Sales Executive", location: "Ikeja, Lagos", status: "Open", applicants: 24, score: 88, tag: "Strong", created: "28 Sep 2026" },
+    { id: 2, title: "Accountant", location: "Lekki, Lagos", status: "Open", applicants: 17, score: 79, tag: "Strong", created: "25 Sep 2026" },
+    { id: 3, title: "Junior Software Developer", location: "Remote", status: "Open", applicants: 9, score: 71, tag: "Good", created: "29 Sep 2026" },
+    { id: 4, title: "Customer Support Officer", location: "Yaba, Lagos", status: "Closed", applicants: 38, score: 84, tag: "Strong", created: "14 Sep 2026" }
+  ];
+
+  function ico(name, size) {
+    return '<svg class="icon ' + (size || "size-5") + '" aria-hidden="true"><use href="#i-' + name + '"/></svg>';
+  }
+  function badge(text, cls) {
+    return '<span class="rounded-full px-2.5 py-0.5 text-xs font-semibold ' + cls + '">' + text + '</span>';
+  }
+  const statusCls = { Open: "bg-teal-50 text-teal-700", Closed: "bg-gray-100 text-gray-500" };
+  const tagCls = { Strong: "bg-teal-50 text-teal-700", Good: "bg-blue-50 text-brand" };
+  const cols = "grid-cols-[2.2fr_1fr_1fr_1.4fr_1.2fr_1.8fr]";
+
+  function copyBtn(id) {
+    return '<button type="button" data-copy="' + id + '" class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-semibold hover:bg-[#f8fafc]">' + ico("copy", "size-4") + '<span>Copy link</span></button>';
+  }
+  const moreBtn = '<button type="button" aria-label="More actions" class="grid size-8 place-items-center rounded-lg text-gray-500 hover:bg-[#f8fafc]">' + ico("dots") + '</button>';
+  const empty = '<li class="p-6 text-center text-sm text-gray-500">No jobs found.</li>';
+
+  // Stats
+  const stats = [
+    { label: "Open jobs", value: jobs.filter(function (j) { return j.status === "Open"; }).length, note: "of " + jobs.length + " jobs", icon: "briefcase", tone: "bg-blue-50 text-brand" },
+    { label: "Applicants", value: jobs.reduce(function (sum, j) { return sum + j.applicants; }, 0), note: "across all jobs", icon: "users", tone: "bg-blue-50 text-brand" },
+    { label: "Analysis pending", value: 3, note: "finishing now", icon: "hourglass", tone: "bg-red-50 text-red-500" },
+    { label: "Shortlisted", value: 9, note: "by you", icon: "check", tone: "bg-green-50 text-green-600" }
+  ];
+  document.getElementById("stats").innerHTML = stats.map(function (s) {
+    return '<div class="card p-4 lg:p-5">' +
+      '<div class="flex items-center gap-3 text-sm text-gray-500">' +
+      '<span class="hidden size-9 place-items-center rounded-lg ' + s.tone + ' lg:grid">' + ico(s.icon) + '</span>' + s.label +
+      '</div>' +
+      '<p class="font-display mt-3 text-3xl font-bold">' + s.value + '</p>' +
+      '<p class="text-xs text-gray-500">' + s.note + '</p>' +
+      '</div>';
+  }).join("");
+
+  // Job rows
+  function rowDesktop(j) {
+    return '<li class="grid ' + cols + ' items-center gap-4 border-b border-line px-5 py-4 text-sm last:border-b-0">' +
+      '<div><p class="font-display font-semibold">' + j.title + '</p><p class="text-xs text-gray-500">' + j.location + '</p></div>' +
+      '<div>' + badge(j.status, statusCls[j.status]) + '</div>' +
+      '<p>' + j.applicants + '</p>' +
+      '<p class="flex items-center gap-2"><span class="font-semibold">' + j.score + '</span>' + badge(j.tag, tagCls[j.tag]) + '</p>' +
+      '<p class="text-gray-500">' + j.created + '</p>' +
+      '<div class="flex items-center justify-end gap-2">' + copyBtn(j.id) + moreBtn + '</div>' +
+      '</li>';
+  }
+
+  function rowMobile(j) {
+    return '<li class="card p-4">' +
+      '<div class="flex items-start justify-between gap-2"><div>' +
+      '<p class="flex flex-wrap items-center gap-2"><span class="font-display font-semibold">' + j.title + '</span>' + badge(j.status, statusCls[j.status]) + '</p>' +
+      '<p class="mt-0.5 text-xs text-gray-500">' + j.location + '</p></div>' + moreBtn + '</div>' +
+      '<div class="mt-4 flex items-center justify-between text-sm">' +
+      '<p><span class="font-semibold">' + j.applicants + '</span> <span class="text-gray-500">applicants</span></p>' +
+      '<p class="flex items-center gap-2"><span class="text-xs text-gray-500">Top match</span><span class="font-semibold">' + j.score + '</span>' + badge(j.tag, tagCls[j.tag]) + '</p></div>' +
+      '<div class="mt-3 flex items-center justify-between text-xs text-gray-500"><p>Created ' + j.created + '</p>' + copyBtn(j.id) + '</div>' +
+      '</li>';
+  }
+
+  const search = document.getElementById("search");
+  function render() {
+    const term = search.value.trim().toLowerCase();
+    const list = jobs.filter(function (j) { return (j.title + " " + j.location).toLowerCase().includes(term); });
+    document.getElementById("rows-desktop").innerHTML = list.map(rowDesktop).join("") || empty;
+    document.getElementById("rows-mobile").innerHTML = list.map(rowMobile).join("") || empty;
+  }
+  search.addEventListener("input", render);
+  render();
+
+  // Copy link
+  document.addEventListener("click", async function (e) {
+    const btn = e.target.closest("[data-copy]");
+    if (!btn) return;
+    try { await navigator.clipboard.writeText(location.origin + "/apply/" + btn.dataset.copy); } catch (err) {}
+    const label = btn.querySelector("span");
+    label.textContent = "Copied";
+    setTimeout(function () { label.textContent = "Copy link"; }, 1500);
+  });
+
+  // Mobile menu
+  const menuBtn = document.getElementById("menu-btn");
+  const menu = document.getElementById("nav-menu");
+  menuBtn.addEventListener("click", function () {
+    const open = menu.classList.toggle("hidden") === false;
+    menu.classList.toggle("flex", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  });
+</script>
+</body>
+  </html>

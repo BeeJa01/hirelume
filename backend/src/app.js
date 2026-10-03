@@ -6,6 +6,7 @@ const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const cvRoutes = require('./routes/cvRoutes');
+const aiRoutes = require('./routes/aiRoutes');
 
 const app = express();
 app.disable('x-powered-by');
@@ -21,6 +22,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/cvs', cvRoutes);
+app.use('/api/ai', aiRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
