@@ -3,5 +3,5 @@ module.exports = {
   Job: require('./Job'),
   Application: require('./Application'),
   CV: require('./CV'),
-  AnalysisResult: require('./AnalysisResult'),
+  AnalysisResult: require('./aiAnalysis'),
 };
