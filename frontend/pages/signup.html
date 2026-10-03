@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Create Account</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+      --color-brand: #2563eb;
+      --color-brand-dark: #1d4ed8;
+    }
+  </style>
+
+  <!-- Background for the left panel (desktop only) -->
+  <style>
+    @media (min-width: 64rem) {
+      .signup-bg {
+        background-image: url('https://res.cloudinary.com/nymcjtq4/image/upload/v1791046965/photo_2026-10-03_17-57-17_sozsvy.jpg'), linear-gradient(180deg, #8ec5f2 0%, #cfe5f8 55%, #eaf3fc 100%);
+        background-size: cover;
+        background-position: top center;
+        background-repeat: no-repeat;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-white font-sans text-black antialiased">
+
+  <!-- Top bar (phone and tablet only) -->
+  <header class="relative border-b border-gray-200 bg-white lg:hidden">
+    <nav aria-label="Main" class="flex h-16 items-center justify-between px-5 sm:px-10">
+      <a href="/" aria-label="HireLume home">
+        <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+      </a>
+
+      <div class="flex items-center gap-2">
+        <a href="/login" class="rounded-lg border border-gray-200 px-4 py-2 text-sm font-semibold hover:bg-[#f8fafc]">Log in</a>
+        <button id="menu-btn" type="button" class="grid size-10 place-items-center rounded-lg border border-gray-200 hover:bg-[#f8fafc]" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu">
+          <svg class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+        </button>
+      </div>
+
+      <div id="nav-menu" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-gray-200 bg-white px-5 py-4 text-sm text-gray-500 sm:px-10">
+        <a href="/" class="hover:text-black">Home</a>
+        <a href="/#how-it-works" class="hover:text-black">How it works</a>
+        <a href="/#recruiters" class="hover:text-black">For recruiters</a>
+        <a href="/#job-seekers" class="hover:text-black">For job seekers</a>
+        <a href="/#promises" class="hover:text-black">Our promises</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="grid lg:min-h-screen lg:grid-cols-[2fr_3fr]">
+
+    <!-- Info panel: under the form on phones, on the left on desktop -->
+    <aside class="signup-bg order-last flex flex-col bg-[#f8fafc] px-5 pb-10 pt-2 sm:px-10 lg:order-first lg:bg-transparent lg:p-12">
+      <a href="/" aria-label="HireLume home" class="hidden lg:block">
+        <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-8 w-auto" width="130" height="32" />
+      </a>
+
+      <div class="mx-auto w-full max-w-md lg:mx-0 lg:mt-20">
+        <h1 class="font-display hidden text-4xl font-bold leading-tight lg:block">See why. Hire with confidence.</h1>
+        <p class="mt-4 hidden text-lg text-gray-500 lg:block">Create your account in under a minute and choose how you want to use Hirelume.</p>
+
+        <ul class="space-y-5 lg:mt-8">
+          <li class="flex items-center gap-3">
+            <span class="grid size-10 shrink-0 place-items-center rounded-lg border border-gray-200 bg-white text-brand shadow-sm">
+              <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="m3 17 2 2 4-4M3 7l2 2 4-4M13 6h8M13 12h8M13 18h8" /></svg>
+            </span>
+            <div>
+              <p class="font-display text-base font-semibold">Every score has a reason</p>
+              <p class="text-sm text-gray-500">See the evidence behind each result.</p>
+            </div>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="grid size-10 shrink-0 place-items-center rounded-lg border border-gray-200 bg-white text-brand shadow-sm">
+              <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M16 4.5a3.5 3.5 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6" /></svg>
+            </span>
+            <div>
+              <p class="font-display text-base font-semibold">You decide</p>
+              <p class="text-sm text-gray-500">The AI never rejects or shortlists anyone.</p>
+            </div>
+          </li>
+          <li class="flex items-center gap-3">
+            <span class="grid size-10 shrink-0 place-items-center rounded-lg border border-gray-200 bg-white text-brand shadow-sm">
+              <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><rect x="7" y="2" width="10" height="20" rx="2" /><path d="M11 18h2" /></svg>
+            </span>
+            <div>
+              <p class="font-display text-base font-semibold">Works on any phone</p>
+              <p class="text-sm text-gray-500">Apply and review from anywhere.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Form panel -->
+    <main class="flex justify-center bg-[#f8fafc] px-5 py-8 sm:px-10 lg:items-center lg:py-10">
+      <div class="w-full max-w-md">
+        <h2 class="font-display text-2xl font-bold">Create your account</h2>
+        <p class="mt-1 text-sm text-gray-500">Choose how you will use Hirelume, then add your details.</p>
+
+        <form id="signup-form" action="/api/auth/signup" method="post" class="mt-6">
+
+          <!-- Role cards:  rows on phones, side by side from 640px -->
+          <fieldset>
+            <legend class="sr-only">I am a</legend>
+            <div class="grid gap-3 sm:grid-cols-2">
+
+              <label class="group flex cursor-pointer gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-colors sm:flex-col has-checked:border-brand has-checked:bg-blue-50 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-brand">
+                <input type="radio" name="role" value="recruiter" class="sr-only" checked />
+                <span class="mt-0.5 size-5 shrink-0 rounded-full border-2 border-slate-300 bg-white sm:hidden group-has-checked:border-[6px] group-has-checked:border-brand" aria-hidden="true"></span>
+                <span class="hidden size-9 place-items-center rounded-lg bg-[#f8fafc] text-slate-600 sm:grid group-has-checked:bg-brand group-has-checked:text-white">
+                  <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></svg>
+                </span>
+                <span class="flex flex-col">
+                    <span class="font-display flex items-center gap-1.5 text-sm font-semibold">
+                    Recruiter
+                    <svg class="hidden size-4 text-green-600 sm:group-has-checked:block" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m8 12 3 3 5-6" /></svg>
+                  </span>
+                  <span class="mt-1 text-xs text-gray-500">I'm hiring. I want to create jobs, share a link and review ranked applicants.</span>
+                </span>
+              </label>
+
+              <label class="group flex cursor-pointer gap-3 rounded-xl border border-gray-200 bg-white p-4 transition-colors sm:flex-col has-checked:border-brand has-checked:bg-blue-50 has-focus-visible:outline-2 has-focus-visible:outline-offset-2 has-focus-visible:outline-brand">
+                <input type="radio" name="role" value="job_seeker" class="sr-only" />
+                <span class="mt-0.5 size-5 shrink-0 rounded-full border-2 border-slate-300 bg-white sm:hidden group-has-checked:border-[6px] group-has-checked:border-brand" aria-hidden="true"></span>
+                <span class="hidden size-9 place-items-center rounded-lg bg-[#f8fafc] text-slate-600 sm:grid group-has-checked:bg-brand group-has-checked:text-white">
+                  <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>
+                </span>
+                <span class="flex flex-col">
+                  <span class="font-display flex items-center gap-1.5 text-sm font-semibold">
+                    Job seeker
+                    <svg class="hidden size-4 text-green-600 sm:group-has-checked:block" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="m8 12 3 3 5-6" /></svg>
+                  </span>
+                  <span class="mt-1 text-xs text-gray-500">I want to check how well I fit a job and get tips and interview questions.</span>
+                </span>
+              </label>
+
+            </div>
+          </fieldset>
+
+          <!-- Fields -->
+          <div class="mt-6 space-y-5">
+            <div>
+              <label for="fullName" class="text-sm font-medium">Full name</label>
+              <input id="fullName" name="fullName" type="text" autocomplete="name" required
+                     class="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3.5 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm" />
+            </div>
+
+            <div>
+              <label for="email" class="text-sm font-medium">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required
+                     class="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3.5 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm" />
+            </div>
+
+            <div>
+              <label for="password" class="text-sm font-medium">Password</label>
+              <div class="relative mt-1.5">
+                <input id="password" name="password" type="password" autocomplete="new-password" minlength="8" required aria-describedby="password-hint"
+                       class="w-full rounded-lg border border-gray-200 bg-white py-3 pl-3.5 pr-11 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm" />
+                <button type="button" id="toggle-password" aria-label="Show password" aria-pressed="false"
+                class="absolute inset-y-0 right-0 grid w-11 place-items-center text-gray-500 hover:text-black">
+                  <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>
+                </button>
+              </div>
+              <p id="password-hint" class="mt-1.5 text-xs text-gray-500">At least 8 characters.</p>
+            </div>
+          </div>
+
+          <button type="submit"
+                  class="mt-6 w-full rounded-lg bg-brand py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+            Create account
+          </button>
+
+          <p class="mt-4 text-center text-xs text-gray-500">
+            You can't change your role later. By continuing you agree to our
+            <a href="/privacy" class="underline hover:text-black">privacy notice</a>.
+          </p>
+          <p class="mt-4 text-center text-sm text-gray-500">Already have an account? <a href="/login" class="font-semibold text-brand">Log in</a></p>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script>
+    // Mobile menu
+    const menuBtn = document.getElementById("menu-btn");
+    const menu = document.getElementById("nav-menu");
+    function setMenu(open) {
+      menu.classList.toggle("hidden", !open);
+      menu.classList.toggle("flex", open);
+      menuBtn.setAttribute("aria-expanded", String(open));
+      menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    }
+    menuBtn.addEventListener("click", () => setMenu(menu.classList.contains("hidden")));
+    menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
+
+    // Show / hide password
+    const pw = document.getElementById("password");
+    const toggle = document.getElementById("toggle-password");
+    toggle.addEventListener("click", () => {
+      const show = pw.type === "password";
+      pw.type = show ? "text" : "password";
+      toggle.setAttribute("aria-pressed", String(show));
+      toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    });
+
+    // Demo submit (replace with a fetch() to the Node.js API when it's ready)
+    document.getElementById("signup-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      console.log("Signup data:", Object.fromEntries(new FormData(e.target)));
+      alert("Account created (Wait)");
+    });
+  </script>
+</body>
+                </html>
