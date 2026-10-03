@@ -1,0 +1,37 @@
+{
+  "name": "hirelume-backend",
+  "version": "0.3.0",
+  "description": "Express API for Hirelume.",
+  "main": "src/server.js",
+  "scripts": {
+    "start": "node src/server.js",
+    "dev": "node --watch src/server.js",
+    "test": "node --test tests/application.test.js tests/cv.test.js tests/blindMode.test.js"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/BeeJa01/hirelume.git"
+  },
+  "bugs": {
+    "url": "https://github.com/BeeJa01/hirelume/issues"
+  },
+  "homepage": "https://github.com/BeeJa01/hirelume#readme",
+  "dependencies": {
+    "bcryptjs": "^3.0.3",
+    "cors": "^2.8.6",
+    "dotenv": "^18.0.5",
+    "express": "^5.2.1",
+    "jsonwebtoken": "^9.0.3",
+    "mammoth": "^1.13.0",
+    "mongoose": "^9.10.3",
+    "multer": "^2.4.0",
+    "pdf-parse": "^2.4.5",
+    "zod": "^4.6.5"
+  },
+  "devDependencies": {
+    "supertest": "^7.3.0"
+  }
+}
