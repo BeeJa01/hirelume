@@ -1,0 +1,18 @@
+const express = require("express");
+const router = express.Router();
+const { analyzeApplication, analyzeRawText } = require("../controllers/analysisController");
+
+// Middleware - use your main auth middleware if you have
+// const { protect, adminOnly } = require("../middleware/authMiddleware");
+
+// Route 1: Analyze an application by ID - Main route for demo
+// POST /api/analysis/:applicationId
+// Body: { jobDescription, jobTitle, cvText (temporary until Dev2 connects) }
+router.post("/:applicationId", analyzeApplication);
+
+// Route 2: Quick test route - No DB needed, just send cvText and jobDescription
+// POST /api/analysis/test/raw
+// Body: { cvText, jobDescription, jobTitle }
+router.post("/test/raw", analyzeRawText);
+
+module.exports = router;
