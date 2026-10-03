@@ -1,0 +1,10 @@
+{
+  "name": "hirelume-root",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "mobile": "npm --prefix mobile run start",
+    "mobile:tunnel": "npm --prefix mobile run tunnel",
+    "mobile:web": "npm --prefix mobile run web"
+  }
+}
