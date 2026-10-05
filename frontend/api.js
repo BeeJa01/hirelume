@@ -53,11 +53,12 @@ async function api(path, opts = {}) {
 }
 
 // Login / signup submit (expects #form-error and a submit button inside the form)
-async function submitAuth(form, path, body) {
+async function submitAuth(form, path, body, redirectTo) {
   const err = form.querySelector("#form-error"), btn = form.querySelector("[type=submit]"), label = btn.textContent;
   err.classList.add("hidden"); btn.disabled = true; btn.textContent = "Please wait...";
   try {
     const d = await api(ENDPOINTS.auth + path, { method: "POST", body, auth: false });
+    if (redirectTo) { location.href = redirectTo; return; }
     session.save(d);
     location.href = ROLE_HOME[d.user.role] || "jobs.html";
   } catch (e) {
