@@ -8,6 +8,8 @@ yarn-error.log*
 # Uploaded applicant files are private runtime data.
 private/cvs/**
 !private/cvs/.gitkeep
+private/users/**
+!private/users/.gitkeep
 
 # Editor and operating-system files.
 .vscode/

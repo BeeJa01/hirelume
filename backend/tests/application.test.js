@@ -5,20 +5,24 @@ const fsSync = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
-const testUri = process.env.MONGODB_TEST_URI;
+const externalTestUri = process.env.MONGODB_TEST_URI;
+const { MongoMemoryServer } = require('mongodb-memory-server');
 const temporaryDirectory = fsSync.mkdtempSync(path.join(os.tmpdir(), 'hirelume-api-'));
 process.env.UPLOAD_DIR = path.join(temporaryDirectory, 'cvs');
+process.env.USER_UPLOAD_DIR = path.join(temporaryDirectory, 'users');
 process.env.SECRET_KEY = 'test-secret-for-automated-tests';
-if (testUri) process.env.MONGODB_URI = testUri;
+if (externalTestUri) process.env.MONGODB_URI = externalTestUri;
 
 const request = require('supertest');
 const { app } = require('../src/app');
 let models;
+let memoryServer;
 
 before(async () => {
-  if (!testUri) return;
   models = require('../src/models');
-  await require('../src/config/db').connectDatabase();
+  const testUri = externalTestUri || (memoryServer = await MongoMemoryServer.create()).getUri();
+  await require('../src/config/db').mongoose.connect(testUri);
+  await Promise.all(Object.values(models).map((model) => model.init()));
 });
 
 beforeEach(async () => {
@@ -29,17 +33,21 @@ beforeEach(async () => {
     models.Application.deleteMany({}),
     models.Job.deleteMany({}),
     models.User.deleteMany({}),
+    models.RefreshToken.deleteMany({}),
+    models.Rating.deleteMany({}),
+    models.AnalyticsEvent.deleteMany({}),
   ]);
 });
 
 after(async () => {
   if (models) await require('../src/config/db').closeDatabase();
+  if (memoryServer) await memoryServer.stop();
   await fs.rm(temporaryDirectory, { recursive: true, force: true });
 });
 
-async function register(email = 'recruiter@example.com') {
+async function register(email = 'recruiter@example.com', role = 'recruiter') {
   const response = await request(app).post('/api/auth/register').send({
-    name: 'Test Recruiter', email, password: 'test-password-123', role: 'recruiter',
+    name: 'Test User', email, password: 'test-password-123', role,
   });
   assert.equal(response.status, 200, response.text);
   return response.body.access_token;
@@ -69,7 +77,7 @@ function apply(publicToken, email = 'candidate@example.com') {
     .attach('cv', Buffer.from('%PDF-1.4 test'), 'resume.pdf');
 }
 
-test('recruiter can create a job, receive an application, and manage its status', { skip: !testUri && 'Set MONGODB_TEST_URI to run database integration tests' }, async () => {
+test('recruiter can create a job, receive an application, and manage its status', async () => {
   const accessToken = await register();
   const job = await createJob(accessToken);
   const publicJob = await request(app).get(`/api/public/jobs/${job.public_token}`);
@@ -94,7 +102,70 @@ test('recruiter can create a job, receive an application, and manage its status'
   assert.equal(result.body.analysis_status, 'pending');
 });
 
-test('registration validates passwords and duplicate applications are rejected', { skip: !testUri && 'Set MONGODB_TEST_URI to run database integration tests' }, async () => {
+test('refresh tokens rotate and logout revokes the active refresh token', async () => {
+  const registered = await request(app).post('/api/auth/register').send({
+    name: 'Recruiter', email: 'refresh@example.com', password: 'test-password-123', role: 'recruiter',
+  });
+  const refreshed = await request(app).post('/api/auth/refresh').send({ refresh_token: registered.body.refresh_token });
+  assert.equal(refreshed.status, 200, refreshed.text);
+  assert.notEqual(refreshed.body.refresh_token, registered.body.refresh_token);
+  assert.equal((await request(app).post('/api/auth/refresh').send({ refresh_token: registered.body.refresh_token })).status, 401);
+  assert.equal((await request(app).post('/api/auth/logout').send({ refresh_token: refreshed.body.refresh_token })).status, 204);
+  assert.equal((await request(app).post('/api/auth/refresh').send({ refresh_token: refreshed.body.refresh_token })).status, 401);
+});
+
+test('public consent, paging, account linking, feedback privacy, ratings, and deletion work', async () => {
+  const recruiterToken = await register();
+  const job = await createJob(recruiterToken);
+  const publicJob = await request(app).get(`/api/public/jobs/${job.public_token}`);
+  assert.equal(publicJob.body.consent.version, 'v1');
+  const submitted = await request(app)
+    .post(`/api/public/jobs/${job.public_token}/applications`)
+    .field('name', 'Candidate').field('email', 'candidate@example.com').field('phone', '555-0100')
+    .field('consent', 'true').field('consent_version', 'v1').field('feedback_opt_in', 'true')
+    .attach('cv', Buffer.from('%PDF-1.4 test'), 'resume.pdf');
+  assert.equal(submitted.status, 200, submitted.text);
+  const id = submitted.body.application_id;
+  const application = await models.Application.findById(id);
+  application.analysis_status = 'completed';
+  application.analysis_score = 88;
+  application.match_level = 'strong';
+  application.reason = 'Strong match';
+  await application.save();
+  await models.AnalysisResult.create({
+    application_id: id, score: 88, match_level: 'strong', reason: 'Strong match', prompt_version: 'test',
+    result_json: JSON.stringify({ questions: ['Tell us about Node.js'], guidance: ['Add metrics'], skills: ['Node.js'], experience: [] }),
+  });
+  const privateResult = await request(app).get(`/api/results/${submitted.body.result_token}`);
+  assert.deepEqual(privateResult.body.questions, ['Tell us about Node.js']);
+  assert.equal(privateResult.body.score, undefined);
+  const seekerToken = await register('candidate@example.com', 'job_seeker');
+  assert.equal((await request(app).post('/api/applications/link').set('Authorization', `Bearer ${seekerToken}`).send({ result_token: submitted.body.result_token })).status, 200);
+  const ownedResult = await request(app).get(`/api/results/${submitted.body.result_token}`).set('Authorization', `Bearer ${seekerToken}`);
+  assert.equal(ownedResult.body.score, 88);
+  assert.deepEqual(ownedResult.body.guidance, ['Add metrics']);
+  const list = await request(app).get(`/api/jobs/${job.id}/applications?page=1&page_size=10&status=undecided&sort=date`).set('Authorization', `Bearer ${recruiterToken}`);
+  assert.equal(list.status, 200);
+  assert.equal(list.body.total, 1);
+  const detail = await request(app).get(`/api/applications/${id}`).set('Authorization', `Bearer ${recruiterToken}`);
+  assert.equal(detail.body.cv_url, `/api/applications/${id}/cv`);
+  assert.equal((await request(app).post('/api/ratings').set('Authorization', `Bearer ${seekerToken}`).send({ application_id: id, value: 5 })).status, 201);
+  assert.equal((await request(app).post('/api/events').send({ name: 'result.viewed', anonymous_id: 'anonymous-123', properties: {} })).status, 202);
+  assert.equal((await request(app).delete(`/api/applications/${id}`).set('Authorization', `Bearer ${seekerToken}`)).status, 204);
+});
+
+test('avatar content is checked and stored avatars can be retrieved', async () => {
+  const token = await register();
+  const headers = { Authorization: `Bearer ${token}` };
+  const bad = await request(app).post('/api/users/me/avatar').set(headers).attach('avatar', Buffer.from('not an image'), 'avatar.png');
+  assert.equal(bad.body.detail, 'AVATAR_INVALID_CONTENT');
+  const png = Buffer.from([137, 80, 78, 71, 13, 10, 26, 10, 0]);
+  assert.equal((await request(app).post('/api/users/me/avatar').set(headers).attach('avatar', png, 'avatar.png')).status, 200);
+  assert.equal((await request(app).get('/api/users/me/avatar').set(headers)).status, 200);
+  assert.equal((await request(app).delete('/api/users/me/avatar').set(headers)).status, 200);
+});
+
+test('registration validates passwords and duplicate applications are rejected', async () => {
   const invalid = await request(app).post('/api/auth/register').send({
     name: 'Recruiter', email: 'long@example.com', password: 'x'.repeat(73), role: 'recruiter',
   });
@@ -104,7 +175,7 @@ test('registration validates passwords and duplicate applications are rejected',
   assert.equal((await apply(job.public_token)).status, 409);
 });
 
-test('application rejects invalid consent and CV files', { skip: !testUri && 'Set MONGODB_TEST_URI to run database integration tests' }, async () => {
+test('application rejects invalid consent and CV files', async () => {
   const job = await createJob(await register());
   const url = `/api/public/jobs/${job.public_token}/applications`;
   const fields = { name: 'Candidate', email: 'candidate@example.com', phone: '555-0100', consent_version: 'v1' };
@@ -122,7 +193,7 @@ test('application rejects invalid consent and CV files', { skip: !testUri && 'Se
   assert.equal(large.status, 413);
 });
 
-test('another recruiter cannot read a job or applicant', { skip: !testUri && 'Set MONGODB_TEST_URI to run database integration tests' }, async () => {
+test('another recruiter cannot read a job or applicant', async () => {
   const job = await createJob(await register());
   const application = await apply(job.public_token);
   assert.equal(application.status, 200);

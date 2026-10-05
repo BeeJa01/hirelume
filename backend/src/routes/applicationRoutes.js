@@ -1,24 +1,13 @@
-const express = require("express");
-const authenicate = require("../middleware/auth");
-
-const {
-  getApplicationCV,
-  setBlindMode
-} = require("../controllers/applicationController");
-
+const express = require('express');
+const { authenticate } = require('../middleware/auth');
+const { authorize } = require('../middleware/authorize');
+const { getApplication, linkApplication, deleteApplication, updateStatus, getStatusHistory } = require('../controllers/applicationController');
 
 const router = express.Router();
-
-router.get(
-  "/:applicationId/cv",
-  authenicate,
-  getApplicationCV
-);
-
-router.patch(
-  "/:applicationId/blind-mode",
-  authenicate,
-  setBlindMode
-);
+router.post('/link', authenticate, authorize('job_seeker'), linkApplication);
+router.delete('/:id', authenticate, deleteApplication);
+router.get('/:id', authenticate, authorize('recruiter'), getApplication);
+router.patch('/:id/status', authenticate, authorize('recruiter'), updateStatus);
+router.get('/:id/status-history', authenticate, authorize('recruiter'), getStatusHistory);
 
 module.exports = router;

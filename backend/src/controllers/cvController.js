@@ -1,158 +1,148 @@
-const fs = require("fs");
+const fs = require('node:fs');
+const path = require('node:path');
+const mongoose = require('mongoose');
+const { z } = require('zod');
+const { Job, Application, CV, AnalysisResult } = require('../models');
+const { asyncRoute, now, token, validate } = require('../utils');
+const { saveCv, removeCv, storedFilePath } = require('../services/fileStorage');
+const { safeFilename } = require('../utils/sanitize');
+const { consentText, consentVersion } = require('../config');
+const { queueAnalysis } = require('../services/analysis');
 
-const CV = require("../models/CV");
-const { createBlindVersion } = require("../services/blindMode");
-const { parseCV } = require("../services/cvParser");
+const applicationSchema = z.object({
+  name: z.string().trim().min(1).max(160),
+  email: z.string().email().max(255),
+  phone: z.string().trim().min(1).max(50),
+  consent: z.enum(['true', 'false', '1', '0']).transform((value) => value === 'true' || value === '1'),
+  consent_version: z.string().min(1).max(50),
+  feedback_opt_in: z.enum(['true', 'false', '1', '0']).optional().transform((value) => value === 'true' || value === '1'),
+});
+const allowedExtensions = new Set(['.pdf', '.docx']);
+const contentTypes = { '.pdf': 'application/pdf', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
 
-// Process and parse an uploaded CV
-const processCV = async (req, res) => {
-  try {
-    const { cvId } = req.params;
+const getPublicJob = asyncRoute(async (req, res) => {
+  const job = await Job.findOne({ public_token: req.params.token }).lean();
+  if (!job) return res.status(404).json({ detail: 'JOB_NOT_FOUND' });
+  res.json({
+    status: job.status,
+    id: String(job._id),
+    title: job.title,
+    description: job.description,
+    requirements: job.requirements.map(({ text, requirement_type }) => ({ text, type: requirement_type })),
+    consent: { version: consentVersion, text: consentText },
+  });
+});
 
-    const cv = req.cv || await CV.findById(cvId);
+const submitApplication = asyncRoute(async (req, res) => {
+  const input = validate(applicationSchema, req.body);
+  const job = await Job.findOne({ public_token: req.params.token });
+  if (!job) return res.status(404).json({ detail: 'JOB_NOT_FOUND' });
+  if (job.status === 'closed') return res.status(409).json({ detail: 'JOB_CLOSED' });
+  if (!input.consent) return res.status(400).json({ detail: 'CONSENT_REQUIRED' });
+  if (input.consent_version !== consentVersion) return res.status(409).json({ detail: 'CONSENT_VERSION_MISMATCH' });
 
-    if (!cv) {
-      return res.status(404).json({
-        message: "CV not found",
-      });
-    }
-
-    if (!cv.storagePath) {
-      return res.status(400).json({
-        message: "CV storage path is missing",
-      });
-    }
-
-    if (!fs.existsSync(cv.storagePath)) {
-      return res.status(404).json({
-        message: "CV file not found",
-      });
-    }
-
-    if (typeof parseCV !== "function") {
-      throw new Error(
-        "parseCV is not exported correctly from cvParser.js"
-      );
-    }
-
-    const parsedText = await parseCV(cv.storagePath);
-
-    if (!parsedText || typeof parsedText !== "string") {
-      return res.status(400).json({
-        message: "Unable to extract text from CV",
-      });
-    }
-
-    cv.parsedText = parsedText;
-    await cv.save();
-
-    return res.status(200).json({
-      message: "CV processed successfully",
-      cvId: cv._id,
-    });
-  } catch (error) {
-    console.error("CV processing error:", error);
-
-    return res.status(500).json({
-      message: "Failed to process CV",
-      error: error.message,
-    });
+  const email = input.email.trim().toLowerCase();
+  if (await Application.exists({ job_id: job._id, email })) {
+    return res.status(409).json({ detail: 'DUPLICATE_APPLICATION' });
   }
-};
+  if (!req.file) return res.status(422).json({ detail: 'CV_REQUIRED' });
 
-// Enable Blind Mode
-const enableBlindMode = async (req, res) => {
+  const extension = path.extname(req.file.originalname || '').toLowerCase();
+  if (!allowedExtensions.has(extension)) return res.status(400).json({ detail: 'CV_UNSUPPORTED_FORMAT' });
+  if (!req.file.buffer.length) return res.status(400).json({ detail: 'CV_EMPTY' });
+  const isPdf = extension === '.pdf' && req.file.buffer.subarray(0, 5).toString() === '%PDF-';
+  const isDocx = extension === '.docx' && req.file.buffer.subarray(0, 4).equals(Buffer.from([0x50, 0x4b, 0x03, 0x04]));
+  if (!isPdf && !isDocx) return res.status(400).json({ detail: 'CV_INVALID_CONTENT' });
+
+  const cvPath = await saveCv(req.file.buffer, extension);
+  let application;
+  let cv;
   try {
-    const cv = req.cv || await CV.findById(req.params.cvId);
-
-    if (!cv) {
-      return res.status(404).json({
-        message: "CV not found",
-      });
-    }
-
-    if (!cv.parsedText) {
-      return res.status(400).json({
-        message:
-          "CV must be successfully parsed before Blind Mode can be enabled.",
-      });
-    }
-
-    const blindText = createBlindVersion(cv.parsedText);
-
-    cv.blindMode = true;
-    cv.blindData = {
-      text: blindText,
-      generatedAt: new Date(),
-    };
-
-    await cv.save();
-
-    return res.status(200).json({
-      message: "Blind Mode enabled successfully",
-      cvId: cv._id,
-      blindMode: true,
+    application = await Application.create({
+      job_id: job._id,
+      name: input.name,
+      email,
+      phone: input.phone,
+      cv_locked: true,
+      consent_given: true,
+      consent_version: input.consent_version,
+      consent_at: now(),
+      feedback_opt_in: input.feedback_opt_in,
+      private_result_token: token(48),
+      analysis_status: 'pending',
+      applied_at: now(),
     });
+    cv = await CV.create({
+      application_id: application._id,
+      filename: safeFilename(req.file.originalname || `cv${extension}`),
+      storage_path: cvPath,
+      content_type: contentTypes[extension],
+      size_bytes: req.file.size,
+    });
+    application.cv_id = cv._id;
+    await application.save();
+    job.requirements_locked = true;
+    await job.save();
+    res.json({
+      application_id: String(application._id),
+      analysis_status: application.analysis_status,
+      result_token: application.private_result_token,
+      message: 'Application received',
+    });
+    queueAnalysis(application._id);
   } catch (error) {
-    console.error("Blind Mode error:", error);
-
-    return res.status(500).json({
-      message: "Failed to enable Blind Mode",
-      error: error.message,
-    });
+    if (cv) await CV.deleteOne({ _id: cv._id });
+    if (application) await Application.deleteOne({ _id: application._id });
+    await removeCv(cvPath);
+    if (error.code === 11000) return res.status(409).json({ detail: 'DUPLICATE_APPLICATION' });
+    throw error;
   }
-};
+});
 
-// Download CV
-const downloadCV = async (req, res) => {
-  try {
-    const cv = req.cv;
+const downloadCv = asyncRoute(async (req, res) => {
+  if (!mongoose.isValidObjectId(req.params.id)) return res.status(404).json({ detail: 'APPLICATION_NOT_FOUND' });
+  const application = await Application.findById(req.params.id).lean();
+  if (!application) return res.status(404).json({ detail: 'APPLICATION_NOT_FOUND' });
+  const job = await Job.exists({ _id: application.job_id, recruiter_id: req.user._id });
+  if (!job) return res.status(404).json({ detail: 'APPLICATION_NOT_FOUND' });
+  const cv = await CV.findOne({ application_id: application._id }).lean();
+  const filePath = cv && storedFilePath(cv.storage_path);
+  if (!filePath || !fs.existsSync(filePath)) return res.status(404).json({ detail: 'CV_NOT_FOUND' });
+  res.type(cv.content_type).download(filePath, cv.filename);
+});
 
-    if (!cv) {
-      return res.status(404).json({
-        message: "CV not found",
-      });
-    }
-
-    // Applicants can download their original CV.
-    if (req.isApplicant) {
-      if (!cv.storagePath || !fs.existsSync(cv.storagePath)) {
-        return res.status(404).json({
-          message: "CV file not found",
-        });
-      }
-
-      return res.download(cv.storagePath, cv.originalName);
-    }
-
-    // Return the redacted text to recruiters when Blind Mode is enabled.
-    if (cv.blindMode) {
-      return res.status(200).json({
-        message: "Blind Mode is enabled for this CV",
-        cvId: cv._id,
-        blindMode: true,
-        data: cv.blindData,
-      });
-    }
-
-    if (!cv.storagePath || !fs.existsSync(cv.storagePath)) {
-      return res.status(404).json({
-        message: "CV file not found",
-      });
-    }
-
-    return res.download(cv.storagePath, cv.originalName);
-  } catch (error) {
-    console.error("CV download error:", error);
-
-    return res.status(500).json({
-      message: "Failed to download CV",
-    });
+const getResult = asyncRoute(async (req, res) => {
+  const application = await Application.findOne({ private_result_token: req.params.token }).lean();
+  if (!application) return res.status(404).json({ detail: 'INVALID_RESULT_TOKEN' });
+  const job = await Job.findById(application.job_id).select('feedback_enabled').lean();
+  const payload = {
+    application_id: String(application._id),
+    analysis_status: application.analysis_status,
+    feedback_enabled: Boolean(job?.feedback_enabled),
+    feedback_opt_in: application.feedback_opt_in,
+  };
+  if (application.analysis_status !== 'completed') {
+    payload.message = ['pending', 'processing', 'queued'].includes(application.analysis_status)
+      ? 'Analysis pending'
+      : 'Analysis unavailable';
+    return res.json(payload);
   }
-};
+  const result = await AnalysisResult.findOne({ application_id: application._id }).sort({ created_at: -1 }).lean();
+  if (!result) {
+    payload.analysis_status = 'failed';
+    payload.message = 'Analysis result unavailable';
+    return res.json(payload);
+  }
+  const analysis = JSON.parse(result.result_json);
+  payload.questions = analysis.questions || [];
+  const ownsApplication = req.user && String(application.user_id || '') === String(req.user._id);
+  const mayReceiveFeedback = Boolean(job?.feedback_enabled && application.feedback_opt_in && ownsApplication);
+  payload.feedback_available = mayReceiveFeedback;
+  if (mayReceiveFeedback) Object.assign(payload, {
+    score: result.score, match_level: result.match_level, reason: result.reason,
+    guidance: analysis.guidance || [], skills: analysis.skills || [], experience: analysis.experience || [],
+  });
+  res.json(payload);
+});
 
-module.exports = {
-  processCV,
-  enableBlindMode,
-  downloadCV,
-};
+module.exports = { getPublicJob, submitApplication, downloadCv, getResult };

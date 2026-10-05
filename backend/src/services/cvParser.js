@@ -1,55 +1,31 @@
-const fs = require("fs/promises");
-const path = require("path");
-const pdfParse = require("pdf-parse");
-const mammoth = require("mammoth");
+const path = require('node:path');
+const { PDFParse } = require('pdf-parse');
+const mammoth = require('mammoth');
 
-const parsePdf = async (filePath) => {
-  const buffer = await fs.readFile(filePath);
-
-  const data = await pdfParse(buffer);
-
-  return data.text;
-};
-
-const parseDocx = async (filePath) => {
-  const result = await mammoth.extractRawText({
-    path: filePath,
-  });
-
-  return result.value;
-};
-
-const cleanExtractedText = (text) => {
-  return text
-    .replace(/\r\n/g, "\n")
-    .replace(/[ \t]+/g, " ")
-    .replace(/\n{3,}/g, "\n\n")
-    .trim();
-};
-
-const parseCV = async (filePath, mimeType) => {
-  let extractedText;
-
-  if (mimeType === "application/pdf") {
-    extractedText = await parsePdf(filePath);
-  } else if (
-    mimeType ===
-    "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
-  ) {
-    extractedText = await parseDocx(filePath);
-  } else if (
-    mimeType === "application/msword"
-  ) {
-    throw new Error(
-      "Legacy .doc files are not supported by the current parser."
-    );
+async function parseCv(buffer, filename = '') {
+  const extension = path.extname(filename).toLowerCase();
+  let text;
+  if (extension === '.pdf') {
+    const parser = new PDFParse({ data: buffer });
+    try {
+      text = (await parser.getText()).text;
+    } finally {
+      await parser.destroy();
+    }
+  } else if (extension === '.docx') {
+    text = (await mammoth.extractRawText({ buffer })).value;
   } else {
-    throw new Error("Unsupported CV file type.");
+    const error = new Error('Unsupported CV format');
+    error.code = 'CV_UNSUPPORTED_FORMAT';
+    throw error;
   }
+  const normalized = String(text || '').replace(/\r/g, '').replace(/[ \t]+/g, ' ').replace(/\n{3,}/g, '\n\n').trim();
+  if (!normalized) {
+    const error = new Error('No readable text found in CV');
+    error.code = 'CV_TEXT_EMPTY';
+    throw error;
+  }
+  return normalized;
+}
 
-  return cleanExtractedText(extractedText);
-};
-
-module.exports = {
-  parseCV,
-};
+module.exports = { parseCv };
