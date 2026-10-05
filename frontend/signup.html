@@ -220,7 +220,7 @@
     document.getElementById("signup-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const f = new FormData(e.target);
-      submitAuth(e.target, "/register", { name: f.get("fullName").trim(), email: f.get("email").trim(), password: f.get("password"), role: f.get("role") });
+      submitAuth(e.target, "/register", { name: f.get("fullName").trim(), email: f.get("email").trim(), password: f.get("password"), role: f.get("role") }, "login.html");
     });
   </script>
 </body>
