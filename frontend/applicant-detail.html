@@ -286,6 +286,7 @@
       $("aInit").textContent = a.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
       const st = STATUS[String(a.status).toLowerCase()] || ["Undecided", "bg-chip text-ink2"];
       $("status").textContent = st[0]; $("status").className = "rounded-full px-2.5 py-0.5 text-[11px] font-semibold " + st[1];
+      curStatus = String(a.status || "undecided").toLowerCase();
       $("aMeta").textContent = "Applied " + fmtDate(a.applied_at);
       $("aApplied").textContent = fmtDate(a.applied_at);
       $("aAnalysis").textContent = a.analysis_status || "Pending";
