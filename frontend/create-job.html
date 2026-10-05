@@ -1,0 +1,370 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Create a job · HireLume</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --color-page: #F5F7FB;
+      --color-ink: #0B1426;
+      --color-ink2: #2B3447;
+      --color-mute: #667085;
+      --color-mute2: #475467;
+      --color-hint: #98A2B3;
+      --color-line: #E4E8F0;
+      --color-line2: #D0D5DD;
+      --color-chip: #EEF1F6;
+      --color-brand: #0070F8;
+      --color-brand-dark: #0059C7;
+      --color-brand-soft: #E8F1FE;
+      --color-ok: #0E7A55;
+      --color-danger: #C0332B;
+      --color-warn-bg: #FDEBE6;
+      --color-warn-line: #F6CFC4;
+      --color-warn-ink: #7A2E1F;
+      --breakpoint-sm: 561px;
+      --breakpoint-app: 861px;
+      --breakpoint-wide: 1101px;
+      --animate-pop: pop 0.18s ease;
+      @keyframes pop { from { opacity: 0; transform: translateY(-4px); } to { opacity: 1; transform: none; } }
+    }
+    @layer components {
+      .ico { @apply size-5 shrink-0 fill-none stroke-current stroke-[1.6]; }
+      .card { @apply rounded-[14px] border border-line bg-white p-5; }
+      .input { @apply block h-10 w-full rounded-[10px] border border-line2 bg-white px-3 text-[13px] outline-none transition placeholder:text-hint focus:border-brand focus:ring-[3px] focus:ring-brand/15; }
+      .btn { @apply inline-flex h-10 items-center justify-center gap-2 rounded-[10px] px-5 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand; }
+    }
+  </style>
+</head>
+
+<body class="bg-page font-sans text-sm text-ink antialiased [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round]">
+<div class="grid min-h-screen app:grid-cols-[260px_1fr]">
+
+  <!-- ===== Sidebar (desktop only) ===== -->
+  <aside class="hidden flex-col border-r border-line bg-white px-4 py-5 app:sticky app:top-0 app:flex app:h-screen">
+    <a href="index.html" aria-label="HireLume home" class="px-1">
+      <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+    </a>
+
+    <p class="mx-1 mb-2.5 mt-[34px] text-[11px] font-medium tracking-wider text-mute">RECRUITER</p>
+    <nav aria-label="Main" class="flex flex-col gap-1.5">
+      <a href="jobs.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" /></svg>Jobs
+      </a>
+      <a href="#" aria-current="page" class="flex h-11 items-center gap-3 rounded-[10px] border border-brand bg-brand-soft px-3.5 text-sm font-medium text-brand-dark">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></svg>Create job
+      </a>
+      <a href="/applicant-detail.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14c2 .8 3.5 2.9 3.5 6" /></svg>Applicants
+      </a>
+      <a href="/help.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5M12 17h.01" /></svg>Help
+      </a>
+    </nav>
+
+    <div class="mt-auto flex items-center gap-2.5 border-t border-line pt-4">
+      <span class="grid size-8 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white" data-user="initials"></span>
+      <div class="min-w-0 leading-tight"><b class="block text-[13px] font-semibold" data-user="name"></b><span class="text-xs text-mute" data-user="email"></span></div>
+      <button type="button" aria-label="Log out" class="ml-auto rounded-lg p-1.5 text-mute2 hover:bg-chip"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></svg></button>
+    </div>
+  </aside>
+
+  <div class="min-w-0">
+
+    <!-- ===== Phone top bar: logo, avatar, menu ===== -->
+    <header class="relative border-b border-line bg-white app:hidden">
+      <div class="flex h-16 items-center justify-between px-4">
+        <a href="index.html" aria-label="HireLume home">
+          <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+        </a>
+        <div class="flex items-center gap-2.5">
+          <span class="grid size-9 place-items-center rounded-full bg-[#5B6B8C] text-xs font-semibold text-white">A</span>
+          <button type="button" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" class="grid size-10 place-items-center rounded-[10px] border border-line hover:bg-chip">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          </button>
+        </div>
+      </div>
+      <nav id="mobileNav" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-1 border-b border-line bg-white px-4 py-3 text-sm data-[open]:flex">
+        <a href="jobs.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Jobs</a>
+        <a href="#" aria-current="page" class="rounded-lg bg-brand-soft px-3 py-2.5 font-medium text-brand-dark">Create job</a>
+        <a href="#" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Applicants</a>
+        <a href="#" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Help</a>
+        <a href="login.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Log out</a>
+      </nav>
+    </header>
+
+    <!-- ===== Desktop top bar: breadcrumb, help, user ===== -->
+    <header class="hidden h-[55px] items-center justify-between border-b border-line bg-white px-8 app:flex">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2.5 text-[13px] text-mute">
+        <a href="jobs.html">Jobs</a>
+        <svg class="size-3 fill-none stroke-current stroke-2 text-mute2" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4" /></svg>
+        <b class="font-semibold text-ink">Create job</b>
+      </nav>
+      <div class="flex items-center gap-3.5">
+        <button type="button" aria-label="Help" class="grid size-8 place-items-center rounded-lg border border-line bg-white text-mute2 hover:bg-chip"><svg class="ico size-[18px]" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5M12 17h.01" /></svg></button>
+        <div class="h-7 w-px bg-line"></div>
+        <button type="button" class="flex items-center gap-2.5 rounded-lg px-1.5 py-1 text-[13px] font-medium hover:bg-chip">
+          <span class="grid size-7 place-items-center rounded-full bg-[#5B6B8C] text-[11px] font-semibold text-white" data-user="initial"></span> <span data-user="first"></span>
+          <svg class="ico size-3.5 text-mute2" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-[1010px] px-4 pb-12 pt-5 app:px-7 app:pb-14 app:pt-8">
+
+      <!-- Breadcrumb (phone only) -->
+      <nav aria-label="Breadcrumb" class="mb-4 flex items-center gap-2.5 text-[13px] text-mute app:hidden">
+        <a href="jobs.html">Jobs</a>
+        <svg class="size-3 fill-none stroke-current stroke-2 text-mute2" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4" /></svg>
+        <b class="font-semibold text-ink">Create job</b>
+      </nav>
+
+      <h1 class="text-2xl font-semibold leading-tight tracking-tight">Create a job</h1>
+      <p class="mb-6 mt-1 text-[13px] text-mute">Tell us what you need. We compare every applicant with these requirements.</p>
+
+      <form id="jobForm" novalidate class="grid items-start gap-4 wide:grid-cols-[minmax(0,620px)_minmax(0,274px)] wide:justify-between">
+
+        <!-- Main column -->
+        <div class="flex min-w-0 flex-col gap-4 wide:col-start-1 wide:row-start-1">
+          <section class="card">
+            <h2 class="text-sm font-semibold leading-snug">Job details</h2>
+            <p class="mb-5 mt-0.5 text-xs text-mute">Applicants will see this on your job page.</p>
+
+            <div class="space-y-[18px]">
+              <div>
+                <label for="title" class="mb-2 block text-[13px] font-medium">Job title</label>
+                <input id="title" class="input" type="text" maxlength="100" placeholder="e.g. Sales Executive" value="" />
+                <p id="titleErr" class="mt-1.5 hidden text-xs text-danger">Please enter a job title.</p>
+              </div>
+
+              <div>
+                <label for="desc" class="mb-2 block text-[13px] font-medium">Job description</label>
+                <textarea id="desc" maxlength="2000" placeholder="Describe the work, the company and who you are looking for." class="input h-[150px] resize-y py-2.5 leading-[1.7]"></textarea>
+                <p id="descCount" class="mt-1 text-right text-[11px] text-hint"></p>
+                <p id="descErr" class="mt-1.5 hidden text-xs text-danger">Please add a short description of the job.</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="card">
+            <div class="mb-4 flex items-start justify-between gap-3">
+              <div>
+                <h2 class="text-sm font-semibold leading-snug">Requirements</h2>
+                <p class="mt-0.5 text-xs text-mute">Mark each one Required or Nice-to-have. Scores are worked out from this list.</p>
+              </div>
+              <span id="reqCount" class="whitespace-nowrap rounded-full bg-chip px-2.5 py-[3px] text-[11px] font-medium text-ink2">0 added</span>
+            </div>
+
+            <div id="reqList" class="flex flex-col sm:gap-2"></div>
+            <p id="reqErr" class="mt-2.5 hidden text-xs text-danger">Add at least one requirement, and fill in every row.</p>
+
+            <button type="button" id="addReq" class="mt-3.5 flex w-full items-center justify-center gap-2 rounded-[10px] border border-line py-3 text-[13px] font-semibold text-ink hover:bg-chip sm:inline-flex sm:w-auto sm:rounded-lg sm:border-0 sm:px-1 sm:py-1.5 sm:text-brand-dark sm:hover:bg-brand-soft">
+              <svg class="size-3.5 fill-none stroke-current stroke-2" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" /></svg> Add requirement
+            </button>
+          </section>
+
+          <section class="card grid grid-cols-[1fr_auto] items-start gap-x-6 gap-y-1.5 sm:items-center">
+            <h2 class="col-start-1 text-sm font-semibold leading-snug">Let applicants see feedback</h2>
+            <div class="col-start-2 row-start-1 flex items-center gap-2.5 text-xs font-medium text-ok has-[[aria-checked=false]]:text-mute sm:row-span-2">
+              <span id="fbLabel">On</span>
+              <button type="button" id="fbSwitch" role="switch" aria-checked="true" aria-label="Let applicants see feedback"
+                class="relative h-[22px] w-[38px] shrink-0 rounded-full bg-brand transition-colors after:absolute after:left-[18px] after:top-0.5 after:size-[18px] after:rounded-full after:bg-white after:shadow after:transition-all after:content-[''] aria-[checked=false]:bg-line2 aria-[checked=false]:after:left-0.5 focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand"></button>
+            </div>
+            <p class="col-span-2 max-w-[400px] text-xs text-mute sm:col-span-1">After applying, applicants can choose to see guidance on their CV: strengths, gaps and tips. They never see their rank or your decision.</p>
+          </section>
+        </div>
+
+        <!-- Side column (under the form on phones) -->
+        <aside class="flex min-w-0 flex-col gap-4 wide:col-start-2 wide:row-span-2 wide:row-start-1">
+          <div class="flex gap-3 rounded-xl border border-warn-line bg-warn-bg p-4 text-warn-ink">
+            <svg class="ico mt-0.5 size-[18px]" viewBox="0 0 24 24" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2" /><path d="M8 11V8a4 4 0 0 1 8 0v3" /></svg>
+            <div>
+              <b class="block text-[13px] font-semibold leading-snug">Requirements lock after the first application</b>
+              <p class="mt-0.5 text-xs leading-normal">This keeps earlier scores fair. You can still edit the title and description at any time.</p>
+            </div>
+          </div>
+
+          <div class="card">
+            <h3 class="mb-3.5 text-sm font-semibold">Tips for a good job post</h3>
+            <ul class="flex flex-col gap-3.5">
+              <li class="flex gap-2.5 text-xs leading-normal text-ink2"><svg class="ico mt-px size-4 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>List real requirements, not a wish list.</li>
+              <li class="flex gap-2.5 text-xs leading-normal text-ink2"><svg class="ico mt-px size-4 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>Use Required only for things the person must have on day one.</li>
+              <li class="flex gap-2.5 text-xs leading-normal text-ink2"><svg class="ico mt-px size-4 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>Describe the work, not just job titles. We compare experience, not keywords.</li>
+            </ul>
+          </div>
+
+          <div class="card">
+            <h3 class="mb-3.5 text-sm font-semibold">What happens next</h3>
+            <ol class="flex flex-col gap-3.5">
+              <li class="flex items-center gap-3"><span class="grid size-7 shrink-0 place-items-center rounded-full bg-brand text-xs font-semibold text-white">1</span><div class="leading-snug"><b class="block text-[13px] font-medium">Get your link</b><span class="text-[11px] text-mute">One link, ready to share.</span></div></li>
+              <li class="flex items-center gap-3"><span class="grid size-7 shrink-0 place-items-center rounded-full bg-chip text-xs font-semibold text-ink2">2</span><div class="leading-snug"><b class="block text-[13px] font-medium">Applicants apply</b><span class="text-[11px] text-mute">On their phones, no account.</span></div></li>
+              <li class="flex items-center gap-3"><span class="grid size-7 shrink-0 place-items-center rounded-full bg-chip text-xs font-semibold text-ink2">3</span><div class="leading-snug"><b class="block text-[13px] font-medium">Review ranked applicants</b><span class="text-[11px] text-mute">Each with a reason.</span></div></li>
+            </ol>
+          </div>
+        </aside>
+
+        <!-- Actions: bottom of the page on phones, under the main column on desktop -->
+        <div class="flex flex-col-reverse justify-end gap-3 sm:flex-row wide:col-start-1 wide:row-start-2">
+          <button type="button" id="cancelBtn" class="btn border border-line2 bg-white shadow-sm hover:bg-chip">Cancel</button>
+          <button type="submit" id="saveBtn" class="btn bg-brand px-[22px] text-white hover:bg-brand-dark disabled:cursor-progress disabled:opacity-65">
+            <span id="saveLabel">Save job and get link</span>
+            <svg class="size-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12h14M13 6l6 6-6 6" /></svg>
+          </button>
+        </div>
+      </form>
+    </main>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" role="status" class="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 translate-y-5 rounded-[10px] bg-ink px-[18px] py-[11px] text-[13px] text-white opacity-0 transition data-[show]:translate-y-0 data-[show]:opacity-100"></div>
+
+<!-- Success modal -->
+<div id="overlay" class="fixed inset-0 z-50 hidden items-center justify-center bg-ink/45 p-5 data-[show]:flex">
+  <div role="dialog" aria-modal="true" aria-labelledby="modalTitle" class="w-full max-w-[440px] animate-pop rounded-2xl bg-white p-7">
+    <div class="mb-3.5 grid size-11 place-items-center rounded-full bg-[#E3F5EE]">
+      <svg class="size-[22px] fill-none stroke-ok stroke-[2.2]" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>
+    </div>
+    <h3 id="modalTitle" class="text-lg font-semibold">Your job is ready</h3>
+    <p class="mb-4 mt-1 text-[13px] text-mute">Share this link with applicants.</p>
+    <div class="flex gap-2">
+      <input id="jobLink" class="input bg-page" type="text" readonly aria-label="Job link" />
+      <button type="button" id="copyBtn" class="btn border border-line2 bg-white shadow-sm hover:bg-chip">Copy</button>
+    </div>
+    <div class="mt-[18px] flex justify-end gap-3">
+      <button type="button" id="doneBtn" class="btn bg-brand px-[22px] text-white hover:bg-brand-dark">Done</button>
+    </div>
+  </div>
+</div>
+
+<script src="api.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+  const esc = (s) => s.replace(/&/g, "&amp;").replace(/"/g, "&quot;").replace(/</g, "&lt;");
+
+  // Phone menu
+  $("menuBtn").addEventListener("click", () => {
+    const open = $("mobileNav").toggleAttribute("data-open");
+    $("menuBtn").setAttribute("aria-expanded", String(open));
+    $("menuBtn").setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  });
+
+  // Starting requirements (from the design)
+  let reqs = [{ text: "", type: "required" }];
+
+  const INVALID = ["border-danger!", "focus:ring-danger/15!"];
+  const mark = (el, bad) => INVALID.forEach((c) => el.classList.toggle(c, bad));
+
+  function segBtn(i, type, label, on) {
+    return '<button type="button" data-i="' + i + '" data-type="' + type + '" class="h-[30px] flex-1 whitespace-nowrap rounded-[7px] px-[13px] text-xs transition-colors sm:flex-none ' +
+      (on ? "bg-white font-medium text-ink shadow-sm" : "text-mute") + '">' + label + "</button>";
+  }
+
+  function renderReqs(focusLast) {
+    $("reqList").innerHTML = reqs.length
+      ? reqs.map((r, i) =>
+          '<div class="grid animate-pop grid-cols-[1fr_auto] items-center gap-x-2 gap-y-2.5 border-b border-line py-3.5 last:border-b-0 sm:grid-cols-[1fr_auto_36px] sm:gap-2 sm:border-0 sm:py-0">' +
+            '<input data-i="' + i + '" class="input col-start-1 row-start-1 h-9 border-transparent bg-transparent px-0 focus:border-brand sm:border-line2 sm:bg-white sm:px-3" type="text" placeholder="e.g. 2 years of sales experience" aria-label="Requirement ' + (i + 1) + '"  value="' + esc(r.text) + '" />' +
+            '<div class="col-span-2 row-start-2 flex rounded-[9px] border border-line bg-chip p-0.5 sm:col-span-1 sm:col-start-2 sm:row-start-1 sm:inline-flex">' +
+              segBtn(i, "required", "Required", r.type === "required") + segBtn(i, "nice", "Nice-to-have", r.type === "nice") +
+            "</div>" +
+            '<button type="button" data-del="' + i + '" aria-label="Remove requirement ' + (i + 1) + '" class="group col-start-2 row-start-1 grid size-9 place-items-center rounded-[9px] border border-line bg-white hover:border-[#F4C3BE] hover:bg-[#FDECEA] sm:col-start-3">' +
+              '<svg class="ico size-4 text-mute2 group-hover:text-danger" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>' +
+            "</button>" +
+          "</div>").join("")
+      : '<div class="rounded-[10px] border border-dashed border-line2 p-3.5 text-center text-xs text-mute">No requirements yet.</div>';
+    $("reqCount").textContent = reqs.length + " added";
+    if (focusLast) { const f = $("reqList").querySelectorAll("input"); f[f.length - 1]?.focus(); }
+  }
+
+  $("reqList").addEventListener("click", (e) => {
+    const seg = e.target.closest("[data-type]");
+    const del = e.target.closest("[data-del]");
+    if (seg) { reqs[+seg.dataset.i].type = seg.dataset.type; renderReqs(); }
+    if (del) { reqs.splice(+del.dataset.del, 1); renderReqs(); }
+  });
+  $("reqList").addEventListener("input", (e) => {
+    if (e.target.dataset.i === undefined) return;
+    reqs[+e.target.dataset.i].text = e.target.value;
+    mark(e.target, false);
+  });
+  $("addReq").addEventListener("click", () => { reqs.push({ text: "", type: "required" }); renderReqs(true); });
+
+  // Description counter and live error clearing
+  const updateCount = () => ($("descCount").textContent = $("desc").value.length + " / 2000");
+  $("desc").addEventListener("input", () => { updateCount(); mark($("desc"), false); $("descErr").classList.add("hidden"); });
+  $("title").addEventListener("input", () => { mark($("title"), false); $("titleErr").classList.add("hidden"); });
+
+  // Feedback switch
+  $("fbSwitch").addEventListener("click", () => {
+    const on = $("fbSwitch").getAttribute("aria-checked") !== "true";
+    $("fbSwitch").setAttribute("aria-checked", String(on));
+    $("fbLabel").textContent = on ? "On" : "Off";
+  });
+
+  // Toast
+  let toastTimer;
+  function toast(msg) {
+    $("toast").textContent = msg;
+    $("toast").setAttribute("data-show", "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $("toast").removeAttribute("data-show"), 2200);
+  }
+
+  // Validate
+  function validate() {
+    const titleBad = !$("title").value.trim();
+    const descBad = !$("desc").value.trim();
+    const rows = [...$("reqList").querySelectorAll("input")];
+    const reqBad = reqs.length === 0 || reqs.some((r) => !r.text.trim());
+    mark($("title"), titleBad); $("titleErr").classList.toggle("hidden", !titleBad);
+    mark($("desc"), descBad); $("descErr").classList.toggle("hidden", !descBad);
+    rows.forEach((el, i) => mark(el, !reqs[i].text.trim()));
+    $("reqErr").classList.toggle("hidden", !reqBad);
+    return !(titleBad || descBad || reqBad);
+  }
+
+  // Save job
+  requireAuth("recruiter");
+  let savedJobId = null;
+  $("jobForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!validate()) { toast("Please fix the highlighted fields."); return; }
+    const payload = {
+      title: $("title").value.trim(),
+      description: $("desc").value.trim(),
+      requirements: reqs.map((r) => ({ text: r.text.trim(), requirement_type: r.type === "nice" ? "nice_to_have" : "required" })),
+      feedback_enabled: $("fbSwitch").getAttribute("aria-checked") === "true",
+      blind_mode: false
+    };
+    $("saveBtn").disabled = true; $("saveLabel").textContent = "Saving...";
+    try {
+      const job = await api(ENDPOINTS.jobs, { method: "POST", body: payload });
+      savedJobId = job.id;
+      $("jobLink").value = applyLink(job.public_token);
+      $("overlay").setAttribute("data-show", "");
+    } catch (err) { toast(err.message); }
+    $("saveBtn").disabled = false; $("saveLabel").textContent = "Save job and get link";
+  });
+
+  // Modal
+  $("copyBtn").addEventListener("click", async () => {
+    try { await navigator.clipboard.writeText($("jobLink").value); toast("Link copied"); }
+    catch (err) { $("jobLink").select(); toast("Press copy on your keyboard"); }
+  });
+  $("doneBtn").addEventListener("click", () => { window.location.href = "share-link.html?id=" + savedJobId; });
+  $("cancelBtn").addEventListener("click", () => { window.location.href = "jobs.html"; });
+
+  renderReqs();
+  updateCount();
+</script>
+</body>
+</html>

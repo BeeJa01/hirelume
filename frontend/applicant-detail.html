@@ -1,0 +1,323 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Applicant · HireLume</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --color-page: #F5F7FB;
+      --color-ink: #0B1426;
+      --color-ink2: #2B3447;
+      --color-mute: #667085;
+      --color-mute2: #475467;
+      --color-line: #E4E8F0;
+      --color-line2: #D0D5DD;
+      --color-chip: #EEF1F6;
+      --color-brand: #0070F8;
+      --color-brand-dark: #0059C7;
+      --color-brand-soft: #E8F1FE;
+      --color-ok: #0E7A55;
+      --color-ok-soft: #E3F5EE;
+      --color-danger: #C0332B;
+      --color-warn-bg: #FDEBE6;
+      --color-warn-line: #F6CFC4;
+      --color-warn-ink: #7A2E1F;
+      --breakpoint-sm: 561px;
+      --breakpoint-app: 861px;
+      --breakpoint-wide: 1101px;
+    }
+    @layer components {
+      .ico { @apply size-5 shrink-0 fill-none stroke-current stroke-[1.6]; }
+      .card { @apply rounded-[14px] border border-line bg-white p-5; }
+      .btn { @apply inline-flex h-10 items-center justify-center gap-2 rounded-[10px] px-5 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand; }
+    }
+  </style>
+</head>
+
+<body class="bg-page font-sans text-sm text-ink antialiased [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round]">
+<div class="grid min-h-screen app:grid-cols-[260px_1fr]">
+
+  <!-- ===== Sidebar (desktop only) ===== -->
+  <aside class="hidden flex-col border-r border-line bg-white px-4 py-5 app:sticky app:top-0 app:flex app:h-screen">
+    <a href="index.html" aria-label="HireLume home" class="px-1">
+      <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+    </a>
+    <p class="mx-1 mb-2.5 mt-[34px] text-[11px] font-medium tracking-wider text-mute">RECRUITER</p>
+    <nav aria-label="Main" class="flex flex-col gap-1.5">
+      <a href="jobs.html" aria-current="page" class="flex h-11 items-center gap-3 rounded-[10px] border border-brand bg-brand-soft px-3.5 text-sm font-medium text-brand-dark">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" /></svg>Jobs
+      </a>
+      <a href="create-job.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></svg>Create job
+      </a>
+      <a href="#" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14c2 .8 3.5 2.9 3.5 6" /></svg>Applicants
+      </a>
+      <a href="#" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5M12 17h.01" /></svg>Help
+      </a>
+    </nav>
+    <div class="mt-auto flex items-center gap-2.5 border-t border-line pt-4">
+      <span class="grid size-8 shrink-0 place-items-center rounded-full bg-ink text-xs font-semibold text-white" data-user="initials"></span>
+      <div class="min-w-0 leading-tight"><b class="block text-[13px] font-semibold" data-user="name"></b><span class="text-xs text-mute" data-user="email"></span></div>
+      <a href="login.html" aria-label="Log out" class="ml-auto rounded-lg p-1.5 text-mute2 hover:bg-chip"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></svg></a>
+    </div>
+  </aside>
+
+  <div class="min-w-0">
+
+    <!-- ===== Phone top bar ===== -->
+    <header class="relative border-b border-line bg-white app:hidden">
+      <div class="flex h-16 items-center justify-between px-4">
+        <a href="index.html" aria-label="HireLume home">
+          <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+        </a>
+        <div class="flex items-center gap-2.5">
+          <span class="grid size-9 place-items-center rounded-full bg-[#5B6B8C] text-xs font-semibold text-white">A</span>
+          <button type="button" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" class="grid size-10 place-items-center rounded-[10px] border border-line hover:bg-chip">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          </button>
+        </div>
+      </div>
+      <nav id="mobileNav" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-1 border-b border-line bg-white px-4 py-3 text-sm data-[open]:flex">
+        <a href="jobs.html" aria-current="page" class="rounded-lg bg-brand-soft px-3 py-2.5 font-medium text-brand-dark">Jobs</a>
+        <a href="create-job.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Create job</a>
+        <a href="#" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Applicants</a>
+        <a href="#" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Help</a>
+        <a href="login.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Log out</a>
+      </nav>
+    </header>
+
+    <!-- ===== Desktop top bar ===== -->
+    <header class="hidden h-[60px] items-center justify-between border-b border-line bg-white px-8 app:flex">
+      <nav aria-label="Breadcrumb" class="flex items-center gap-2.5 text-[13px] text-mute">
+        <a href="jobs.html">Jobs</a>
+        <svg class="size-3 fill-none stroke-current stroke-2 text-mute2" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4" /></svg>
+        <a href="#" data-job-title></a>
+        <svg class="size-3 fill-none stroke-current stroke-2 text-mute2" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4" /></svg>
+        <b class="font-semibold text-ink" data-applicant-name></b>
+      </nav>
+      <div class="flex items-center gap-3.5">
+        <a href="create-job.html" class="btn h-9 bg-brand px-4 text-white hover:bg-brand-dark"><svg class="size-3.5 fill-none stroke-current stroke-2" viewBox="0 0 14 14" aria-hidden="true"><path d="M7 1v12M1 7h12" /></svg>Create job</a>
+        <button type="button" aria-label="Help" class="grid size-9 place-items-center rounded-lg border border-line bg-white text-mute2 hover:bg-chip"><svg class="ico size-[18px]" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5M12 17h.01" /></svg></button>
+        <div class="h-7 w-px bg-line"></div>
+        <button type="button" class="flex items-center gap-2.5 rounded-lg px-1.5 py-1 text-[13px] font-medium hover:bg-chip">
+          <span class="grid size-8 place-items-center rounded-full bg-[#5B6B8C] text-[11px] font-semibold text-white" data-user="initial"></span> <span data-user="first"></span>
+          <svg class="ico size-3.5 text-mute2" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-[1180px] px-4 pb-12 pt-5 app:px-7 app:pb-14 app:pt-7">
+
+      <!-- Breadcrumb (phone only) -->
+      <nav aria-label="Breadcrumb" class="mb-4 flex flex-wrap items-center gap-2.5 text-[13px] text-mute app:hidden">
+        <a href="jobs.html">Jobs</a>
+        <svg class="size-3 fill-none stroke-current stroke-2 text-mute2" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4" /></svg>
+        <a href="#" data-job-title></a>
+        <svg class="size-3 fill-none stroke-current stroke-2 text-mute2" viewBox="0 0 12 12" aria-hidden="true"><path d="M4 2l4 4-4 4" /></svg>
+        <b class="font-semibold text-ink" data-applicant-name></b>
+      </nav>
+
+      <!-- Applicant header -->
+      <section class="card flex flex-col gap-4 wide:flex-row wide:items-center wide:justify-between wide:border-0 wide:bg-transparent wide:p-0">
+        <div class="flex items-start gap-4">
+          <span class="grid size-12 shrink-0 place-items-center rounded-full bg-[#5B6B8C] text-sm font-semibold text-white wide:size-14" id="aInit"></span>
+          <div class="min-w-0">
+            <div class="flex flex-wrap items-center gap-2">
+              <h1 class="text-xl font-semibold leading-tight tracking-tight wide:text-2xl" id="aName"></h1>
+              <span id="status" class="rounded-full bg-chip px-2.5 py-0.5 text-[11px] font-semibold text-ink2">Undecided</span>
+            </div>
+            <ul class="mt-2 flex flex-col gap-1.5 text-[13px] text-mute wide:flex-row wide:flex-wrap wide:gap-x-4"><li id="aMeta"></li></ul>
+          </div>
+        </div>
+        <div class="grid grid-cols-2 gap-3 wide:flex">
+          <button type="button" id="rejectBtn" class="btn border border-line2 bg-white shadow-sm hover:bg-chip"><svg class="size-3.5 fill-none stroke-current stroke-2" viewBox="0 0 14 14" aria-hidden="true"><path d="M2 2l10 10M12 2L2 12" /></svg>Reject</button>
+          <button type="button" id="shortlistBtn" class="btn bg-ink text-white hover:bg-ink2"><svg class="size-4 fill-none stroke-current stroke-2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>Shortlist</button>
+        </div>
+      </section>
+
+      <div class="mt-4 grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
+
+        <!-- ===== Left column ===== -->
+        <div class="flex min-w-0 flex-col gap-4">
+
+          <!-- Score -->
+          <section class="card flex flex-col items-center gap-4 text-center wide:flex-row wide:items-start wide:gap-6 wide:p-6 wide:text-left">
+            <div class="relative size-28 shrink-0">
+              <svg class="size-full -rotate-90" viewBox="0 0 120 120" aria-hidden="true">
+                <circle cx="60" cy="60" r="52" class="fill-none stroke-chip" stroke-width="9" />
+                <circle cx="60" cy="60" r="52" class="fill-none stroke-brand" stroke-width="9" id="aRing" stroke-dasharray="0 326.7" />
+              </svg>
+              <div class="absolute inset-0 grid place-content-center text-center leading-none">
+                <b id="aScore" class="text-3xl font-bold">-</b>
+                <span class="mt-1 text-[10px] text-mute">out of 100</span>
+              </div>
+            </div>
+            <div>
+              <h2 class="flex items-center justify-center gap-2 text-lg font-semibold wide:justify-start"><span id="aLevelText"></span> <span id="aLevel" class="rounded-full bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold text-brand-dark"></span></h2>
+              <p id="aReason" class="mt-2 text-[13px] leading-relaxed text-ink2"></p>
+              <div class="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs wide:justify-start">
+                <span class="inline-flex items-center gap-1.5 rounded-full bg-ok-soft px-2.5 py-1 font-medium text-ok"><svg class="size-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>No review flags</span>
+                <span id="aConf" class="text-mute2"></span>
+              </div>
+            </div>
+          </section>
+
+          <!-- AI notice (phone position) -->
+          <div class="flex gap-3 rounded-xl border border-warn-line bg-warn-bg p-4 text-warn-ink xl:hidden">
+            <svg class="ico mt-0.5 size-[18px]" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z" /><path d="M12 10v4M12 17h.01" /></svg>
+            <p class="text-xs leading-normal"><b class="font-semibold">The AI can be wrong.</b> Check the CV, then decide. Only you can change this applicant's status.</p>
+          </div>
+
+          <!-- Requirement by requirement -->
+          <section hidden id="reqSection" class="card overflow-hidden p-0">
+            <div class="p-5 pb-4">
+              <h2 class="text-[15px] font-semibold">Requirement by requirement</h2>
+              <p class="mt-0.5 text-xs text-mute">Score = Required skills count double. Evidence comes from the CV.</p>
+            </div>
+            <div class="hidden grid-cols-[1.5fr_1fr_1fr_2.2fr] gap-4 bg-chip px-5 py-3 text-xs font-semibold text-ink2 wide:grid">
+              <span>Requirement</span><span>Type</span><span>Result</span><span>Evidence in the CV</span>
+            </div>
+            <div id="reqTable" class="hidden wide:block"></div>
+            <ul id="reqList" class="divide-y divide-line px-5 pb-2 wide:hidden"></ul>
+          </section>
+
+          <!-- Skills -->
+          <section hidden class="card grid gap-6 sm:grid-cols-2">
+            <div>
+              <h2 class="text-[15px] font-semibold">Matched skills</h2>
+              <div class="mt-3 flex flex-wrap gap-2 text-xs text-ink2">
+                <span class="rounded-full border border-line px-3 py-1">Field sales</span>
+                <span class="rounded-full border border-line px-3 py-1">Excel reporting</span>
+                <span class="rounded-full border border-line px-3 py-1">Customer visits</span>
+                <span class="rounded-full border border-line px-3 py-1">Business degree</span>
+              </div>
+            </div>
+            <div>
+              <h2 class="text-[15px] font-semibold">Missing skills</h2>
+              <div class="mt-3 flex flex-wrap gap-2 text-xs text-mute2">
+                <span class="inline-flex items-center gap-2 rounded-full border border-line py-1 pl-3 pr-1.5">Negotiation <b class="rounded-full bg-ink px-2 py-0.5 text-[11px] font-semibold text-white">Required</b></span>
+                <span class="inline-flex items-center gap-2 rounded-full border border-line py-1 pl-3 pr-1.5">CRM tools <b class="rounded-full bg-ink px-2 py-0.5 text-[11px] font-semibold text-white">Required</b></span>
+              </div>
+            </div>
+          </section>
+
+          <!-- Relevant experience -->
+          <section hidden class="card">
+            <h2 class="text-[15px] font-semibold">Relevant experience</h2>
+            <ul class="mt-3 flex flex-col gap-3 text-[13px] text-ink2">
+              <li class="flex items-start gap-2.5"><svg class="ico mt-0.5 size-4 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>Visited 15 to 20 retail customers a week and agreed delivery schedules.</li>
+              <li class="flex items-start gap-2.5"><svg class="ico mt-0.5 size-4 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>Prepared weekly sales reports for the sales manager.</li>
+              <li class="flex items-start gap-2.5"><svg class="ico mt-0.5 size-4 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>Handled customer complaints and renewals.</li>
+            </ul>
+          </section>
+        </div>
+
+        <!-- ===== Right column ===== -->
+        <aside class="flex min-w-0 flex-col gap-4">
+
+          <!-- AI notice (desktop position) -->
+          <div class="hidden gap-3 rounded-xl border border-warn-line bg-warn-bg p-4 text-warn-ink xl:flex">
+            <svg class="ico mt-0.5 size-[18px]" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z" /><path d="M12 10v4M12 17h.01" /></svg>
+            <p class="text-xs leading-normal"><b class="font-semibold">The AI can be wrong.</b> Check the CV, then decide. Only you can change this applicant's status.</p>
+          </div>
+
+          <!-- Original CV -->
+          <section class="card">
+            <div class="flex items-center justify-between gap-3">
+              <h2 class="text-[15px] font-semibold">Original CV</h2>
+              <a href="#" id="cvOpen" class="btn h-8 border border-line bg-white px-3 text-xs hover:bg-chip"><svg class="ico size-3.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" /></svg>Open</a>
+            </div>
+            <p class="mt-3 text-xs text-mute">Opens the applicant\'s CV. If the applicant turned on Blind Mode you will see an anonymised text version.</p>
+          </section>
+
+          <!-- Application details -->
+          <section class="card">
+            <h2 class="text-[15px] font-semibold">Application details</h2>
+            <dl class="mt-3 divide-y divide-line text-[13px]">
+              <div class="flex items-center justify-between gap-3 py-2.5"><dt class="text-mute">Applied</dt><dd id="aApplied" class="text-right font-medium"></dd></div>
+              <div class="flex items-center justify-between gap-3 py-2.5"><dt class="text-mute">Analysis</dt><dd id="aAnalysis" class="rounded-full bg-chip px-2.5 py-0.5 text-xs font-semibold text-ink2"></dd></div>
+            </dl>
+          </section>
+        </aside>
+      </div>
+    </main>
+  </div>
+</div>
+
+<!-- Toast -->
+<div id="toast" role="status" class="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 translate-y-5 rounded-[10px] bg-ink px-[18px] py-[11px] text-[13px] text-white opacity-0 transition data-[show]:translate-y-0 data-[show]:opacity-100"></div>
+
+<script src="api.js"></script>
+<script>
+  const $ = (id) => document.getElementById(id);
+
+  requireAuth("recruiter");
+
+  // Toast
+  let toastTimer;
+  function toast(msg) {
+    $("toast").textContent = msg;
+    $("toast").setAttribute("data-show", "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => $("toast").removeAttribute("data-show"), 2200);
+  }
+
+  // Load the applicant. The list endpoint has the summary; find this applicant in it.
+  const qs = new URLSearchParams(location.search), jobId = qs.get("job"), appId = qs.get("id");
+  const STATUS = { shortlisted: ["Shortlisted", "bg-ok-soft text-ok"], rejected: ["Rejected", "bg-[#FDECEA] text-danger"] };
+  (async () => {
+    try {
+      const [job, list] = await Promise.all([api(ENDPOINTS.jobs + "/" + jobId), api(ENDPOINTS.jobs + "/" + jobId + "/applications")]);
+      const a = list.applicants.find((x) => x.id === appId);
+      if (!a) throw new Error("Applicant not found");
+      document.querySelectorAll("[data-job-title]").forEach((el) => { el.textContent = job.title; el.href = "applicants.html?job=" + jobId; });
+      document.querySelectorAll("[data-applicant-name]").forEach((el) => (el.textContent = a.name));
+      $("aName").textContent = a.name;
+      $("aInit").textContent = a.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
+      const st = STATUS[String(a.status).toLowerCase()] || ["Undecided", "bg-chip text-ink2"];
+      $("status").textContent = st[0]; $("status").className = "rounded-full px-2.5 py-0.5 text-[11px] font-semibold " + st[1];
+      $("aMeta").textContent = "Applied " + fmtDate(a.applied_at);
+      $("aApplied").textContent = fmtDate(a.applied_at);
+      $("aAnalysis").textContent = a.analysis_status || "Pending";
+      if (a.score != null) {
+        $("aScore").textContent = a.score;
+        $("aRing").setAttribute("stroke-dasharray", (326.7 * a.score / 100).toFixed(1) + " 326.7");
+        $("aLevelText").textContent = (a.level || levelOf(a.score)) + " match";
+        $("aLevel").textContent = a.level || levelOf(a.score);
+        $("aReason").textContent = a.reason || "";
+        $("aConf").textContent = a.needs_review ? "Needs your review" : "";
+      } else {
+        $("aLevelText").textContent = "Analysis in progress";
+        $("aReason").textContent = "The score will appear when the analysis finishes. Refresh in a moment.";
+      }
+    } catch (e) { toast(e.message); }
+  })();
+
+  // Open CV (uses openCV from api.js)
+  $("cvOpen").addEventListener("click", async (e) => {
+    e.preventDefault();
+    try { await openCV(appId); } catch (err) { toast(err.message); }
+  });
+
+  // Shortlist / Reject: the backend files I have don't include a status endpoint yet.
+  ["shortlistBtn", "rejectBtn"].forEach((id) => { const b = $(id); b.disabled = true; b.title = "Waiting for the backend status endpoint"; b.classList.add("opacity-50", "cursor-not-allowed"); });
+
+  // Phone menu
+  $("menuBtn").addEventListener("click", () => {
+    const open = $("mobileNav").toggleAttribute("data-open");
+    $("menuBtn").setAttribute("aria-expanded", String(open));
+    $("menuBtn").setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  });
+</script>
+</body>
+</html>

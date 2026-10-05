@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Your jobs | HireLume</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+      --color-brand: #2563eb;
+      --color-brand-dark: #1d4ed8;
+      --color-line: #e2e8f0;
+    }
+    @layer components {
+      .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand; }
+      .card { @apply rounded-xl border border-line bg-white; }
+    }
+  </style>
+  <style>
+    .icon { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</head>
+
+<body class="bg-[#f8fafc] font-sans text-black antialiased">
+
+  <!-- Icon sprite (use with <svg class="icon size-5"><use href="#i-name"/></svg>) -->
+  <svg width="0" height="0" class="absolute" aria-hidden="true">
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></symbol>
+    <symbol id="i-plus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8v8" /></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" /><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M16 4.5a3.5 3.5 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6" /></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" /></symbol>
+    <symbol id="i-hourglass" viewBox="0 0 24 24"><path d="M5 22h14M5 2h14M17 22v-4.2a2 2 0 0 0-.6-1.4L12 12l-4.4 4.4a2 2 0 0 0-.6 1.4V22M7 2v4.2a2 2 0 0 0 .6 1.4L12 12l4.4-4.4a2 2 0 0 0 .6-1.4V2" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="m8 12 3 3 5-6" /></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></symbol>
+    <symbol id="i-copy" viewBox="0 0 24 24"><rect x="9" y="9" width="12" height="12" rx="2" /><path d="M5 15V5a2 2 0 0 1 2-2h10" /></symbol>
+    <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+  </svg>
+
+  <div class="lg:flex lg:min-h-screen">
+
+    <!-- Sidebar (desktop only) -->
+    <aside class="hidden w-64 shrink-0 flex-col border-r border-line bg-white lg:sticky lg:top-0 lg:flex lg:h-screen">
+      <a href="/landingpage.html" class="px-6 py-6" aria-label="HireLume home">
+        <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+      </a>
+
+      <p class="px-6 text-xs font-bold uppercase tracking-wide text-gray-500">Recruiter</p>
+      <nav aria-label="Dashboard" class="mt-3 space-y-1 px-4">
+        <a href="/jobs" aria-current="page" class="flex items-center gap-3 rounded-lg border border-brand/30 bg-blue-50 px-3 py-2.5 text-sm font-semibold text-brand">
+          <svg class="icon size-5" aria-hidden="true"><use href="#i-briefcase" /></svg>Jobs
+        </a>
+        <a href="/create-job.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+          <svg class="icon size-5" aria-hidden="true"><use href="#i-plus-circle" /></svg>Create job
+        </a>
+        <a href="/applicant-detail.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+          <svg class="icon size-5" aria-hidden="true"><use href="#i-users" /></svg>Applicants
+        </a>
+        <a href="/help.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+          <svg class="icon size-5" aria-hidden="true"><use href="#i-help" /></svg>Help
+        </a>
+      </nav>
+
+      <div class="mt-auto flex items-center gap-3 border-t border-line p-4">
+        <span class="grid size-9 shrink-0 place-items-center rounded-full bg-gray-200 text-xs font-semibold" data-user="initials"></span>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold" data-user="name"></p>
+          <p class="truncate text-xs text-gray-500" data-user="email"></p>
+        </div>
+        <a href="/logout" aria-label="Log out" class="text-gray-500 hover:text-black"><svg class="icon size-5" aria-hidden="true"><use href="#i-logout" /></svg></a>
+      </div>
+    </aside>
+
+    <div class="min-w-0 flex-1">
+
+      <!-- Top bar -->
+      <header class="relative border-b border-line bg-white">
+        <div class="flex h-16 items-center justify-between px-5 sm:px-8">
+          <a href="/landingpage.html" class="lg:hidden" aria-label="HireLume home">
+            <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+          </a>
+          <p class="font-display hidden text-sm font-semibold lg:block">Jobs</p>
+
+          <div class="flex items-center gap-3">
+            <a href="/create-job.html" class="btn-primary hidden lg:inline-flex"><svg class="icon size-4" aria-hidden="true"><use href="#i-plus" /></svg>Create job</a>
+            <a href="/help" aria-label="Help" class="hidden size-10 place-items-center rounded-lg border border-line text-gray-500 hover:bg-[#f8fafc] lg:grid"><svg class="icon size-5" aria-hidden="true"><use href="#i-help" /></svg></a>
+            <button type="button" class="flex items-center gap-2" aria-label="Account menu">
+              <span class="grid size-9 place-items-center rounded-full bg-gray-200 text-xs font-semibold" data-user="initials"></span>
+              <span class="hidden text-sm font-semibold lg:inline" data-user="first"></span>
+              <svg class="icon hidden size-4 text-gray-500 lg:block" aria-hidden="true"><use href="#i-chevron" /></svg>
+            </button>
+            <button id="menu-btn" type="button" class="grid size-10 place-items-center rounded-lg border border-line lg:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu">
+              <svg class="icon size-5" aria-hidden="true"><use href="#i-menu" /></svg>
+            </button>
+          </div>
+        </div>
+
+        <nav id="nav-menu" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-line bg-white px-5 py-4 text-sm text-gray-500 sm:px-8 lg:hidden!">
+          <a href="/jobs" class="font-semibold text-brand">Jobs</a>
+          <a href="/create-job.html" class="hover:text-black">Create job</a>
+          <a href="/applicant-detail.html" class="hover:text-black">Applicants</a>
+          <a href="/help" class="hover:text-black">Help</a>
+          <a href="/logout" class="hover:text-black">Log out</a>
+        </nav>
+      </header>
+
+      <main class="px-5 py-6 sm:px-8 lg:py-8">
+        <a href="jobs.html" class="text-sm text-gray-500 hover:text-black">&larr; All jobs</a>
+        <h1 id="job-title" class="font-display mt-2 text-2xl font-bold lg:text-3xl">Applicants</h1>
+        <p id="job-sub" class="mt-1 text-sm text-gray-500"></p>
+        <div class="mt-4 flex gap-2 text-sm">
+          <button type="button" data-sort="score" class="rounded-lg border border-line bg-white px-3 py-1.5 font-semibold">Best match</button>
+          <button type="button" data-sort="date" class="rounded-lg border border-line bg-white px-3 py-1.5 font-semibold">Newest</button>
+        </div>
+        <ul id="rows" class="mt-4 space-y-3"></ul>
+      </main>
+    </div>
+  </div>
+
+ <script src="api.js"></script>
+<script>
+  requireAuth("recruiter");
+  const jobId = new URLSearchParams(location.search).get("job"), rows = document.getElementById("rows");
+  let sort = "score";
+  async function load() {
+    document.querySelectorAll("[data-sort]").forEach(function (b) { b.classList.toggle("border-brand", b.dataset.sort === sort); });
+    try {
+      const out = await Promise.all([api(ENDPOINTS.jobs + "/" + jobId), api(ENDPOINTS.jobs + "/" + jobId + "/applications?sort=" + sort)]);
+      document.getElementById("job-title").textContent = out[0].title;
+      document.getElementById("job-sub").textContent = out[1].total + " applicant" + (out[1].total === 1 ? "" : "s");
+      rows.innerHTML = out[1].applicants.map(function (a) {
+        const right = a.score != null
+          ? '<span class="font-semibold">' + a.score + '</span><span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-brand">' + levelOf(a.score) + '</span>'
+          : '<span class="text-xs text-gray-500">Analysing...</span>';
+        return '<li><a href="applicant-detail.html?job=' + jobId + '&id=' + a.id + '" class="card block p-4 hover:border-brand/40">' +
+          '<div class="flex items-center justify-between gap-3"><p class="font-display font-semibold">' + esc(a.name) + '</p><p class="flex items-center gap-2">' + right + '</p></div>' +
+          '<p class="mt-2 text-sm text-gray-500">' + esc(a.reason) + '</p>' +
+          '<p class="mt-2 text-xs text-gray-500">' + esc(a.status) + ' - ' + fmtDate(a.applied_at) + '</p></a></li>';
+      }).join("") || '<li class="p-6 text-center text-sm text-gray-500">No applicants yet.</li>';
+    } catch (e) { rows.innerHTML = '<li class="p-6 text-center text-sm text-red-600">' + esc(e.message) + '</li>'; }
+  }
+  document.querySelectorAll("[data-sort]").forEach(function (b) { b.addEventListener("click", function () { sort = b.dataset.sort; load(); }); });
+  load();
+  // Mobile menu
+  const menuBtn = document.getElementById("menu-btn");
+  const menu = document.getElementById("nav-menu");
+  menuBtn.addEventListener("click", function () {
+    const open = menu.classList.toggle("hidden") === false;
+    menu.classList.toggle("flex", open);
+    menuBtn.setAttribute("aria-expanded", String(open));
+    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+  });
+</script>
+</body>
+</html>

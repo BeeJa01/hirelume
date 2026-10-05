@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Log in | HireLume</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+
+  <!-- Tailwind v4 browser build -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+      --color-brand: #2563eb;
+      --color-brand-dark: #1d4ed8;
+      --color-line: #e2e8f0;
+    }
+  </style>
+
+  <!-- Background for the info panel: soft fade on phones, image on desktop -->
+  <style>
+    .auth-bg { background-image: linear-gradient(180deg, #dbe7f5 0%, #f8fafc 100%); }
+    @media (min-width: 64rem) {
+      .auth-bg {
+        background-image: url('https://res.cloudinary.com/nymcjtq4/image/upload/v1791046965/photo_2026-10-03_17-57-17_sozsvy.jpg'), linear-gradient(180deg, #8ec5f2 0%, #cfe5f8 55%, #eaf3fc 100%);
+        background-repeat: no-repeat;
+        background-size: cover;
+        background-position: top center;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-white font-sans text-black antialiased">
+
+  <!-- Top bar (phone and tablet only) -->
+  <header class="relative border-b border-line bg-white lg:hidden">
+    <nav aria-label="Main" class="flex h-16 items-center justify-between px-5 sm:px-10">
+      <a href="index.html" aria-label="HireLume home">
+        <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+      </a>
+
+      <button id="menu-btn" type="button" class="grid size-10 place-items-center rounded-lg border border-line hover:bg-[#f8fafc]" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu">
+        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+      </button>
+
+      <div id="nav-menu" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-line bg-white px-5 py-4 text-sm text-gray-500 sm:px-10">
+        <a href="index.html" class="hover:text-black">Home</a>
+        <a href="index.html#how-it-works" class="hover:text-black">How it works</a>
+        <a href="index.html#recruiters" class="hover:text-black">For recruiters</a>
+        <a href="index.html#job-seekers" class="hover:text-black">For job seekers</a>
+        <a href="index.html#promises" class="hover:text-black">Our promises</a>
+        <a href="signup.html" class="font-semibold text-brand">Sign up</a>
+      </div>
+    </nav>
+  </header>
+
+  <div class="grid lg:min-h-screen lg:grid-cols-[2fr_3fr]">
+
+    <!-- Info panel: heading and benefits on top on phones, on the left on desktop -->
+    <aside class="auth-bg flex flex-col px-5 pb-4 pt-8 sm:px-10 lg:p-12">
+      <a href="index.html" aria-label="HireLume home" class="hidden lg:block">
+        <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-8 w-auto" width="130" height="32" />
+      </a>
+
+      <div class="mx-auto w-full max-w-md lg:mx-0 lg:mt-24">
+        <h1 class="font-display text-3xl font-bold leading-tight lg:text-4xl">Welcome back.</h1>
+        <p class="mt-2 text-sm text-gray-500 lg:mt-3 lg:text-lg">Pick up where you left off.</p>
+        <ul class="mt-6 space-y-4 rounded-xl border border-line bg-white/60 p-4 lg:mt-8 lg:space-y-5 lg:rounded-none lg:border-0 lg:bg-transparent lg:p-0">
+          <li class="flex items-start gap-3 lg:items-center">
+            <span class="mt-0.5 grid size-6 shrink-0 place-items-center text-brand lg:mt-0 lg:size-10 lg:rounded-lg lg:border lg:border-line lg:bg-white lg:shadow-sm">
+              <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M16 4.5a3.5 3.5 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6" /></svg>
+            </span>
+            <div>
+              <p class="font-display text-base font-semibold">Ranked applicants, explained</p>
+              <p class="text-sm text-gray-500">Recruiters: your jobs and applicants are waiting.</p>
+            </div>
+          </li>
+          <li class="flex items-start gap-3 lg:items-center">
+            <span class="mt-0.5 grid size-6 shrink-0 place-items-center text-brand lg:mt-0 lg:size-10 lg:rounded-lg lg:border lg:border-line lg:bg-white lg:shadow-sm">
+              <!-- Sparkles icon (phone) -->
+              <svg class="size-5 lg:hidden" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M9.9 15.5A2 2 0 0 0 8.5 14.1l-6.1-1.6a.5.5 0 0 1 0-1L8.5 9.9A2 2 0 0 0 9.9 8.5l1.6-6.1a.5.5 0 0 1 1 0l1.6 6.1a2 2 0 0 0 1.4 1.4l6.1 1.6a.5.5 0 0 1 0 1l-6.1 1.6a2 2 0 0 0-1.4 1.4l-1.6 6.1a.5.5 0 0 1-1 0z" /><path d="M20 3v4M22 5h-4M4 17v2M5 18H3" /></svg>
+              <!-- Target icon (desktop) -->
+              <svg class="hidden size-5 lg:block" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><circle cx="12" cy="12" r="6" /><circle cx="12" cy="12" r="2" /></svg>
+            </span>
+            <div>
+              <p class="font-display text-base font-semibold">Your matches and interview prep</p>
+              <p class="text-sm text-gray-500">Job seekers: your analyses and applications are saved.</p>
+            </div>
+          </li>
+        </ul>
+      </div>
+    </aside>
+
+    <!-- Form panel -->
+    <main class="flex justify-center bg-[#f8fafc] px-5 py-8 sm:px-10 lg:items-center lg:py-10">
+      <div class="w-full max-w-md">
+        <h2 class="font-display text-2xl font-bold">Log in</h2>
+        <p class="mt-1 text-sm text-gray-500">Enter your email and password to continue.</p>
+
+        <form id="login-form" action="/api/auth/login" method="post" class="mt-6">
+          <div class="space-y-5">
+            <div>
+              <label for="email" class="text-sm font-medium">Email</label>
+              <input id="email" name="email" type="email" autocomplete="email" required
+                     class="mt-1.5 w-full rounded-lg border border-line bg-white px-3.5 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm" />
+            </div>
+
+            <div>
+              <label for="password" class="text-sm font-medium">Password</label>
+              <div class="relative mt-1.5">
+                <input id="password" name="password" type="password" autocomplete="current-password" required
+                       class="w-full rounded-lg border border-line bg-white py-3 pl-3.5 pr-11 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm" />
+                <button type="button" id="toggle-password" aria-label="Show password" aria-pressed="false"
+                        class="absolute inset-y-0 right-0 grid w-11 place-items-center text-gray-500 hover:text-black">
+                        <svg class="size-5" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.5-7 10-7 10 7 10 7-3.5 7-10 7S2 12 2 12z" /><circle cx="12" cy="12" r="3" /></svg>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <p id="form-error" role="alert" class="mt-4 hidden text-sm text-red-600"></p>
+          <button type="submit"
+                  class="mt-6 w-full rounded-lg bg-brand py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
+            Log in
+          </button>
+
+          <p class="mt-4 text-center text-sm text-gray-500">New to Hirelume? <a href="signup.html" class="font-semibold text-brand">Create an account</a></p>
+        </form>
+      </div>
+    </main>
+  </div>
+
+  <script src="api.js"></script>
+<script>
+    // Mobile menu
+    const menuBtn = document.getElementById("menu-btn");
+    const menu = document.getElementById("nav-menu");
+    function setMenu(open) {
+      menu.classList.toggle("hidden", !open);
+      menu.classList.toggle("flex", open);
+      menuBtn.setAttribute("aria-expanded", String(open));
+      menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    }
+    menuBtn.addEventListener("click", () => setMenu(menu.classList.contains("hidden")));
+    menu.querySelectorAll("a").forEach((a) => a.addEventListener("click", () => setMenu(false)));
+
+    // Show / hide password
+    const pw = document.getElementById("password");
+    const toggle = document.getElementById("toggle-password");
+    toggle.addEventListener("click", () => {
+      const show = pw.type === "password";
+      pw.type = show ? "text" : "password";
+      toggle.setAttribute("aria-pressed", String(show));
+      toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
+    });
+
+    // Real login
+    document.getElementById("login-form").addEventListener("submit", (e) => {
+      e.preventDefault();
+      const f = new FormData(e.target);
+      submitAuth(e.target, "/login", { email: f.get("email").trim(), password: f.get("password") });
+    });
+  </script>
+</body>
+</html>

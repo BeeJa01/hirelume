@@ -1,0 +1,7 @@
+{
+  "cleanUrls": true,
+  "rewrites": [
+    { "source": "/", "destination": "/landingpage.html" },
+    { "source": "/apply/:token", "destination": "/apply.html" }
+  ]
+}
