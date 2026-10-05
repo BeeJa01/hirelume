@@ -1,0 +1,607 @@
+{
+  "info": {
+    "_postman_id": "ab80db97-81ea-4863-9b38-7aaba1faf3f6",
+    "name": "Hirelume-backend API test",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "55344620",
+    "_collection_link": "https://go.postman.co/collection/55344620-ab80db97-81ea-4863-9b38-7aaba1faf3f6?source=collection_link"
+  },
+  "item": [
+    {
+      "name": "01 Health check",
+      "item": [
+        {
+          "name": "Health Check",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5050/health",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5050",
+              "path": [
+                "health"
+              ]
+            },
+            "description": "PURPOSE\n\nConfirms that the HIRELUME backend server is running and responding to requests.\n\nHOW TO TEST\n\n1. Make sure the HIRELUME backend server is running.\n2. Send this GET request.\n3. No authentication is required.\n    \n\nEXPECTED RESULT\n\n```\nStatus: 200 OK\n\n ```\n\nThe response should contain:\n\n``` json\n{\n\"status\": \"ok\",\n\"service\": \"hirelume-backend\"\n}\n\nA successful response confirms that the backend is running correctly.\n\n\n ```"
+          },
+          "response": []
+        }
+      ],
+      "description": "PURPOSE\n\nContains the basic backend health check.\n\nThis confirms that the HIRELUME backend server is running and responding to requests.\n\nTESTING NOTE\n\nRun this first before testing the other endpoints."
+    },
+    {
+      "name": "02 Authentication",
+      "item": [
+        {
+          "name": "Recruiter login",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"{{testEmail}}\",\n  \"password\": \"{{testPassword}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5050/api/auth/login",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5050",
+              "path": [
+                "api",
+                "auth",
+                "login"
+              ]
+            },
+            "description": "PURPOSE\n\nAuthenticates a recruiter and returns an access token that is required for protected recruiter endpoints.\n\nHOW TO TEST\n\n1. Open the Body tab.\n2. Select raw.\n3. Select JSON as the body type.\n4. Enter the test recruiter login credentials.\n5. Send the request.\n6. Copy the value of \"access_token\" from the response.\n7. Save the access token in the collection variable:\n    \n\naccessToken\n\nDo not copy the entire response. Only save the value of \"access_token\".\n\nEXPECTED RESULT\n\nStatus: 200 OK\n\nThe response should contain:\n\n- access_token\n- token_type\n- user\n    \n\nThe access token will be used to authenticate requests to protected endpoints."
+          },
+          "response": []
+        },
+        {
+          "name": "get current user",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authorization_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5050/api/auth/me",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5050",
+              "path": [
+                "api",
+                "auth",
+                "me"
+              ]
+            },
+            "description": "PURPOSE\n\nConfirms that the authentication token returned during login is valid and identifies the currently authenticated user.\n\nHOW TO TEST\n\n1. Run the Login request first.\n2. Save the returned access_token as the collection variable:\n    \n\naccessToken\n\n1. Open this request.\n2. Go to Authorization.\n3. Select Bearer Token.\n4. Enter:\n    \n\n{{accessToken}}\n\n1. Send the request.\n    \n\nEXPECTED RESULT\n\nStatus: 200 OK\n\nThe response should contain the authenticated user's information.\n\nIf the access token is missing, invalid or expired, the request should return an authentication error."
+          },
+          "response": []
+        }
+      ],
+      "description": "PURPOSE\n\nContains the authentication tests for recruiter accounts.\n\nThese requests verify that a recruiter can log in and that the returned access token can be used to access protected backend endpoints.\n\nTESTING ORDER\n\n1. Login\n    \n2. Get Current User\n    \n\nThe access token returned by Login is required for the protected requests that follow."
+    },
+    {
+      "name": "03 Jobs",
+      "item": [
+        {
+          "name": "Create a new job",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authorization_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"title\": \"Backend Developer - Postman Test\",\n  \"description\": \"We are looking for a backend developer to build and maintain APIs and server-side applications.\",\n  \"feedback_enabled\": true,\n  \"blind_mode\": false,\n  \"requirements\": [\n    {\n      \"text\": \"Node.js\",\n      \"requirement_type\": \"required\"\n    },\n    {\n      \"text\": \"Express.js\",\n      \"requirement_type\": \"required\"\n    },\n    {\n      \"text\": \"MongoDB\",\n      \"requirement_type\": \"nice_to_have\"\n    }\n  ]\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "http://localhost:5050/api/jobs",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5050",
+              "path": [
+                "api",
+                "jobs"
+              ]
+            },
+            "description": "PURPOSE\n\nCreates an open recruiter job that will be used to test the public application flow.\n\nHOW TO TEST\n\n1. Run the Login request first.\n2. Make sure the collection variable \"accessToken\" contains a valid recruiter access token.\n3. Open this request.\n4. Go to Authorization.\n5. Select Bearer Token.\n6. Enter:\n    \n\n{{accessToken}}\n\n1. Provide the required job information in the request body.\n2. Send the request.\n3. From the successful response, copy the value of \"public_token\".\n4. Save it as the collection variable:\n    \n\npublicToken\n\nEXPECTED RESULT\n\nThe job should be created successfully.\n\nThe response should contain information including:\n\n- Job ID\n- Job title\n- Job status\n- Public token\n- Job requirements\n    \n\nThe created job should have:\n\nstatus: open\n\nThe public_token will be used to test the public applicant flow."
+          },
+          "response": []
+        }
+      ],
+      "description": "PURPOSE\n\nContains the recruiter job creation test.\n\nThe Create Job request creates an open job that is later used to test the public applicant flow.\n\nTESTING NOTE\n\nRun Authentication tests first because job creation requires a valid recruiter access token.\n\nThe public_token returned when a job is created is used by the application tests."
+    },
+    {
+      "name": "04 Applications",
+      "item": [
+        {
+          "name": "Submit an Application + CV",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "fullName",
+                  "value": "Sheku Ishmael Kamara",
+                  "type": "text",
+                  "id": 0
+                },
+                {
+                  "key": "email",
+                  "value": "ishmaelk263@gmail.com",
+                  "type": "text",
+                  "id": 1
+                },
+                {
+                  "key": "phone",
+                  "value": "+23233898590",
+                  "type": "text",
+                  "id": 2
+                },
+                {
+                  "key": "consent",
+                  "value": "true",
+                  "type": "text",
+                  "id": 3
+                },
+                {
+                  "key": "cv",
+                  "type": "file",
+                  "id": 4,
+                  "fileUploadError": "",
+                  "src": [
+                    "/Users/shekuishmaelkamara/Downloads/HireLume_Test_CV.pdf"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:5050/public/jobs/PV35kvZ9P7GN7972TOh_a3BfijCfAtpY/applications",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5050",
+              "path": [
+                "public",
+                "jobs",
+                "PV35kvZ9P7GN7972TOh_a3BfijCfAtpY",
+                "applications"
+              ]
+            },
+            "description": "## Body\n\nUse:\n\n**Body → form-data**\n\nFields:\n\n```\nfullName\nemail\nphone\nconsent\ncv\n\n ```\n\nFor `cv`, select **File**.\n\nPURPOSE\n\nTests the public applicant flow where a job seeker submits their personal information, consent and CV without creating a HIRELUME account.\n\nHOW TO TEST\n\n1. Run the Login request.\n2. Run the Create Job request.\n3. Save the returned public_token as the collection variable:\n    \n\npublicToken\n\n1. Open this request.\n2. Go to Body.\n3. Select form-data.\n4. Provide the following fields:\n    \n\nfullName  \nemail  \nphone  \nconsent  \ncv\n\n1. Set the \"cv\" field type to File.\n2. Select a test CV file.\n3. Set consent to true.\n4. Send the request.\n5. From the successful response, copy the applicationId.\n6. Save it as the collection variable:\n    \n\napplicationId\n\nEXPECTED RESULT\n\nStatus: 201 Created\n\nThe response should contain:\n\n- applicationId\n- resultToken\n- analysisStatus\n    \n\nThe analysisStatus should be:\n\npending\n\n\"pending\" is expected at this stage because the AI analysis worker has not yet been implemented.\n\nThe application should be saved successfully and the uploaded CV should be stored."
+          },
+          "response": []
+        },
+        {
+          "name": "Duplicate application",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "name": "cache-control",
+                "sortOrder": 2,
+                "infoTitle": "We recommend using this header",
+                "info": "Postman added \"Cache-Control: no-cache\" as a precautionary measure to prevent the server from returning stale response when one makes repeated requests.\n\nYou can remove this header in the app settings or enter a new one with a different value.",
+                "allowedToToggle": false,
+                "disableEdit": true,
+                "previewSettingsLink": "Go to settings",
+                "key": "Cache-Control",
+                "value": "no-cache",
+                "system": true,
+                "type": "text"
+              },
+              {
+                "name": "postman-token",
+                "sortOrder": 3,
+                "infoTitle": "We recommend using this header",
+                "info": "The Postman-Token header appends a random UUID to every outgoing request. Postman adds this header for API developers to better debug requests sent and to ensure separate requests appear distinct to the receiving server.\n\nYou can remove this header in the app settings.",
+                "allowedToToggle": false,
+                "disableEdit": true,
+                "previewSettingsLink": "Go to settings",
+                "key": "Postman-Token",
+                "value": "<calculated when request is sent>",
+                "system": true,
+                "type": "text"
+              },
+              {
+                "name": "content-type",
+                "sortOrder": 4,
+                "infoTitle": "This header was automatically added",
+                "info": "The Content-Type header is added to help the server identify the media type of the request body that is present in this request.\n\nUse the request body tab to control the value or to remove this header.",
+                "allowedToToggle": true,
+                "disableEdit": true,
+                "previewSettingsLink": "Go to body",
+                "key": "Content-Type",
+                "value": "multipart/form-data; boundary=<calculated when request is sent>",
+                "system": true,
+                "type": "text"
+              },
+              {
+                "name": "content-length",
+                "sortOrder": 5,
+                "infoTitle": "This header was automatically added",
+                "info": "The Content-Length header was added to indicate to the server the size of the request body that is added to this request. Server uses this value to parse the request body accurately.\n\nYou can remove the header or enter a new one with a different value.",
+                "allowedToToggle": true,
+                "disableEdit": true,
+                "previewSettingsLink": "Go to body",
+                "key": "Content-Length",
+                "value": "<calculated when request is sent>",
+                "system": true,
+                "type": "text"
+              },
+              {
+                "name": "host",
+                "sortOrder": 6,
+                "infoTitle": "We recommend using this header",
+                "info": "The Host header is added to identify the domain name for which a request is being sent to the server. This header is implicitly sent by every HTTP client.\n\nYou can remove the header or enter a new one with a different value. It is most likely that without this header, your request will return an HTTP 400 error.",
+                "allowedToToggle": true,
+                "disableEdit": true,
+                "key": "Host",
+                "value": "<calculated when request is sent>",
+                "system": true,
+                "type": "text"
+              },
+              {
+                "name": "user-agent",
+                "sortOrder": 7,
+                "infoTitle": "We recommend using this header",
+                "info": "The User-Agent header is added to help the server identify Postman as the HTTP requesting application or client.\n\nIt is recommended that this header be sent, but you can remove the header or enter a new one with a different value.",
+                "allowedToToggle": true,
+                "disableEdit": true,
+                "key": "User-Agent",
+                "value": "PostmanRuntime/7.39.1",
+                "system": true,
+                "type": "text"
+              },
+              {
+                "name": "accept",
+                "sortOrder": 8,
+                "infoTitle": "We recommend using this header",
+                "info": "The \"Accept: */*\" header is added to tell the server that Postman can understand and process all forms of response content types.\n\nIt is recommended that this header be sent, but you can remove the header or enter a new one with a different value.",
+                "allowedToToggle": true,
+                "disableEdit": true,
+                "key": "Accept",
+                "value": "*/*",
+                "system": true,
+                "type": "text"
+              },
+              {
+                "name": "accept-encoding",
+                "sortOrder": 9,
+                "infoTitle": "We recommend using this header",
+                "info": "The Accept-Encoding header is added to indicate to the server that Postman HTTP client supports a defined list of content-encoding or compression algorithms as response.\n\nYou can remove the header or enter a new one with a different value. Doing that may not accurately render the response within the app.",
+                "allowedToToggle": true,
+                "disableEdit": true,
+                "key": "Accept-Encoding",
+                "value": "gzip, deflate, br",
+                "system": true,
+                "type": "text"
+              },
+              {
+                "name": "connection",
+                "sortOrder": 10,
+                "infoTitle": "We recommend using this header",
+                "info": "Postman added the Connection header to indicate the server to keep the underlying network connection open once the current response is received. This allows Postman to reuse the same connection for faster response times in subsequent requests to the same server.\n\nYou can remove this header or enter a new one with a different value, such as `Connection: Close` to control this behaviour.",
+                "allowedToToggle": true,
+                "disableEdit": true,
+                "key": "Connection",
+                "value": "keep-alive",
+                "system": true,
+                "type": "text"
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "id": 0
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "id": 1
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "id": 2
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "id": 3
+              },
+              {
+                "key": "",
+                "value": "",
+                "type": "text",
+                "id": 4
+              }
+            ],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "fullName",
+                  "value": "Abdul Salam",
+                  "type": "text",
+                  "id": 0
+                },
+                {
+                  "key": "email",
+                  "value": "ishmaelk263@gmail.com",
+                  "type": "text",
+                  "id": 1
+                },
+                {
+                  "key": "phone",
+                  "value": "23275788453",
+                  "type": "text",
+                  "id": 2
+                },
+                {
+                  "key": "consent",
+                  "value": "true",
+                  "type": "text",
+                  "id": 3
+                },
+                {
+                  "key": "cv",
+                  "type": "file",
+                  "id": 4,
+                  "fileUploadError": "",
+                  "src": [
+                    "/Users/shekuishmaelkamara/Downloads/HireLume_Test_CV.pdf"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:5050/public/jobs/PV35kvZ9P7GN7972TOh_a3BfijCfAtpY/applications",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5050",
+              "path": [
+                "public",
+                "jobs",
+                "PV35kvZ9P7GN7972TOh_a3BfijCfAtpY",
+                "applications"
+              ]
+            },
+            "description": "PURPOSE\n\nConfirms that the same applicant email cannot submit more than one application for the same job.\n\nHOW TO TEST\n\n1. Run the \"Submit Application + CV\" request successfully first.\n2. Use the same job.\n3. Use the same applicant email address.\n4. Submit the application again.\n5. The other applicant information and CV can be provided again for testing.\n    \n\nEXPECTED RESULT\n\nStatus: 409 Conflict\n\nThe response should indicate that an application with the same email already exists for that job.\n\nExpected message:\n\n\"An application with this email already exists for this job\"\n\nThis confirms that duplicate applications are prevented."
+          },
+          "response": []
+        },
+        {
+          "name": "Recruiter CV access",
+          "request": {
+            "auth": {
+              "type": "bearer",
+              "bearer": [
+                {
+                  "key": "token",
+                  "value": "{{authorization_secret}}",
+                  "type": "string"
+                }
+              ]
+            },
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "http://localhost:5050/api/applications/6ac18c566f6719bbaa87c71b/cv",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5050",
+              "path": [
+                "api",
+                "applications",
+                "6ac18c566f6719bbaa87c71b",
+                "cv"
+              ]
+            },
+            "description": "PURPOSE\n\nConfirms that an authenticated recruiter can access the CV attached to an application.\n\nHOW TO TEST\n\n1. Run the Login request.\n2. Save the returned access_token as:\n    \n\naccessToken\n\n1. Run the Submit Application + CV request successfully.\n2. Save the returned applicationId as:\n    \n\napplicationId\n\n1. Open this request.\n2. Go to Authorization.\n3. Select Bearer Token.\n4. Enter:\n    \n\n{{accessToken}}\n\n1. Send the request.\n    \n\nEXPECTED RESULT\n\nThe authenticated recruiter should be authorized to access the CV attached to the application.\n\nThe response is a file download rather than a normal JSON response.\n\nDepending on Postman's display, the PDF may open in a viewer or appear as a file response.\n\nThis does not necessarily indicate an API failure."
+          },
+          "response": []
+        },
+        {
+          "name": "Missing consent",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "fullName",
+                  "value": "Idriss Kamara",
+                  "type": "text",
+                  "id": 0
+                },
+                {
+                  "key": "email",
+                  "value": "shekuik.dev@gmail.com",
+                  "type": "text",
+                  "id": 1
+                },
+                {
+                  "key": "phone",
+                  "value": "+23272342596",
+                  "type": "text",
+                  "id": 2
+                },
+                {
+                  "key": "consent",
+                  "value": "false",
+                  "type": "text",
+                  "id": 3
+                },
+                {
+                  "key": "cv",
+                  "type": "file",
+                  "id": 4,
+                  "fileUploadError": "",
+                  "src": [
+                    "/Users/shekuishmaelkamara/Downloads/HireLume_Test_CV.pdf"
+                  ]
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:5050/public/jobs/PV35kvZ9P7GN7972TOh_a3BfijCfAtpY/applications",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5050",
+              "path": [
+                "public",
+                "jobs",
+                "PV35kvZ9P7GN7972TOh_a3BfijCfAtpY",
+                "applications"
+              ]
+            },
+            "description": "PURPOSE\n\nConfirms that an applicant cannot submit an application without giving the required consent.\n\nHOW TO TEST\n\n1. Make sure {{publicToken}} contains a valid open job token.\n2. Open this request.\n3. Use Body → form-data.\n4. Provide:\n    \n\nfullName  \nemail  \nphone  \ncv\n\n1. Do not provide valid consent.\n2. Send the request.\n    \n\nEXPECTED RESULT\n\nStatus: 400 Bad Request\n\nThe response should contain:\n\n\"Consent is required before applying\"\n\nThe application should not be created."
+          },
+          "response": []
+        },
+        {
+          "name": "Missing CV",
+          "request": {
+            "method": "POST",
+            "header": [],
+            "body": {
+              "mode": "formdata",
+              "formdata": [
+                {
+                  "key": "fullName",
+                  "value": "Rebecca Mason",
+                  "type": "text",
+                  "id": 0
+                },
+                {
+                  "key": "email",
+                  "value": "kayesi2k7@gmail.com",
+                  "type": "text",
+                  "id": 1
+                },
+                {
+                  "key": "phone",
+                  "value": "+23288141273",
+                  "type": "text",
+                  "id": 2
+                },
+                {
+                  "key": "consent",
+                  "value": "true",
+                  "type": "text",
+                  "id": 3
+                },
+                {
+                  "key": "cv",
+                  "value": "",
+                  "type": "file",
+                  "id": 4
+                }
+              ]
+            },
+            "url": {
+              "raw": "http://localhost:5050/public/jobs/PV35kvZ9P7GN7972TOh_a3BfijCfAtpY/applications",
+              "protocol": "http",
+              "host": [
+                "localhost"
+              ],
+              "port": "5050",
+              "path": [
+                "public",
+                "jobs",
+                "PV35kvZ9P7GN7972TOh_a3BfijCfAtpY",
+                "applications"
+              ]
+            },
+            "description": "Method + URL\n\nPOST {{baseUrl}}/public/jobs/{{publicToken}}/applications\n\nPURPOSE\n\nConfirms that an applicant cannot submit an application without providing a CV.\n\nHOW TO TEST\n\n1. Make sure {{publicToken}} contains a valid open job token.\n    \n2. Open this request.\n    \n3. Use Body → form-data.\n    \n4. Provide:\n    \n\nfullName  \nemail  \nphone  \nconsent\n\n1. Do not attach a CV.\n    \n2. Send the request.\n    \n\nEXPECTED RESULT\n\nStatus: 400 Bad Request\n\nThe response should contain:\n\n\"CV file is required\"\n\nThe application should not be created."
+          },
+          "response": []
+        }
+      ],
+      "description": "PURPOSE\n\nContains tests for the HIRELUME public CV application flow.\n\nThese tests cover:\n\n- Submitting an application with a CV\n    \n- Preventing duplicate applications\n    \n- Rejecting applications without a CV\n    \n- Rejecting applications without consent\n    \n- Authenticated recruiter access to an applicant's CV\n    \n\nTESTING ORDER\n\nRun \"Submit Application + CV\" successfully before testing the related application validation and CV access requests.\n\nThe applicationId returned from a successful application is required for Recruiter CV Access."
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl  ",
+      "value": "http://localhost:5050",
+      "type": "string"
+    },
+    {
+      "key": "accessToken",
+      "value": "(empty)",
+      "type": "string"
+    },
+    {
+      "key": "publicToken",
+      "value": "(empty)",
+      "type": "string"
+    },
+    {
+      "key": "applicationId",
+      "value": "(empty)",
+      "type": "string"
+    },
+    {
+      "key": "testEmail",
+      "value": "test.recruiter3@hirelume.com",
+      "type": "string"
+    },
+    {
+      "key": "testPassword",
+      "value": "(empty)",
+      "type": "string"
+    }
+  ]
+}

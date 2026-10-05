@@ -7,11 +7,18 @@ const {
 
 const allowedMimeTypes = [
   "application/pdf",
-  "application/msword",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
+  "image/jpeg",
+  "image/png",
 ];
 
-const allowedExtensions = [".pdf", ".doc", ".docx"];
+const allowedExtensions = [
+  ".pdf",
+  ".docx",
+  ".jpg",
+  ".jpeg",
+  ".png",
+];
 
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
@@ -44,7 +51,7 @@ const fileFilter = (req, file, cb) => {
   if (!validMimeType || !validExtension) {
     return cb(
       new Error(
-        "Invalid CV file. Only PDF, DOC and DOCX files are allowed."
+        "Invalid CV file. Only PDF, DOCX, JPG and PNG files are allowed."
       )
     );
   }

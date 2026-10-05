@@ -2,10 +2,17 @@ const mongoose = require("mongoose");
 
 const cvSchema = new mongoose.Schema(
   {
+    // Optional because public applicants do not have HIRELUME accounts.
     applicant: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
-      required: true,
+      index: true,
+    },
+
+    // Links the CV to the application that owns it.
+    application: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "Application",
       index: true,
     },
 
@@ -36,9 +43,20 @@ const cvSchema = new mongoose.Schema(
       required: true,
     },
 
+    // Prevents the CV from being replaced after application submission.
+    locked: {
+      type: Boolean,
+      default: false,
+    },
+
     parsingStatus: {
       type: String,
-      enum: ["pending", "processing", "completed", "failed"],
+      enum: [
+        "pending",
+        "processing",
+        "completed",
+        "failed",
+      ],
       default: "pending",
     },
 
@@ -62,4 +80,6 @@ const cvSchema = new mongoose.Schema(
   }
 );
 
-module.exports = mongoose.model("CV", cvSchema);
+module.exports =
+  mongoose.models.CV ||
+  mongoose.model("CV", cvSchema);

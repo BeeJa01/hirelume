@@ -28,7 +28,7 @@
     "mammoth": "^1.13.0",
     "mongoose": "^9.10.3",
     "multer": "^2.4.0",
-    "pdf-parse": "^2.4.5",
+    "pdf-parse": "^1.1.1",
     "zod": "^4.6.5"
   },
   "devDependencies": {

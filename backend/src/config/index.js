@@ -1,7 +1,7 @@
 require('dotenv').config();
 
 module.exports = {
-  port: Number(process.env.PORT || 8000),
+  port: Number(process.env.PORT || 5050),
   mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/hirelume',
   uploadDirectory: process.env.UPLOAD_DIR || 'private/cvs',
   secretKey: process.env.SECRET_KEY || 'change-this-in-production',
