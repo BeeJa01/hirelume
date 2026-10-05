@@ -204,6 +204,9 @@ test('another recruiter cannot read a job or applicant', async () => {
 });
 
 test('health check responds without a database connection', async () => {
+  const root = await request(app).get('/');
+  assert.equal(root.status, 200);
+  assert.equal(root.body.api_base, '/api');
   const response = await request(app).get('/health');
   assert.equal(response.status, 200);
   assert.equal(response.body.status, 'ok');

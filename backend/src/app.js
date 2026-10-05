@@ -14,6 +14,13 @@ app.disable('x-powered-by');
 app.use(cors({ origin: corsOrigins }));
 app.use(express.json({ limit: '1mb' }));
 
+app.get('/', (req, res) => res.json({
+  status: 'ok',
+  service: 'hirelume-backend',
+  version: '0.3.0',
+  health: '/health',
+  api_base: '/api',
+}));
 app.get('/health', (req, res) => res.json({ status: 'ok', service: 'hirelume-backend', version: '0.3.0' }));
 app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);

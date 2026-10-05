@@ -16,7 +16,7 @@ Authenticated routes require `Authorization: Bearer <access_token>`. Successful 
 
 Errors use `{ "detail": "STABLE_ERROR_CODE" }`. Validation errors additionally include an `errors` array. Common HTTP statuses are 400 (bad input), 401 (authentication), 403 (role/access), 404 (missing or deliberately hidden resource), 409 (state conflict), 413 (file/payload limit), 422 (validation), 429 (rate limit), and 500 (unexpected failure).
 
-`GET /health` sits outside the `/api` prefix and returns `{ "status":"ok", "service":"hirelume-backend", "version":"0.3.0" }` without authentication.
+`GET /` returns service metadata and links to `/health` and `/api`. `GET /health` sits outside the `/api` prefix and returns `{ "status":"ok", "service":"hirelume-backend", "version":"0.3.0" }` without authentication.
 
 ## Authentication and profile
 
