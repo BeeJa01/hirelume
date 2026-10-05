@@ -205,17 +205,27 @@
       toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
     });
 
-    // Prefill from the apply step: signup-applicant.html?name=&email=&application=&jobTitle=
-    const q = new URLSearchParams(location.search), form = document.getElementById("signup-form");
-    form.fullName.value = q.get("name") || ""; form.email.value = q.get("email") || "";
-    form.applicationId.value = q.get("application") || "";
-    const jt = q.get("jobTitle") || "";
-    document.getElementById("jcTitle").textContent = jt;
-    document.getElementById("jcInit").textContent = jt.slice(0, 2).toUpperCase();
-    form.addEventListener("submit", (e) => {
-      e.preventDefault();
-      submitAuth(form, "/register", { name: form.fullName.value.trim(), email: form.email.value.trim(), password: form.password.value, role: "job_seeker" });
-    });
+   // Prefill from the apply step: signup-applicant.html?result=&name=&email=&jobTitle=
+const q = new URLSearchParams(location.search), form = document.getElementById("signup-form");
+form.fullName.value = q.get("name")  ""; form.email.value = q.get("email")  "";
+const resultToken = q.get("result") || "";
+const jt = q.get("jobTitle") || "";
+document.getElementById("jcTitle").textContent = jt;
+document.getElementById("jcInit").textContent = jt.slice(0, 2).toUpperCase();
+form.addEventListener("submit", async (e) => {
+  e.preventDefault();
+  const err = document.getElementById("form-error"), btn = form.querySelector("[type=submit]"), label = btn.textContent;
+  err.classList.add("hidden"); btn.disabled = true; btn.textContent = "Please wait...";
+  try {
+    const d = await api(ENDPOINTS.auth + "/register", { method: "POST", auth: false, body: { name: form.fullName.value.trim(), email: form.email.value.trim(), password: form.password.value, role: "job_seeker" } });
+    session.save(d);
+    if (resultToken) await api(ENDPOINTS.applications + "/link", { method: "POST", body: { result_token: resultToken } });
+    location.href = resultToken ? "results.html?token=" + encodeURIComponent(resultToken) : "landingpage.html";
+  } catch (ex) {
+    err.textContent = ex.message; err.classList.remove("hidden");
+    btn.disabled = false; btn.textContent = label;
+  }
+});
   </script>
 </body>
 </html>
