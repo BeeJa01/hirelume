@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Apply | HireLume</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme { --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif; --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif; --color-brand: #2563eb; --color-brand-dark: #1d4ed8; --color-line: #e2e8f0; }
+  </style>
+</head>
+<body class="bg-[#f8fafc] font-sans text-black antialiased">
+  <header class="border-b border-line bg-white"><div class="mx-auto flex max-w-3xl items-center justify-between px-5 py-4">
+    <a href="/landingpage.html" class="font-display text-lg font-bold">Hire<span class="text-brand">Lume</span></a>
+    <a href="/login.html" class="text-sm text-gray-500 hover:text-black">Log in</a>
+  </div></header>
+  <main class="mx-auto max-w-3xl px-5 py-8">
+    <p id="state" class="py-16 text-center text-sm text-gray-500">Loading job...</p>
+
+    <div id="jobView" class="hidden">
+      <section class="rounded-2xl border border-line bg-white p-5 sm:p-6">
+        <h1 id="jTitle" class="font-display text-2xl font-bold"></h1>
+        <p id="jDesc" class="mt-3 whitespace-pre-line text-sm leading-relaxed text-gray-600"></p>
+        <h2 class="mt-5 text-sm font-semibold">What the recruiter is looking for</h2>
+        <ul id="jReqs" class="mt-2 space-y-1.5 text-sm"></ul>
+      </section>
+
+      <form id="applyForm" novalidate class="mt-4 rounded-2xl border border-line bg-white p-5 sm:p-6">
+        <h2 class="font-display text-lg font-semibold">Apply for this job</h2>
+        <label class="mt-4 block text-sm font-medium" for="name">Full name</label>
+        <input id="name" name="name" type="text" autocomplete="name" required class="mt-1.5 h-11 w-full rounded-lg border border-line px-3 outline-none focus:border-brand" />
+        <label class="mt-4 block text-sm font-medium" for="email">Email</label>
+        <input id="email" name="email" type="email" autocomplete="email" required class="mt-1.5 h-11 w-full rounded-lg border border-line px-3 outline-none focus:border-brand" />
+        <label class="mt-4 block text-sm font-medium" for="phone">Phone</label>
+        <input id="phone" name="phone" type="tel" autocomplete="tel" required class="mt-1.5 h-11 w-full rounded-lg border border-line px-3 outline-none focus:border-brand" />
+        <label class="mt-4 block text-sm font-medium" for="cv">Your CV (PDF or DOCX, up to 5 MB)</label>
+        <input id="cv" name="cv" type="file" accept=".pdf,.docx" required class="mt-1.5 block w-full text-sm file:mr-3 file:rounded-lg file:border-0 file:bg-blue-50 file:px-4 file:py-2.5 file:font-semibold file:text-brand" />
+        <label class="mt-5 flex items-start gap-2.5 text-sm"><input id="feedback" type="checkbox" class="mt-1 size-4" checked /> <span>Send me my score, feedback and interview tips when the job allows it.</span></label>
+        <label class="mt-3 flex items-start gap-2.5 text-sm"><input id="consent" type="checkbox" class="mt-1 size-4" /> <span id="consentText">I agree to my CV being analysed for this job.</span></label>
+        <p id="form-error" role="alert" class="mt-4 hidden text-sm text-red-600"></p>
+        <button id="submitBtn" type="submit" class="mt-5 h-11 w-full rounded-lg bg-brand font-semibold text-white hover:bg-brand-dark disabled:opacity-60">Submit application</button>
+      </form>
+    </div>
+
+    <section id="doneView" class="hidden rounded-2xl border border-line bg-white p-6 text-center">
+      <h1 class="font-display text-2xl font-bold">Application received</h1>
+      <p class="mt-2 text-sm text-gray-600">Your CV is being analysed. Create an account to see your result and interview tips.</p>
+      <a id="createAcc" href="#" class="mt-5 inline-flex h-11 items-center rounded-lg bg-brand px-6 font-semibold text-white hover:bg-brand-dark">Create account to see my result</a>
+      <p class="mt-4 text-sm"><a id="privLink" href="#" class="text-brand underline">Or open my private result page</a></p>
+      <p class="mt-1 text-xs text-gray-500">Save that link. It is the only way back to your result without an account.</p>
+    </section>
+  </main>
+
+  <script src="/api.js"></script>
+  <script>
+    const $ = (id) => document.getElementById(id);
+    const seg = location.pathname.split("/").filter(Boolean).pop() || "";
+    const jobToken = (seg === "apply" || seg === "apply.html") ? new URLSearchParams(location.search).get("t") : seg;
+    let job = null;
+    const FRIENDLY = {
+      JOB_NOT_FOUND: "This job link is not valid.", JOB_CLOSED: "This job is no longer accepting applications.",
+      DUPLICATE_APPLICATION: "You have already applied to this job with this email.", CONSENT_REQUIRED: "Please tick the consent box.",
+      CONSENT_VERSION_MISMATCH: "The consent text changed. Reload the page and try again.", CV_REQUIRED: "Please attach your CV.",
+      CV_UNSUPPORTED_FORMAT: "Your CV must be a PDF or DOCX file.", CV_EMPTY: "That CV file is empty.",
+      CV_INVALID_CONTENT: "That file doesn't look like a real PDF or DOCX."
+    };
+    const friendly = (m) => FRIENDLY[m] || m;
+
+    (async () => {
+      try {
+        job = await api(ENDPOINTS.pub + "/jobs/" + encodeURIComponent(jobToken), { auth: false });
+        $("state").classList.add("hidden");
+        $("jTitle").textContent = job.title;
+        $("jDesc").textContent = job.description;
+        $("jReqs").innerHTML = job.requirements.map((r) => '<li class="flex items-start gap-2"><span class="mt-0.5 rounded-full px-2 py-0.5 text-[11px] font-semibold ' + (r.type === "required" ? "bg-blue-50 text-brand" : "bg-gray-100 text-gray-500") + '">' + (r.type === "required" ? "Required" : "Nice to have") + '</span><span>' + esc(r.text) + '</span></li>').join("");
+        if (job.consent && job.consent.text) $("consentText").textContent = job.consent.text;
+        if (job.status === "closed") { $("jobView").classList.remove("hidden"); $("applyForm").innerHTML = '<p class="text-sm text-gray-600">This job is closed and no longer accepts applications.</p>'; return; }
+        $("jobView").classList.remove("hidden");
+      } catch (e) { $("state").textContent = friendly(e.message); $("state").classList.add("text-red-600"); }
+    })();
+
+    $("applyForm").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const err = $("form-error"), btn = $("submitBtn");
+      err.classList.add("hidden");
+      const file = $("cv").files[0], f = e.target;
+      const fail = (m) => { err.textContent = m; err.classList.remove("hidden"); };
+      if (!f.name.value.trim() || !f.email.value.trim() || !f.phone.value.trim()) return fail("Please fill in your name, email and phone.");
+      if (!file) return fail("Please attach your CV.");
+      if (file.size > 5 * 1024 * 1024) return fail("Your CV is over 5 MB.");
+      if (!$("consent").checked) return fail("Please tick the consent box.");
+      const fd = new FormData();
+      fd.append("name", f.name.value.trim()); fd.append("email", f.email.value.trim()); fd.append("phone", f.phone.value.trim());
+      fd.append("consent", "true"); fd.append("consent_version", job.consent.version);
+      fd.append("feedback_opt_in", $("feedback").checked ? "true" : "false");
+      fd.append("cv", file);
+      btn.disabled = true; btn.textContent = "Submitting... (this can take a moment)";
+      try {
+        const d = await apiForm(ENDPOINTS.pub + "/jobs/" + encodeURIComponent(jobToken) + "/applications", fd);
+        const q = new URLSearchParams({ result: d.result_token, name: f.name.value.trim(), email: f.email.value.trim(), jobTitle: job.title });
+        $("createAcc").href = "/signup-applicant.html?" + q.toString();
+        $("privLink").href = "/results.html?token=" + encodeURIComponent(d.result_token);
+        $("jobView").classList.add("hidden"); $("doneView").classList.remove("hidden"); window.scrollTo(0, 0);
+      } catch (ex) { fail(friendly(ex.message)); btn.disabled = false; btn.textContent = "Submit application"; }
+    });
+  </script>
+</body>
+</html>
