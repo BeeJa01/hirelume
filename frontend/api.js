@@ -2,7 +2,7 @@
 const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
   ? "http://localhost:8000"                       // your local backend port (check PORT in backend/src/config.js)
   : "https://hirelume-api.onrender.com";      // your deployed backend URL, no trailing slash
-const ENDPOINTS = { auth: "/api/auth", jobs: "/api/jobs", applications: "/api/applications", cvs: "/api/cvs", analysis: "/api/analysis" };
+const ENDPOINTS = { auth: "/api/auth", jobs: "/api/jobs", applications: "/api/applications", cvs: "/api/cvs", analysis: "/api/analysis", pub: "/api/public", results: "/api/results" };
 const ROLE_HOME = { recruiter: "jobs.html", job_seeker: "landingpage.html" };
 
 // ---- Session ----
@@ -48,6 +48,16 @@ async function api(path, opts = {}) {
   } catch (e) { throw new Error("Can't reach the server. Check your connection and try again."); }
   const data = await res.json().catch(() => null);
   if (res.status === 401 && opts.auth !== false) { logout(); throw new Error("Session expired"); }
+  if (!res.ok) throw new Error(errMsg(data, res.status));
+  return data;
+}
+
+// Multipart POST (apply form with CV)
+async function apiForm(path, formData) {
+  let res;
+  try { res = await fetch(API_BASE + path, { method: "POST", body: formData }); }
+  catch (e) { throw new Error("Can't reach the server. Check your connection and try again."); }
+  const data = await res.json().catch(() => null);
   if (!res.ok) throw new Error(errMsg(data, res.status));
   return data;
 }
