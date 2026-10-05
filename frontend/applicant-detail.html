@@ -45,7 +45,7 @@
 <body class="bg-page font-sans text-sm text-ink antialiased [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round]">
 <div class="grid min-h-screen app:grid-cols-[260px_1fr]">
 
-  <!-- ===== Sidebar (desktop only) ===== -->
+  <!-- Sidebar (desktop only) -->
   <aside class="hidden flex-col border-r border-line bg-white px-4 py-5 app:sticky app:top-0 app:flex app:h-screen">
     <a href="index.html" aria-label="HireLume home" class="px-1">
       <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
@@ -74,7 +74,7 @@
 
   <div class="min-w-0">
 
-    <!-- ===== Phone top bar ===== -->
+    <!-- Phone top bar -->
     <header class="relative border-b border-line bg-white app:hidden">
       <div class="flex h-16 items-center justify-between px-4">
         <a href="index.html" aria-label="HireLume home">
@@ -96,7 +96,7 @@
       </nav>
     </header>
 
-    <!-- ===== Desktop top bar ===== -->
+    <!--  Desktop top bar -->
     <header class="hidden h-[60px] items-center justify-between border-b border-line bg-white px-8 app:flex">
       <nav aria-label="Breadcrumb" class="flex items-center gap-2.5 text-[13px] text-mute">
         <a href="jobs.html">Jobs</a>
@@ -147,7 +147,7 @@
 
       <div class="mt-4 grid items-start gap-4 xl:grid-cols-[minmax(0,1fr)_320px]">
 
-        <!-- ===== Left column ===== -->
+        <!-- Left column -->
         <div class="flex min-w-0 flex-col gap-4">
 
           <!-- Score -->
@@ -222,7 +222,7 @@
           </section>
         </div>
 
-        <!-- ===== Right column ===== -->
+        <!-- Right column -->
         <aside class="flex min-w-0 flex-col gap-4">
 
           <!-- AI notice (desktop position) -->
@@ -310,8 +310,21 @@
     try { await openCV(appId); } catch (err) { toast(err.message); }
   });
 
-  // Shortlist / Reject: the backend files I have don't include a status endpoint yet.
-  ["shortlistBtn", "rejectBtn"].forEach((id) => { const b = $(id); b.disabled = true; b.title = "Waiting for the backend status endpoint"; b.classList.add("opacity-50", "cursor-not-allowed"); });
+  // Shortlist / Reject (clicking the active choice again resets to undecided)
+let curStatus = "undecided";
+async function decide(want) {
+  const next = curStatus === want ? "undecided" : want;
+  try {
+    await api(ENDPOINTS.applications + "/" + appId + "/status", { method: "PATCH", body: { status: next } });
+    curStatus = next;
+    const st = STATUS[next] || ["Undecided", "bg-chip text-ink2"];
+    $("status").textContent = st[0];
+    $("status").className = "rounded-full px-2.5 py-0.5 text-[11px] font-semibold " + st[1];
+    toast(next === "undecided" ? "Back to undecided." : "Marked as " + next + ".");
+  } catch (err) { toast(err.message); }
+}
+$("shortlistBtn").addEventListener("click", () => decide("shortlisted"));
+$("rejectBtn").addEventListener("click", () => decide("rejected"));
 
   // Phone menu
   $("menuBtn").addEventListener("click", () => {
