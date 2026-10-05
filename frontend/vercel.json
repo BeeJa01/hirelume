@@ -1,7 +1,9 @@
 {
   "cleanUrls": true,
+  "redirects": [
+    { "source": "/", "destination": "/landingpage.html", "permanent": false }
+  ],
   "rewrites": [
-    { "source": "/", "destination": "/landingpage.html" },
     { "source": "/apply/:token", "destination": "/apply.html" }
   ]
 }
