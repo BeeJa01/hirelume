@@ -22,7 +22,7 @@ document.addEventListener("click", (e) => {
 });
 
 // ---- Helpers ----
-const applyLink = (token) => location.origin + "/apply/" + token;
+const applyLink = (token) => location.origin + "/apply?t=" + token;
 const levelOf = (s) => (s >= 80 ? "Strong" : s >= 60 ? "Good" : "Fair");
 const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
