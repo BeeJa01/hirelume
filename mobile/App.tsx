@@ -10,6 +10,11 @@ import { LoginScreen } from './src/screens/LoginScreen';
 import { HomeScreen } from './src/screens/HomeScreen';
 import { AddJobPasteTextScreen } from './src/screens/AddJobPasteTextScreen';
 import { AddJobScreenshotScreen } from './src/screens/AddJobScreenshotScreen';
+import { AddJobLinkFallbackScreen } from './src/screens/AddJobLinkFallbackScreen';
+import { AddCvScreen } from './src/screens/AddCvScreen';
+import { AnalysingScreen } from './src/screens/AnalysingScreen';
+import { AnalysisResultScreen } from './src/screens/AnalysisResultScreen';
+import { MyAnalysesScreen } from './src/screens/MyAnalysesScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -19,6 +24,11 @@ export type RootStackParamList = {
   Home: undefined;
   AddJobPasteText: undefined;
   AddJobScreenshot: undefined;
+  AddJobLinkFallback: undefined;
+  AddCv: undefined;
+  Analysing: undefined;
+  AnalysisResult: { initialTab?: 'overview' | 'requirements' | 'questions' } | undefined;
+  MyAnalyses: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -43,6 +53,11 @@ export default function App() {
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="AddJobPasteText" component={AddJobPasteTextScreen} />
           <Stack.Screen name="AddJobScreenshot" component={AddJobScreenshotScreen} />
+          <Stack.Screen name="AddJobLinkFallback" component={AddJobLinkFallbackScreen} />
+          <Stack.Screen name="AddCv" component={AddCvScreen} />
+          <Stack.Screen name="Analysing" component={AnalysingScreen} />
+          <Stack.Screen name="AnalysisResult" component={AnalysisResultScreen} />
+          <Stack.Screen name="MyAnalyses" component={MyAnalysesScreen} />
         </Stack.Navigator>
       </NavigationContainer>
     </SafeAreaProvider>

@@ -102,7 +102,7 @@ export const AddJobScreenshotScreen = ({ navigation }: AddJobScreenshotScreenPro
             <TouchableOpacity
               style={styles.segmentTab}
               activeOpacity={0.7}
-              onPress={() => {}}
+              onPress={() => navigation.navigate('AddJobLinkFallback')}
             >
               <Text style={styles.segmentTabText}>Link</Text>
             </TouchableOpacity>
@@ -185,13 +185,7 @@ export const AddJobScreenshotScreen = ({ navigation }: AddJobScreenshotScreenPro
           <TouchableOpacity
             style={styles.continueButton}
             activeOpacity={0.9}
-            onPress={() => {
-              Alert.alert(
-                'Job Ready',
-                'Job details captured successfully. Continuing to Step 2: Add your CV.',
-                [{ text: 'OK' }]
-              );
-            }}
+            onPress={() => navigation.navigate('AddCv')}
           >
             <Text style={styles.continueButtonText}>Continue</Text>
           </TouchableOpacity>

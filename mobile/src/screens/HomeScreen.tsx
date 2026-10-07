@@ -127,7 +127,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
           <View style={styles.recentSection}>
             <View style={styles.recentHeaderRow}>
               <Text style={styles.recentTitle}>Recent analyses</Text>
-              <TouchableOpacity activeOpacity={0.7} onPress={() => {}}>
+              <TouchableOpacity activeOpacity={0.7} onPress={() => navigation.navigate('MyAnalyses')}>
                 <Text style={styles.viewAllText}>View all</Text>
               </TouchableOpacity>
             </View>
@@ -168,7 +168,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
                   <TouchableOpacity
                     style={styles.viewResultBtn}
                     activeOpacity={0.7}
-                    onPress={() => {}}
+                    onPress={() => navigation.navigate('AnalysisResult')}
                   >
                     <Text style={styles.viewResultText}>View result</Text>
                     <Ionicons name="chevron-forward" size={14} color="#0066FF" />
@@ -190,7 +190,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
             <Text style={[styles.navTabLabel, styles.navTabLabelActive]}>New</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.navTab} activeOpacity={0.8} onPress={() => {}}>
+          <TouchableOpacity style={styles.navTab} activeOpacity={0.8} onPress={() => navigation.navigate('MyAnalyses')}>
             <Ionicons name="document-text-outline" size={20} color="#94A3B8" />
             <Text style={styles.navTabLabel}>Analyses</Text>
           </TouchableOpacity>

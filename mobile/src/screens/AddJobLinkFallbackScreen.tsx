@@ -9,36 +9,20 @@ import {
   StatusBar,
   StyleSheet,
   Platform,
-  KeyboardAvoidingView,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-type AddJobPasteTextScreenProps = {
+type AddJobLinkFallbackScreenProps = {
   navigation: any;
 };
 
-const DEFAULT_JOB_TEXT = `Greenfield Agro Ltd is hiring a Business Development Officer in Ibadan. You will find and win new business customers for our farm produce and packaging services.
-
-Requirements: 2+ years in sales or business development. Experience writing proposals or quotes. Comfortable presenting to business owners. Familiarity with CRM tools (HubSpot or Zoho). Degree or HND in a business-related field.
-
-Nice to have: knowledge of the agribusiness sector. Willingness to travel across the South-West.`;
-
-export const AddJobPasteTextScreen = ({ navigation }: AddJobPasteTextScreenProps) => {
-  const [jobText, setJobText] = useState(DEFAULT_JOB_TEXT);
-
-  // Calculate word count
-  const wordCount = jobText
-    .trim()
-    .split(/\s+/)
-    .filter((word) => word.length > 0).length;
+export const AddJobLinkFallbackScreen = ({ navigation }: AddJobLinkFallbackScreenProps) => {
+  const [jobUrl, setJobUrl] = useState('https://example.com/jobs/business-develo...');
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <KeyboardAvoidingView
-        behavior={Platform.OS === 'ios' ? 'padding' : undefined}
-        style={{ flex: 1 }}
-      >
+      <View style={{ flex: 1 }}>
         <ScrollView
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
@@ -69,10 +53,11 @@ export const AddJobPasteTextScreen = ({ navigation }: AddJobPasteTextScreenProps
           {/* Segmented Control Tabs */}
           <View style={styles.segmentedControl}>
             <TouchableOpacity
-              style={[styles.segmentTab, styles.segmentTabActive]}
-              activeOpacity={0.9}
+              style={styles.segmentTab}
+              activeOpacity={0.7}
+              onPress={() => navigation.navigate('AddJobPasteText')}
             >
-              <Text style={styles.segmentTabTextActive}>Paste text</Text>
+              <Text style={styles.segmentTabText}>Paste text</Text>
             </TouchableOpacity>
 
             <TouchableOpacity
@@ -84,52 +69,91 @@ export const AddJobPasteTextScreen = ({ navigation }: AddJobPasteTextScreenProps
             </TouchableOpacity>
 
             <TouchableOpacity
-              style={styles.segmentTab}
-              activeOpacity={0.7}
-              onPress={() => navigation.navigate('AddJobLinkFallback')}
+              style={[styles.segmentTab, styles.segmentTabActive]}
+              activeOpacity={0.9}
             >
-              <Text style={styles.segmentTabText}>Link</Text>
+              <Text style={styles.segmentTabTextActive}>Link</Text>
             </TouchableOpacity>
           </View>
 
-          {/* Main Multiline Input */}
-          <View style={styles.inputCard}>
-            <TextInput
-              style={styles.textInput}
-              multiline
-              value={jobText}
-              onChangeText={setJobText}
-              placeholder="Paste job description here..."
-              placeholderTextColor="#94A3B8"
-              textAlignVertical="top"
-            />
+          {/* Input Label & Field */}
+          <View style={styles.inputSection}>
+            <Text style={styles.inputLabel}>Link to the job post</Text>
+            <View style={styles.inputBox}>
+              <Ionicons
+                name="link-outline"
+                size={18}
+                color="#94A3B8"
+                style={{ marginRight: 8 }}
+              />
+              <TextInput
+                style={styles.textInput}
+                value={jobUrl}
+                onChangeText={setJobUrl}
+                placeholder="https://..."
+                placeholderTextColor="#94A3B8"
+                autoCapitalize="none"
+                keyboardType="url"
+              />
+            </View>
+            <Text style={styles.inputHint}>We try to read the page for you.</Text>
           </View>
 
-          {/* Word count & Tips */}
-          <View style={styles.hintRow}>
-            <View style={{ flex: 1, paddingRight: 8 }}>
-              <Text style={styles.hintPrimary}>
-                Add the full job post for the best match.
-              </Text>
-              <Text style={styles.hintSecondary}>
-                About 50 words or more works best.
-              </Text>
-            </View>
-            <Text style={styles.wordCountText}>{wordCount} words</Text>
+          {/* Fallback Warning Box */}
+          <View style={styles.warningBox}>
+            <Ionicons
+              name="warning-outline"
+              size={18}
+              color="#D97706"
+              style={{ marginRight: 8, marginTop: 1 }}
+            />
+            <Text style={styles.warningText}>
+              <Text style={styles.warningBold}>We could not read that page.</Text> Some sites block this. Paste the job text or upload a screenshot instead.
+            </Text>
+          </View>
+
+          {/* Fallback Action Buttons */}
+          <View style={styles.actionButtonsCol}>
+            <TouchableOpacity
+              style={styles.fallbackButton}
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('AddJobPasteText')}
+            >
+              <Ionicons
+                name="document-text-outline"
+                size={18}
+                color="#0F172A"
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.fallbackButtonText}>Paste the text instead</Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity
+              style={styles.fallbackButton}
+              activeOpacity={0.8}
+              onPress={() => navigation.navigate('AddJobScreenshot')}
+            >
+              <Ionicons
+                name="images-outline"
+                size={18}
+                color="#0F172A"
+                style={{ marginRight: 10 }}
+              />
+              <Text style={styles.fallbackButtonText}>Upload a screenshot instead</Text>
+            </TouchableOpacity>
           </View>
         </ScrollView>
 
-        {/* Bottom Sticky Action */}
+        {/* Bottom Disabled Button */}
         <View style={styles.bottomBar}>
           <TouchableOpacity
-            style={styles.continueButton}
-            activeOpacity={0.9}
-            onPress={() => navigation.navigate('AddCv')}
+            style={styles.continueButtonDisabled}
+            disabled={true}
           >
-            <Text style={styles.continueButtonText}>Continue</Text>
+            <Text style={styles.continueButtonDisabledText}>Continue</Text>
           </TouchableOpacity>
         </View>
-      </KeyboardAvoidingView>
+      </View>
     </SafeAreaView>
   );
 };
@@ -195,7 +219,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#F1F5F9',
     borderRadius: 10,
     padding: 3,
-    marginBottom: 16,
+    marginBottom: 20,
   },
   segmentTab: {
     flex: 1,
@@ -222,41 +246,71 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#0F172A',
   },
-  inputCard: {
-    backgroundColor: '#FFFFFF',
+  inputSection: {
+    marginBottom: 16,
+  },
+  inputLabel: {
+    fontSize: 13,
+    fontWeight: '600',
+    color: '#0F172A',
+    marginBottom: 8,
+  },
+  inputBox: {
+    flexDirection: 'row',
+    alignItems: 'center',
     borderWidth: 1,
     borderColor: '#E2E8F0',
-    borderRadius: 12,
-    padding: 14,
-    minHeight: 220,
-    marginBottom: 10,
+    borderRadius: 10,
+    paddingHorizontal: 12,
+    height: 48,
+    backgroundColor: '#FFFFFF',
   },
   textInput: {
+    flex: 1,
     fontSize: 13.5,
     color: '#1E293B',
-    lineHeight: 20,
-    minHeight: 190,
   },
-  hintRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
-    marginTop: 2,
-  },
-  hintPrimary: {
-    fontSize: 11.5,
+  inputHint: {
+    fontSize: 12,
     color: '#64748B',
-    lineHeight: 16,
+    marginTop: 6,
   },
-  hintSecondary: {
-    fontSize: 11.5,
-    color: '#94A3B8',
-    lineHeight: 16,
+  warningBox: {
+    backgroundColor: '#FEF3C7',
+    borderWidth: 1,
+    borderColor: '#FDE68A',
+    borderRadius: 12,
+    padding: 14,
+    flexDirection: 'row',
+    alignItems: 'flex-start',
+    marginBottom: 16,
   },
-  wordCountText: {
-    fontSize: 11.5,
-    color: '#94A3B8',
-    fontWeight: '500',
+  warningText: {
+    flex: 1,
+    fontSize: 12.5,
+    color: '#92400E',
+    lineHeight: 18,
+  },
+  warningBold: {
+    fontWeight: '700',
+  },
+  actionButtonsCol: {
+    gap: 10,
+  },
+  fallbackButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 10,
+    height: 46,
+    backgroundColor: '#FFFFFF',
+  },
+  fallbackButtonText: {
+    fontSize: 14,
+    fontWeight: '700',
+    color: '#0F172A',
   },
   bottomBar: {
     paddingHorizontal: 20,
@@ -266,14 +320,14 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#F1F5F9',
   },
-  continueButton: {
-    backgroundColor: '#0066FF',
+  continueButtonDisabled: {
+    backgroundColor: '#CBD5E1',
     height: 48,
     borderRadius: 10,
     alignItems: 'center',
     justifyContent: 'center',
   },
-  continueButtonText: {
+  continueButtonDisabledText: {
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
