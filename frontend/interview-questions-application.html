@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Interview questions | HireLume</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" /><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+<style type="text/tailwindcss">
+@theme{--font-sans:"Inter",ui-sans-serif,system-ui,sans-serif;--font-display:"Poppins",ui-sans-serif,system-ui,sans-serif;--color-brand:#2563eb;--color-soft:#eff6ff;--color-mute:#64748b;--color-line:#e2e8f0;--color-ok:#16a34a}
+.icon{fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+</style></head>
+<body class="bg-[#f8fafc] font-sans text-slate-900 antialiased">
+<svg width="0" height="0" class="absolute" aria-hidden="true">
+<symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4L12 3zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15z"/></symbol>
+<symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5M9 13h6M9 17h4"/></symbol>
+<symbol id="i-case" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2"/><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2M3 13h18"/></symbol>
+<symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01"/></symbol>
+<symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></symbol>
+<symbol id="i-ok" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M8 12.5l2.7 2.7L16 9.5"/></symbol>
+<symbol id="i-tick" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5"/></symbol>
+<symbol id="i-lock" viewBox="0 0 24 24"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 018 0v3"/></symbol>
+<symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="3" width="10" height="18" rx="2"/><path d="M11 18h2"/></symbol>
+<symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M3 20a6 6 0 0112 0M16 4.5a3.5 3.5 0 010 7M18 20a6 6 0 00-2.5-4.9"/></symbol>
+<symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3zM8.5 12l2.5 2.5L15.5 10"/></symbol>
+<symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol>
+<symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol>
+<symbol id="i-up" viewBox="0 0 24 24"><path d="M7 11v9H4v-9h3zM7 11l4-8a2 2 0 012 2v4h5.5a2 2 0 012 2.3l-1 6a2 2 0 01-2 1.7H7"/></symbol>
+<symbol id="i-down" viewBox="0 0 24 24"><path d="M17 13V4h3v9h-3zM17 13l-4 8a2 2 0 01-2-2v-4H5.500a2 2 0 01-2-2.300l1-6A2 2 0 016.500 5H17"/></symbol>
+<symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1"/></symbol>
+<symbol id="i-doc" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5"/></symbol>
+</svg>
+<div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]"><aside class="hidden border-r border-line bg-white px-4 py-5 lg:sticky lg:top-0 lg:flex lg:h-screen lg:flex-col"><a href="public-job-page.html" class="px-2 font-display text-xl font-bold">Hire<span class="text-brand">Lume</span></a><p class="mt-8 px-2 text-xs font-semibold text-mute">Job seeker</p><nav class="mt-3 flex flex-col gap-1" aria-label="Main"><a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"><svg class="icon size-5" aria-hidden="true"><use href="#i-spark"/></svg>New analysis</a><a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"><svg class="icon size-5" aria-hidden="true"><use href="#i-file"/></svg>My analyses</a><a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium bg-soft text-brand ring-1 ring-brand/30"><svg class="icon size-5" aria-hidden="true"><use href="#i-case"/></svg>My applications<span class="ml-auto grid size-5 place-items-center rounded-full bg-white text-xs font-semibold">1</span></a><a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium text-slate-700 hover:bg-slate-100"><svg class="icon size-5" aria-hidden="true"><use href="#i-help"/></svg>Help</a></nav><div class="mt-auto flex items-center gap-3 border-t border-line px-2 pt-4"><span data-user="initial" class="grid size-9 place-items-center rounded-full bg-brand text-sm font-semibold text-white">O</span><div class="leading-tight"><p data-user="name" class="text-sm font-semibold">Obinna</p><p class="text-xs text-mute">Job seeker</p></div></div></aside><div class="min-w-0"><header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-white/90 px-5 py-3.5 backdrop-blur sm:px-8"><p class="flex min-w-0 items-center gap-2 text-sm text-mute"><a href="#" class="truncate hover:text-slate-900">My applications</a><span aria-hidden="true">&rsaquo;</span><a id="crumbTitle" href="application-result.html" class="truncate hover:text-slate-900">Your application</a><span aria-hidden="true">&rsaquo;</span><strong class="truncate font-semibold text-slate-900">Interview questions</strong></p><div class="flex items-center gap-3"><button type="button" aria-label="Help" class="grid size-9 place-items-center rounded-lg border border-line text-mute"><svg class="icon size-5" aria-hidden="true"><use href="#i-help"/></svg></button><span class="flex items-center gap-2 text-sm font-medium"><span data-user="initial" class="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-white">O</span><span data-user="first" class="hidden sm:inline">Obinna</span></span></div></header><main class="mx-auto grid max-w-6xl gap-5 px-5 py-6 sm:px-8 xl:grid-cols-[1fr_300px]"><div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between xl:col-span-2"><div><h1 class="font-display text-2xl font-bold sm:text-3xl">Interview questions</h1><p id="sub" class="mt-1 text-sm text-mute">Loading your questions...</p></div>
+<a id="backBtn" href="application-result.html" class="inline-flex h-10 w-fit items-center gap-2 rounded-lg border border-line bg-white px-4 text-sm font-semibold hover:bg-slate-50"><svg class="icon size-4" aria-hidden="true"><use href="#i-back"/></svg> Back to your result</a></div>
+<section id="qSection" class="rounded-2xl border border-line bg-white p-5 sm:p-7"><p class="text-sm text-mute">Loading your questions...</p></section>
+<aside class="space-y-5"><div class="rounded-2xl border border-line bg-white p-5"><h2 class="font-display font-semibold">How to use these</h2><ul class="mt-3 space-y-3"><li class="flex items-start gap-2.5 text-sm"><span class="mt-0.5 text-ok"><svg class="icon size-4" aria-hidden="true"><use href="#i-ok"/></svg></span>Write short answers using real examples from your work.</li><li class="flex items-start gap-2.5 text-sm"><span class="mt-0.5 text-ok"><svg class="icon size-4" aria-hidden="true"><use href="#i-ok"/></svg></span>Use numbers where you can: customers, sales, days saved.</li><li class="flex items-start gap-2.5 text-sm"><span class="mt-0.5 text-ok"><svg class="icon size-4" aria-hidden="true"><use href="#i-ok"/></svg></span>Practise your answers to the gap questions out loud.</li></ul></div>
+<div class="rounded-2xl border border-line bg-white p-5"><h2 class="font-display font-semibold">Was this useful?</h2><div class="mt-3 flex gap-2"><button type="button" data-vote class="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-line text-sm font-semibold"><svg class="icon size-4" aria-hidden="true"><use href="#i-up"/></svg> Helpful</button><button type="button" data-vote class="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-line text-sm font-semibold"><svg class="icon size-4" aria-hidden="true"><use href="#i-down"/></svg> Not helpful</button></div><p id="thanks" class="mt-2 hidden text-xs text-mute">Thanks for the feedback.</p></div></aside></main></div></div><script src="api.js"></script><script>// "Was this useful?" -> POST /api/events (works logged in or not; needs an anonymous id of 8+ characters)
+var HL_APP_ID = "";
+function sendVote(helpful) {
+  var anon = "";
+  try { anon = localStorage.getItem("hl_anon"); if (!anon) { anon = "anon-" + Math.random().toString(36).slice(2) + Date.now().toString(36); localStorage.setItem("hl_anon", anon); } }
+  catch (e) { anon = "anon-" + Date.now().toString(36); }
+  api("/api/events", { method: "POST", auth: false, body: { name: "interview_questions_feedback", anonymous_id: anon, properties: { helpful: helpful, application_id: HL_APP_ID } } }).catch(function () {});
+}
+(function () {
+  var $ = function (id) { return document.getElementById(id); };
+  var rt = applyFlow.resultToken();
+  if (!session.user) {   // applicant who has not made an account
+    document.querySelectorAll('[data-user="initial"]').forEach(function (el) { el.textContent = "A"; });
+    document.querySelectorAll('[data-user="name"],[data-user="first"]').forEach(function (el) { el.textContent = "Applicant"; });
+  }
+  $("backBtn").style.display = "none";      // shown only when there is a result page to go back to
+  $("backBtn").href = applyFlow.link("application-result.html", true);
+  $("crumbTitle").href = applyFlow.link("application-result.html", true);
+  function msg(t, bad) { $("qSection").innerHTML = '<p class="text-sm ' + (bad ? "text-red-700" : "text-mute") + '">' + esc(t) + "</p>"; }
+  function render(r) {
+    HL_APP_ID = r.applicationId;
+    var title = r.jobTitle || "Your application";
+    document.title = "Interview questions | HireLume";
+    $("crumbTitle").textContent = title;
+    $("sub").textContent = [r.jobTitle, r.company, r.questions.length + " questions based on this job and your CV"].filter(Boolean).join(" \u00b7 ");
+    // Back to the result only if the recruiter allows feedback and the applicant is logged in
+    $("backBtn").style.display = (r.feedbackAvailable && session.token) ? "" : "none";
+    if (!r.questions.length) { msg("No questions were listed for this job yet."); return; }
+    var groups = [], map = {};
+    r.questions.forEach(function (q) { var g = q.group || "Questions for this job"; if (!map[g]) { map[g] = []; groups.push(g); } map[g].push(q.text); });
+    var n = 0;
+    $("qSection").innerHTML = groups.map(function (g) {
+      var ic = /gap|prepare/i.test(g) ? "i-target" : /experience/i.test(g) ? "i-doc" : "i-case";
+      return '<h2 class="mt-7 flex items-center gap-3 font-display text-lg font-semibold first:mt-0"><span class="grid size-9 place-items-center rounded-lg bg-soft text-brand"><svg class="icon size-5" aria-hidden="true"><use href="#' + ic + '"/></svg></span>' + esc(g) + '</h2><ol class="mt-3 divide-y divide-line">' +
+        map[g].map(function (t) { n++; return '<li class="flex items-start gap-3 py-3.5 text-sm"><span class="grid size-7 shrink-0 place-items-center rounded-lg bg-soft text-xs font-semibold text-brand">' + n + '</span><span class="pt-1">' + esc(t) + "</span></li>"; }).join("") + "</ol>";
+    }).join("");
+  }
+  if (!rt) { $("sub").textContent = ""; msg("We could not tell which application these questions belong to. Open this page from the link in your application.", true); return; }
+  var stop = applyFlow.poll(rt, function (r, err) {
+    if (err) { msg(err.status === 404 || err.status === 403 ? "We could not find these questions." : err.message, true); return; }
+    if (r.state === "completed") render(r);
+    else if (r.state === "failed") msg("We could not read your CV just yet. We will keep trying in the background. This page will update by itself.");
+    else msg("Your questions are still being prepared. This page will update by itself.");
+  });
+})();
+document.querySelectorAll("[data-vote]").forEach(function (b) {
+  b.addEventListener("click", function () {
+    document.querySelectorAll("[data-vote]").forEach(function (x) { x.classList.remove("border-brand", "bg-soft", "text-brand"); });
+    b.classList.add("border-brand", "bg-soft", "text-brand"); document.getElementById("thanks").classList.remove("hidden");
+    sendVote(b.textContent.indexOf("Not") < 0);
+  });
+});</script></body></html>

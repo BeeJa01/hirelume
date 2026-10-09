@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HireLume - Application Result</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS (browser build, no install needed) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+      --color-brand: #2563eb;
+      --color-brand-soft: #eff6ff;
+      --color-ink: #0f172a;
+      --color-mute: #64748b;
+      --color-line: #e2e8f0;
+      --color-ok: #16a34a;
+    }
+    .icon { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</head>
+
+<body class="bg-[#f8fafc] font-sans text-ink antialiased">
+
+  <!-- Icons -->
+  <svg width="0" height="0" class="absolute" aria-hidden="true">
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4L12 3zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15z" /></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5M9 13h6M9 17h4" /></symbol>
+    <symbol id="i-case" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2M3 13h18" /></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01" /></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.5" /></symbol>
+    <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7 11v9H4v-9h3zM7 11l4-8a2 2 0 012 2v4h5.5a2 2 0 012 2.3l-1 6a2 2 0 01-2 1.7H7" /></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 013 3L8 19l-4 1zM14 7l3 3" /></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2" /></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H5a2 2 0 00-2 2v12a2 2 0 002 2h4M16 8l4 4-4 4M20 12H9" /></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+  </svg>
+
+  <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
+
+    <!-- SIDEBAR (desktop) / MENU (phone) -->
+    <aside id="sidebar" class="hidden flex-col border-r border-line bg-white px-4 py-5 lg:sticky lg:top-0 lg:flex lg:h-screen">
+      <a href="/landingpage.html" class="px-2 font-display text-xl font-bold">Hire<span class="text-brand">Lume</span></a>
+      <p class="mt-8 px-2 text-xs font-semibold text-mute">Job seeker</p>
+      <nav class="mt-3 flex flex-col gap-1 text-sm font-medium" aria-label="Main">
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink/80 hover:bg-[#f1f5f9]"><svg class="icon size-5"><use href="#i-spark" /></svg>New analysis</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink/80 hover:bg-[#f1f5f9]"><svg class="icon size-5"><use href="#i-file" /></svg>My analyses</a>
+        <a href="#" aria-current="page" class="flex items-center gap-3 rounded-lg bg-brand-soft px-3 py-2.5 text-brand ring-1 ring-brand/30"><svg class="icon size-5"><use href="#i-case" /></svg>My applications<span class="ml-auto grid size-5 place-items-center rounded-full bg-white text-xs font-semibold">1</span></a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink/80 hover:bg-[#f1f5f9]"><svg class="icon size-5"><use href="#i-help" /></svg>Help</a>
+      </nav>
+      <div class="mt-auto flex items-center gap-3 border-t border-line px-2 pt-4">
+        <span class="grid size-9 place-items-center rounded-full bg-brand text-sm font-semibold text-white" data-user="initial">O</span>
+        <div class="min-w-0 flex-1 leading-tight"><p class="truncate text-sm font-semibold" data-user="name">Obinna</p><p class="text-xs text-mute">Job seeker</p></div>
+        <button type="button" aria-label="Log out" onclick="logout()" class="text-mute hover:text-ink"><svg class="icon size-5"><use href="#i-logout" /></svg></button>
+      </div>
+    </aside>
+
+    <div class="min-w-0">
+      <!-- TOP BAR -->
+      <header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-white/90 px-5 py-3.5 backdrop-blur sm:px-8">
+        <div class="flex min-w-0 items-center gap-3">
+          <button id="menuBtn" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Toggle menu" class="grid size-9 place-items-center rounded-lg border border-line lg:hidden"><svg class="icon size-5"><use href="#i-menu" /></svg></button>
+          <p class="flex min-w-0 items-center gap-2 text-sm text-mute"><a href="#" class="hover:text-ink">My applications</a><span aria-hidden="true">&rsaquo;</span><strong id="crumbTitle" class="truncate font-semibold text-ink">Your application</strong></p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" aria-label="Help" class="grid size-9 place-items-center rounded-lg border border-line text-mute"><svg class="icon size-5"><use href="#i-help" /></svg></button>
+          <span class="flex items-center gap-2 text-sm font-medium"><span class="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-white" data-user="initial">O</span><span class="hidden sm:inline" data-user="first">Obinna</span></span>
+        </div>
+      </header>
+
+      <main class="mx-auto max-w-5xl px-5 py-6 sm:px-8 sm:py-8">
+
+        <!-- TITLE -->
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between">
+          <div>
+            <h1 id="hTitle" class="font-display text-2xl font-bold sm:text-3xl">Your result</h1>
+            <p id="sub" class="mt-1 text-sm text-mute"></p>
+          </div>
+          <span class="status inline-flex w-fit items-center gap-1.5 rounded-full bg-brand-soft px-3 py-1.5 text-xs font-semibold text-brand"><svg class="icon size-4"><use href="#i-clock" /></svg>Under review by the recruiter</span>
+        </div>
+
+        <div id="loadNote" role="status" class="mt-5 rounded-xl border border-line bg-white px-4 py-3 text-sm text-mute">Loading your result...</div>
+        <!-- AI NOTICE -->
+        <div class="mt-5 flex items-start gap-3 rounded-xl border border-brand/20 bg-brand-soft px-4 py-3 text-sm">
+          <svg class="icon mt-0.5 size-5 shrink-0 text-brand"><use href="#i-info" /></svg>
+          <p><strong class="font-semibold">This is AI guidance and it can be wrong.</strong> The recruiter reviews your application and makes the decision. You will not see how other applicants compare.</p>
+        </div>
+
+        <!-- SCORE -->
+        <section class="mt-5 flex flex-col items-center gap-5 rounded-2xl border border-line bg-white p-5 text-center sm:flex-row sm:items-center sm:gap-8 sm:p-6 sm:text-left">
+          <div class="relative size-32 shrink-0">
+            <svg viewBox="0 0 120 120" class="size-full -rotate-90" aria-hidden="true">
+              <circle cx="60" cy="60" r="52" fill="none" stroke="#e2e8f0" stroke-width="9" />
+              <circle cx="60" cy="60" r="52" fill="none" stroke="#2563eb" stroke-width="9" stroke-linecap="round" stroke-dasharray="0 326.7" id="ring" />
+            </svg>
+            <div class="absolute inset-0 grid place-content-center text-center"><strong id="score" class="font-display text-4xl font-bold leading-none">&ndash;</strong><span class="mt-1 text-xs text-mute">out of 100</span></div>
+          </div>
+          <div>
+            <p class="flex flex-wrap items-center justify-center gap-2 font-display text-xl font-semibold sm:justify-start"><span id="levelText">Your match</span> <span id="levelPill" class="rounded-full bg-brand-soft px-2.5 py-0.5 font-sans text-xs font-semibold text-brand"></span></p>
+            <p id="reason" class="mt-2 text-sm leading-relaxed text-mute"></p>
+          </div>
+        </section>
+
+        <!-- STRENGTHS + GAPS -->
+        <section class="mt-5 grid gap-6 rounded-2xl border border-line bg-white p-5 sm:p-6 md:grid-cols-2">
+          <div>
+            <h2 class="flex items-center gap-2 font-display text-lg font-semibold"><span class="grid size-8 place-items-center rounded-lg bg-green-50 text-ok"><svg class="icon size-5"><use href="#i-thumb" /></svg></span>Skills found in your CV</h2>
+            <ul id="strengths" class="mt-4 space-y-3 text-sm"></ul>
+          </div>
+          <div>
+            <h2 class="flex items-center gap-2 font-display text-lg font-semibold"><span class="grid size-8 place-items-center rounded-lg bg-amber-50 text-amber-600"><svg class="icon size-5"><use href="#i-target" /></svg></span>Experience found in your CV</h2>
+            <ul id="gaps" class="mt-4 space-y-3 text-sm"></ul>
+          </div>
+        </section>
+
+        <!-- TIPS + NEXT STEPS -->
+        <section class="mt-5 grid gap-6 rounded-2xl border border-line bg-white p-5 sm:p-6 md:grid-cols-2">
+          <div>
+            <h2 class="font-display text-lg font-semibold">CV tips for this job</h2>
+            <ul id="tips" class="mt-4 space-y-3 text-sm"></ul>
+          </div>
+          <div>
+            <h2 class="font-display text-lg font-semibold">Your next steps</h2>
+            <ol id="steps" class="mt-4 space-y-4 text-sm"></ol>
+          </div>
+        </section>
+
+        <!-- INTERVIEW BANNER -->
+        <section class="mt-5 overflow-hidden rounded-2xl bg-[#0b3fa0] text-white">
+          <div class="flex flex-col gap-4 p-5 sm:flex-row sm:items-center sm:justify-between sm:p-6">
+            <div class="flex items-center gap-4">
+              <span class="grid size-12 shrink-0 place-items-center rounded-xl bg-white/15"><svg class="icon size-6"><use href="#i-list" /></svg></span>
+              <div><h2 class="font-display text-lg font-semibold">Prepare for the interview</h2><p id="qCount" class="text-sm text-white/80">Questions based on this job and your CV.</p></div>
+            </div>
+            <a id="qLink" href="interview-questions-application.html" class="inline-flex items-center justify-center h-11 shrink-0 rounded-lg bg-[#22b8e6] px-5 text-sm font-semibold text-white hover:bg-[#1aa7d3] focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-white">View interview questions</a>
+          </div>
+        </section>
+
+      </main>
+    </div>
+  </div>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+
+      // 2. Phone menu: show / hide the sidebar
+      var menu = document.getElementById("menuBtn"), side = document.getElementById("sidebar");
+      menu.addEventListener("click", function () {
+        var nowHidden = side.classList.toggle("hidden");
+        side.classList.toggle("flex", !nowHidden);
+        menu.setAttribute("aria-expanded", String(!nowHidden));
+      });
+
+      // 3. Accessible match score
+      var score = document.getElementById("score");
+      score.setAttribute("aria-label", score.textContent.trim() + " out of 100");
+    });
+  </script>
+  <script src="api.js"></script>
+  <script>
+  (function () {
+    // Result page is for logged-in job seekers (they sign up from the "Yes, show me" step)
+    if (!session.token) { location.replace("login.html"); return; }
+    var $ = function (id) { return document.getElementById(id); };
+    var rt = applyFlow.resultToken(), stop = null;
+    function note(msg, bad) { var n = $("loadNote"); n.textContent = msg; n.className = "mt-5 rounded-xl border px-4 py-3 text-sm " + (bad ? "border-red-200 bg-red-50 text-red-700" : "border-line bg-white text-mute"); n.classList.remove("hidden"); }
+    function li(icon, cls, inner) { return '<li class="flex items-start gap-2.5"><svg class="icon mt-0.5 size-5 shrink-0 ' + cls + '"><use href="#' + icon + '" /></svg>' + inner + "</li>"; }
+    var DEFAULT_STEPS = [
+      { title: "Prepare your answers", detail: "Use the interview questions for this job." },
+      { title: "Collect real examples", detail: "Think of one example for each skill you want to show." },
+      { title: "Update your CV for future roles", detail: "Use the tips on the left." }
+    ];
+    function render(r) {
+      var title = r.jobTitle || "Your application";
+      document.title = "HireLume - " + title;
+      $("hTitle").textContent = "Your result: " + title; $("crumbTitle").textContent = title;
+      $("sub").textContent = [r.company, r.submittedAt ? "Submitted " + fmtDate(r.submittedAt) : ""].filter(Boolean).join(" \u00b7 ");
+      var sc = r.score;
+      $("score").textContent = sc == null ? "\u2013" : sc; $("score").setAttribute("aria-label", (sc == null ? "No" : sc) + " out of 100");
+      $("ring").setAttribute("stroke-dasharray", ((sc || 0) / 100 * 326.7).toFixed(1) + " 326.7");
+      $("levelText").textContent = r.level ? r.level + " match" : "Your match"; $("levelPill").textContent = r.level; $("levelPill").classList.toggle("hidden", !r.level);
+      $("reason").textContent = r.reason;
+      $("strengths").innerHTML = r.skills.length ? r.skills.map(function (x) { return li("i-check", "text-ok", esc(x)); }).join("") : '<li class="text-mute">Nothing was listed here.</li>';
+      $("gaps").innerHTML = r.experience.length ? r.experience.map(function (x) { return li("i-check", "text-ok", esc(x)); }).join("") : '<li class="text-mute">Nothing was listed here.</li>';
+      $("tips").innerHTML = r.tips.length ? r.tips.map(function (x) { return li("i-pen", "text-brand", esc(x)); }).join("") : '<li class="text-mute">No tips were listed.</li>';
+      var steps = DEFAULT_STEPS;
+      $("steps").innerHTML = steps.map(function (st, i) {
+        return '<li class="flex items-start gap-3"><span class="grid size-7 shrink-0 place-items-center rounded-full text-xs font-semibold ' + (i === 0 ? "bg-brand text-white" : "bg-slate-100 text-mute") + '">' + (i + 1) + '</span><div><p class="font-medium">' + esc(st.title) + "</p>" + (st.detail ? '<p class="text-xs text-mute">' + esc(st.detail) + "</p>" : "") + "</div></li>";
+      }).join("");
+      $("qCount").textContent = r.questions.length ? r.questions.length + " questions based on this job and your CV." : "Questions based on this job and your CV.";
+      $("qLink").href = applyFlow.link("interview-questions-application.html", true);
+    }
+    if (!rt) { note("We could not tell which application to show. Open this page from the link in your application.", true); return; }
+    stop = applyFlow.poll(rt, function (r, err) {
+      if (err) { if (err.status === 404 || err.status === 403) note("We could not find this result.", true); else note(err.message, true); return; }
+      // Flowchart: "Recruiter allows feedback?" No -> interview questions only
+      if (!r.feedbackEnabled) { if (stop) stop(); location.replace(applyFlow.link("interview-questions-application.html", true)); return; }
+      if (r.state === "completed") {
+        if (!r.feedbackAvailable) { note("We could not show your result here. Make sure you are logged in with the account you created from this application, then open this page again."); return; }
+        $("loadNote").classList.add("hidden"); render(r);
+      }
+      else if (r.state === "failed") note("We could not read your CV just yet. We will keep trying in the background. This page will update by itself.");
+      else note("Your result is still being prepared. This page will update by itself.");
+    });
+  })();
+  </script>
+</body>
+</html>

@@ -152,7 +152,7 @@
               <label for="email" class="text-sm font-medium">Email</label>
               <input id="email" name="email" type="email" autocomplete="email" required aria-describedby="email-hint"
                      class="mt-1.5 w-full rounded-lg border border-line bg-white px-3.5 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm" />
-              <p id="email-hint" class="mt-1.5 text-xs text-gray-500">Filled in from your application.</p>
+              <p id="email-hint" class="mt-1.5 text-xs text-gray-500">Filled in from your application. Use this same email so we can link your result.</p>
             </div>
 
             <div>
@@ -205,27 +205,45 @@
       toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
     });
 
-   // Prefill from the apply step: signup-applicant.html?result=&name=&email=&jobTitle=
-const q = new URLSearchParams(location.search), form = document.getElementById("signup-form");
-form.fullName.value = q.get("name")  ""; form.email.value = q.get("email")  "";
-const resultToken = q.get("result") || "";
-const jt = q.get("jobTitle") || "";
-document.getElementById("jcTitle").textContent = jt;
-document.getElementById("jcInit").textContent = jt.slice(0, 2).toUpperCase();
-form.addEventListener("submit", async (e) => {
-  e.preventDefault();
-  const err = document.getElementById("form-error"), btn = form.querySelector("[type=submit]"), label = btn.textContent;
-  err.classList.add("hidden"); btn.disabled = true; btn.textContent = "Please wait...";
-  try {
-    const d = await api(ENDPOINTS.auth + "/register", { method: "POST", auth: false, body: { name: form.fullName.value.trim(), email: form.email.value.trim(), password: form.password.value, role: "job_seeker" } });
-    session.save(d);
-    if (resultToken) await api(ENDPOINTS.applications + "/link", { method: "POST", body: { result_token: resultToken } });
-    location.href = resultToken ? "results.html?token=" + encodeURIComponent(resultToken) : "landingpage.html";
-  } catch (ex) {
-    err.textContent = ex.message; err.classList.remove("hidden");
-    btn.disabled = false; btn.textContent = label;
-  }
-});
+    // Prefill from the apply step. The offer page sends ?result=&t=&name=&email=&jobTitle=&company=
+    // (falls back to what the apply form saved in this browser tab)
+    const q = new URLSearchParams(location.search), form = document.getElementById("signup-form");
+    let saved = {}; try { saved = JSON.parse(sessionStorage.getItem("hlApp")) || {}; } catch (e) {}
+    form.fullName.value = q.get("name") || saved.name || "";
+    form.email.value = (q.get("email") || saved.email || "").trim().toLowerCase();
+    // The application can only be linked to an account with the SAME email, so lock it when we know it
+    if (form.email.value) { form.email.readOnly = true; }
+    const resultToken = applyFlow.resultToken();
+    const jobTok = applyFlow.jobToken();
+    const jcTitle = document.getElementById("jcTitle"), jcSub = document.getElementById("jcSub"), jcInit = document.getElementById("jcInit");
+    function setJobCard(title, company) {
+      jcTitle.textContent = title || "Your application";
+      jcSub.textContent = company || "";
+      jcInit.textContent = (title || "A").slice(0, 2).toUpperCase();
+    }
+    setJobCard(q.get("jobTitle"), q.get("company"));
+    if (jobTok && !q.get("jobTitle")) applyFlow.getJob(jobTok).then((j) => setJobCard(j.title, j.company)).catch(() => {});
+
+    form.addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const err = document.getElementById("form-error"), btn = form.querySelector("[type=submit]"), label = btn.textContent;
+      err.classList.add("hidden"); btn.disabled = true; btn.textContent = "Please wait...";
+      try {
+        // 1) create the job seeker account (existing register route, unchanged).
+        //    If the account was already created on an earlier try, skip straight to linking.
+        if (!session.token) {
+          const d = await api(ENDPOINTS.auth + "/register", { method: "POST", auth: false, body: { name: form.fullName.value.trim(), email: form.email.value.trim().toLowerCase(), password: form.password.value, role: "job_seeker" } });
+          session.save(d);
+        }
+        // 2) link the application to the account. The result is only shown to the account it is linked to.
+        if (resultToken) await api(ENDPOINTS.applications + "/link", { method: "POST", body: { result_token: resultToken } });
+        // 3) show the result
+        location.href = resultToken ? applyFlow.link("application-result.html", true) : "landingpage.html";
+      } catch (ex) {
+        err.textContent = applyFlow.CODES[ex.message] || ex.message; err.classList.remove("hidden");
+        btn.disabled = false; btn.textContent = label;
+      }
+    });
   </script>
 </body>
 </html>
