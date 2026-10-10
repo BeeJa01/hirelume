@@ -1,7 +1,7 @@
 // ---- Config: the only block you edit when deploying ----
 const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
   ? "http://localhost:8000"                       // your local backend port (check PORT in backend/src/config.js)
-  : "";      // your deployed backend URL, no trailing slash
+  : "https://hirelume-api.onrender.com";      // your deployed backend URL, no trailing slash
 const ENDPOINTS = { auth: "/api/auth", jobs: "/api/jobs", applications: "/api/applications", cvs: "/api/cvs", analysis: "/api/analysis", pub: "/api/public", results: "/api/results" };
 const ROLE_HOME = { recruiter: "jobs.html", job_seeker: "landingpage.html" };
 
