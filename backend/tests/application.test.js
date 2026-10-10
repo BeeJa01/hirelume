@@ -213,8 +213,13 @@ test('health check responds without a database connection', async () => {
 });
 
 test('frontend origin is allowed by CORS', async () => {
-  const response = await request(app).options('/api/auth/login')
+  const localResponse = await request(app).options('/api/auth/login')
     .set('Origin', 'http://localhost:5173')
     .set('Access-Control-Request-Method', 'POST');
-  assert.equal(response.headers['access-control-allow-origin'], 'http://localhost:5173');
+  assert.equal(localResponse.headers['access-control-allow-origin'], 'http://localhost:5173');
+
+  const deployedResponse = await request(app).options('/api/auth/login')
+    .set('Origin', 'https://hirelume-kappa.vercel.app')
+    .set('Access-Control-Request-Method', 'POST');
+  assert.equal(deployedResponse.headers['access-control-allow-origin'], 'https://hirelume-kappa.vercel.app');
 });

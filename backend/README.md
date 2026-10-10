@@ -12,7 +12,7 @@ npm run dev
 
 Make sure MongoDB is running locally, or set `MONGODB_URI` in `.env` to your MongoDB Atlas connection string. The API is at `http://localhost:8000`; check `/health` to see if it is running. Run `npm test` for the local checks. To run the database-backed API tests, set `MONGODB_TEST_URI` to a separate test database URI; those tests clear its collections, not the app database.
 
-The default CORS setting allows Vite at `localhost:5173` and `127.0.0.1:5173`. If your frontend uses another address, add it to `CORS_ORIGIN` in `.env`, separated by commas. Restart the API after changing it.
+The example CORS setting allows Vite at `localhost:5173` and `127.0.0.1:5173`, plus the deployed frontend at `https://hirelume-kappa.vercel.app`. If your frontend uses another address, add it to `CORS_ORIGIN` in `.env`, separated by commas. Restart the API after changing it. Production hosts must set `CORS_ORIGIN` in their environment; `.env.example` is only a template.
 
 ## Connect the frontend
 

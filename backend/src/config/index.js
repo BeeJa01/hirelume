@@ -20,6 +20,6 @@ module.exports = {
   groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
   publicRateLimit: Number(process.env.PUBLIC_RATE_LIMIT || 60),
   publicRateWindowMinutes: Number(process.env.PUBLIC_RATE_WINDOW_MINUTES || 15),
-  corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173')
+  corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173,https://hirelume-kappa.vercel.app')
     .split(',').map((origin) => origin.trim()).filter(Boolean),
 };
