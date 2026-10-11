@@ -82,7 +82,7 @@ $("form").addEventListener("submit", async function (e) {
       file: $("cv").files[0], consentVersion: JOB && JOB.consentVersion, feedbackOptIn: FEEDBACK_OPT_IN
     });
     sessionStorage.setItem("hlApp", JSON.stringify({ name: $("name").value.trim(), email: $("email").value.trim(), cv: $("cv").files[0].name }));
-    location.href = "application-received.html?t=" + encodeURIComponent(token) + "&r=" + encodeURIComponent(rt);
+    location.href = applyFlow.page("application-received.html") + "?t=" + encodeURIComponent(token) + "&r=" + encodeURIComponent(rt);
   } catch (err) {
     // Flowchart: error -> back to the form (fix or re-upload)
     if (applyFlow.isClosedError(err)) { label.textContent = oldLabel; block("This job is no longer accepting applications."); return; }

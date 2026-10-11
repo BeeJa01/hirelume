@@ -67,7 +67,7 @@ function signupHref() {
   if (app.email) p.set("email", app.email);
   if (jobTitle) p.set("jobTitle", jobTitle);
   if (company) p.set("company", company);
-  return "signup-applicant.html?" + p.toString();
+  return applyFlow.page("signup-applicant.html") + "?" + p.toString();
 }
 var loggedIn = !!(session.token && session.user && session.user.role === "job_seeker");
 function updateYes() { $("yesBtn").href = loggedIn ? "#" : signupHref(); }
@@ -77,7 +77,8 @@ $("yesBtn").addEventListener("click", async function (e) {
   if (!loggedIn) return;                      // normal link to the signup page
   e.preventDefault();
   // Already logged in as a job seeker: link this application to their account, then show the result
-  try { await api(ENDPOINTS.applications + "/link", { method: "POST", body: { result_token: rt } }); } catch (ex) { /* the result page still opens by token */ }
+  try { await api(ENDPOINTS.applications + "/link", { method: "POST", body: { result_token: rt } }); }
+  catch (ex) { $("msg").textContent = applyFlow.CODES[ex.message] || ex.message; return; }
   location.href = applyFlow.link("application-result.html", true);
 });
 

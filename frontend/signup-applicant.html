@@ -224,6 +224,10 @@
     setJobCard(q.get("jobTitle"), q.get("company"));
     if (jobTok && !q.get("jobTitle")) applyFlow.getJob(jobTok).then((j) => setJobCard(j.title, j.company)).catch(() => {});
 
+    // Existing account? Log in, and come straight back to the result (login links the application)
+    const loginHref = applyFlow.page("login.html") + (resultToken ? "?next=" + encodeURIComponent(applyFlow.link("application-result.html", true)) : "");
+    document.querySelectorAll('a[href="login.html"]').forEach((a) => { a.href = loginHref; });
+
     form.addEventListener("submit", async (e) => {
       e.preventDefault();
       const err = document.getElementById("form-error"), btn = form.querySelector("[type=submit]"), label = btn.textContent;
@@ -231,7 +235,9 @@
       try {
         // 1) create the job seeker account (existing register route, unchanged).
         //    If the account was already created on an earlier try, skip straight to linking.
-        if (!session.token) {
+        const email = form.email.value.trim().toLowerCase();
+        const sameUser = session.token && session.user && session.user.role === "job_seeker" && String(session.user.email || "").toLowerCase() === email;
+        if (!sameUser) {
           const d = await api(ENDPOINTS.auth + "/register", { method: "POST", auth: false, body: { name: form.fullName.value.trim(), email: form.email.value.trim().toLowerCase(), password: form.password.value, role: "job_seeker" } });
           session.save(d);
         }
@@ -240,7 +246,10 @@
         // 3) show the result
         location.href = resultToken ? applyFlow.link("application-result.html", true) : "landingpage.html";
       } catch (ex) {
-        err.textContent = applyFlow.CODES[ex.message] || ex.message; err.classList.remove("hidden");
+        const msgText = applyFlow.CODES[ex.message] || ex.message;
+        err.textContent = msgText;
+        if (ex.message === "ACCOUNT_ALREADY_EXISTS") err.innerHTML = esc(msgText) + ' <a class="font-semibold underline" href="' + loginHref + '">Log in</a>';
+        err.classList.remove("hidden");
         btn.disabled = false; btn.textContent = label;
       }
     });

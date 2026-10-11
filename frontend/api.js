@@ -3,7 +3,7 @@ const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
   ? "http://localhost:8000"                       // your local backend port (check PORT in backend/src/config.js)
   : "https://hirelume-api.onrender.com";      // your deployed backend URL, no trailing slash
 const ENDPOINTS = { auth: "/api/auth", jobs: "/api/jobs", applications: "/api/applications", cvs: "/api/cvs", analysis: "/api/analysis", pub: "/api/public", results: "/api/results" };
-const ROLE_HOME = { recruiter: "jobs.html", job_seeker: "landingpage.html" };
+const ROLE_HOME = { recruiter: "jobs.html", job_seeker: "job-seeker-home.html" };   // job seekers land on the "Check your fit" home
 
 // ---- Session ----
 const session = {
@@ -22,7 +22,7 @@ document.addEventListener("click", (e) => {
 });
 
 // ---- Helpers ----
-const applyLink = (token) => location.origin + "/apply?t=" + token;
+const applyLink = (token) => location.origin + "/public-job-page?t=" + token;   // new applicant flow (old /apply links still work)
 const levelOf = (s) => (s >= 80 ? "Strong" : s >= 60 ? "Good" : "Fair");
 const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "");
 const esc = (s) => String(s == null ? "" : s).replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/"/g, "&quot;");
@@ -142,6 +142,12 @@ const applyFlow = {
     CV_EMPTY: "That CV file is empty.",
     CV_INVALID_CONTENT: "We could not read that CV. Please upload a real PDF or DOCX file, not a renamed one.",
     INVALID_RESULT_TOKEN: "We could not find this result.",
+    CV_TOO_LARGE: "Your CV is over 5 MB. Please upload a smaller file.",
+    UNEXPECTED_FILE: "Something was wrong with the file you attached. Please try again.",
+    RATE_LIMIT_EXCEEDED: "Too many attempts. Please wait a few minutes and try again.",
+    INTERNAL_SERVER_ERROR: "The server had a problem. Please try again in a moment.",
+    ACCOUNT_ALREADY_EXISTS: "An account with this email already exists. Please log in to see your result.",
+    INVALID_CREDENTIALS: "Wrong email or password.",
     APPLICATION_ALREADY_LINKED: "This application is already linked to another account.",
     APPLICATION_EMAIL_MISMATCH: "Please use the same email address you applied with."
   },
@@ -158,13 +164,37 @@ const applyFlow = {
     if (t) sessionStorage.setItem("hl_result_token", t);
     return t;
   },
+  // "application-form.html" -> "application-form" when the site is served with clean URLs
+  page(name) { return /\.html$/.test(location.pathname) || location.protocol === "file:" ? name : name.replace(/\.html$/, ""); },
   // Build a link to another page, carrying the tokens along
   link(page, withResult) {
     const p = new URLSearchParams(), t = applyFlow.jobToken(), r = withResult ? applyFlow.resultToken() : "";
     if (t) p.set("t", t);
     if (r) p.set("r", r);
     const s = p.toString();
-    return page + (s ? "?" + s : "");
+    return applyFlow.page(page) + (s ? "?" + s : "");
+  },
+  // ?next=... on the login page: only same-site page names, never another website
+  safeNext() {
+    const n = applyFlow.qs("next");
+    return /^[A-Za-z0-9_\-]+(\.html)?(\?[A-Za-z0-9_\-=&%.]*)?$/.test(n) ? n : "";
+  },
+  // Login, then link the application (if the next page carries a result token) and go to `next`
+  async login(form, body, next) {
+    const err = form.querySelector("#form-error"), btn = form.querySelector("[type=submit]"), label = btn.textContent;
+    err.classList.add("hidden"); btn.disabled = true; btn.textContent = "Please wait...";
+    try {
+      const d = await api(ENDPOINTS.auth + "/login", { method: "POST", body, auth: false });
+      session.save(d);
+      const r = new URLSearchParams(next.split("?")[1] || "").get("r");
+      if (r && d.user.role === "job_seeker") {
+        try { await api(ENDPOINTS.applications + "/link", { method: "POST", body: { result_token: r } }); } catch (e) { /* the result page explains if it is not linked */ }
+      }
+      location.href = next;
+    } catch (e) {
+      err.textContent = applyFlow.CODES[e.message] || e.message; err.classList.remove("hidden");
+      btn.disabled = false; btn.textContent = label;
+    }
   },
 
   // ---- request helper: like api() but keeps status/code on the error and never logs the user out ----
@@ -178,7 +208,12 @@ const applyFlow = {
     const data = await res.json().catch(() => null);
     if (!res.ok) {
       const det = data && typeof data.detail === "string" ? data.detail : "";
-      const er = new Error(applyFlow.CODES[det] || errMsg(data, res.status));
+      let text = applyFlow.CODES[det] || errMsg(data, res.status);
+      if (det === "VALIDATION_ERROR" && data.errors && data.errors.length) {
+        const f = String((data.errors[0].loc || []).slice(-1)[0] || "");
+        text = "Please check your " + ({ name: "name", email: "email address", phone: "phone number" }[f] || f || "details") + ".";
+      }
+      const er = new Error(text);
       er.status = res.status;
       er.code = det || (data && (data.code || data.error_code || (typeof data.error === "string" ? data.error : ""))) || "";
       er.data = data;
@@ -328,5 +363,170 @@ const applyFlow = {
     };
     tick();
     return () => { stopped = true; clearTimeout(timer); };
+  }
+};
+
+
+// =====================================================================
+// ---- JOB SEEKER STANDALONE FLOW ("Check your fit for a job you found") ----
+// Pages: job-seeker-home, my-analyses, new-analysis, analysing,
+//        analysis-result, analysis-questions.
+// The backend routes below are the contract in analysis-api-contract.md.
+// If the backend dev changes a path or field name, change it HERE only.
+// =====================================================================
+const seekerFlow = {
+  paths: {
+    list:           (n) => "/api/analyses" + (n ? "?limit=" + n : ""),             // GET  -> { quota, analyses[] }
+    create:         "/api/analyses",                                              // POST multipart: job_text, source, cv -> { id, status }
+    one:            (id) => "/api/analyses/" + encodeURIComponent(id),            // GET  -> one analysis (see contract)
+    retry:          (id) => "/api/analyses/" + encodeURIComponent(id) + "/retry", // POST -> { id, status }
+    jobScreenshots: "/api/analyses/job/screenshots",                              // POST multipart: images[] -> { text }
+    jobLink:        "/api/analyses/job/link",                                     // POST json: { url } -> { text }
+    cvCheck:        "/api/analyses/cv/check"                                      // POST multipart: cv -> { readable: true }
+  },
+
+  CODES: {
+    DAILY_LIMIT_REACHED: "You have used all your analyses for today. The limit resets at midnight.",
+    JOB_TEXT_REQUIRED: "Add the job first.",
+    JOB_TEXT_TOO_SHORT: "That job text is too short. Paste the full job post for a better match.",
+    JOB_IMAGES_REQUIRED: "Upload at least one screenshot of the job.",
+    JOB_IMAGE_UNSUPPORTED: "Screenshots must be JPG or PNG.",
+    JOB_IMAGE_TOO_LARGE: "Each screenshot must be 5 MB or less.",
+    JOB_TEXT_NOT_READABLE: "We could not read the text in your screenshots.",
+    JOB_LINK_INVALID: "That does not look like a valid link.",
+    JOB_LINK_NOT_READABLE: "We could not read that link.",
+    CV_NOT_READABLE: "We could not read that CV. Please upload a different file.",
+    ANALYSIS_NOT_FOUND: "We could not find this analysis.",
+    ANALYSIS_FAILED: "We could not finish this analysis. Please try again."
+  },
+
+  // page name (+ params) in the host's URL style
+  url(page, params) {
+    const q = params ? new URLSearchParams(params).toString() : "";
+    return applyFlow.page(page) + (q ? "?" + q : "");
+  },
+  id() { return new URLSearchParams(location.search).get("id") || ""; },
+  // Only logged-in job seekers. Others go to login and come back here.
+  guard(page) {
+    const ok = session.token && (!session.user || session.user.role === "job_seeker");
+    if (!ok) location.replace(applyFlow.page("login.html") + "?next=" + encodeURIComponent(page + location.search));
+    return !!ok;
+  },
+
+  async req(path, opts = {}) {
+    const headers = { Authorization: "Bearer " + session.token };
+    let body;
+    if (opts.form) body = opts.form;
+    else if (opts.body !== undefined) { headers["Content-Type"] = "application/json"; body = JSON.stringify(opts.body); }
+    let res;
+    try { res = await fetch(API_BASE + path, { method: opts.method || "GET", headers, body }); }
+    catch (e) { const er = new Error("Can't reach the server. Check your connection and try again."); er.network = true; throw er; }
+    const data = await res.json().catch(() => null);
+    if (res.status === 401) {
+      session.clear();
+      location.replace(applyFlow.page("login.html") + "?next=" + encodeURIComponent((location.pathname.split("/").pop() || "job-seeker-home") + location.search));
+      throw new Error("Session expired");
+    }
+    if (!res.ok) {
+      const det = data && typeof data.detail === "string" ? data.detail : "";
+      let text = seekerFlow.CODES[det] || applyFlow.CODES[det] || errMsg(data, res.status);
+      if (det === "VALIDATION_ERROR") text = "Please check the details you entered and try again.";
+      if (/^[A-Z_]{4,}$/.test(text)) text = "Something went wrong. Please try again.";
+      const er = new Error(text);
+      er.status = res.status; er.code = det; er.data = data;
+      throw er;
+    }
+    return data;
+  },
+
+  // ---- normalisers (the contract fixes the names; these only protect against missing parts) ----
+  T: (x) => (x == null ? "" : String(typeof x === "object" ? (x.text || x.title || x.name || "") : x).trim()),
+  strs(v) { return (Array.isArray(v) ? v : []).map((x) => seekerFlow.T(x)).filter(Boolean); },
+  levelLabel(k) {
+    k = String(k || "").toLowerCase();
+    return /strong/.test(k) ? "Strong" : /good|moderate/.test(k) ? "Good" : /partial|weak|fair|low/.test(k) ? "Partial" : "";
+  },
+  levelClass(l) { return l === "Strong" ? "text-ok" : l === "Good" ? "text-brand" : "text-rose-500"; },
+  groupKey(g) { g = String(g || "").toLowerCase(); return /about|role/.test(g) ? "about" : /experience/.test(g) ? "experience" : /gap/.test(g) ? "gaps" : "other"; },
+  norm(a) {
+    a = a || {};
+    const T = seekerFlow.T, st = String(a.status || "").toLowerCase();
+    let score = a.score; score = score == null || isNaN(Number(score)) ? null : Math.round(Number(score));
+    return {
+      id: String(a.id || ""),
+      state: /complet/.test(st) ? "completed" : /fail|error/.test(st) ? "failed" : "pending",
+      step: Number(a.step) || 0,
+      jobTitle: T(a.job_title), company: T(a.company), source: String(a.source || "text"),
+      createdAt: a.created_at || "",
+      score,
+      level: seekerFlow.levelLabel(a.match_level) || (score == null ? "" : score >= 75 ? "Strong" : score >= 60 ? "Good" : "Partial"),
+      reason: T(a.reason),
+      requirements: (Array.isArray(a.requirements) ? a.requirements : []).map((x) => {
+        const r = String((x && x.result) || "").toLowerCase();
+        return { text: T(x), required: String((x && x.type) || "required").toLowerCase() !== "nice_to_have",
+                 result: /^met$/.test(r) ? "met" : /partl|partial/.test(r) ? "partly" : "missing", evidence: T(x && x.evidence) };
+      }).filter((x) => x.text),
+      matched: seekerFlow.strs(a.matched_skills), missing: seekerFlow.strs(a.missing_skills),
+      tips: seekerFlow.strs(a.tips),
+      steps: (Array.isArray(a.next_steps) ? a.next_steps : []).map((x) => ({ title: T(x && typeof x === "object" ? (x.title || x.text) : x), detail: x && typeof x === "object" ? T(x.detail) : "" })).filter((x) => x.title),
+      questions: (Array.isArray(a.questions) ? a.questions : []).map((x) => ({ group: seekerFlow.groupKey(x && x.group), text: T(x && typeof x === "object" ? (x.text || x.question) : x) })).filter((x) => x.text)
+    };
+  },
+  normQuota(q) {
+    q = q || {};
+    const limit = Number(q.limit) || 5, used = Math.max(0, Number(q.used) || 0);
+    return { limit, used, remaining: q.remaining != null ? Math.max(0, Number(q.remaining)) : Math.max(0, limit - used) };
+  },
+
+  // ---- calls ----
+  async list(n) {
+    const d = await seekerFlow.req(seekerFlow.paths.list(n));
+    return { quota: seekerFlow.normQuota(d && d.quota), analyses: ((d && d.analyses) || []).map(seekerFlow.norm) };
+  },
+  async get(id) { return seekerFlow.norm(await seekerFlow.req(seekerFlow.paths.one(id))); },
+  async retry(id) { return seekerFlow.req(seekerFlow.paths.retry(id), { method: "POST" }); },
+  async create(f) {            // f = { jobText, source, cv }  -> { id }
+    const fd = new FormData();
+    fd.append("job_text", f.jobText); fd.append("source", f.source); fd.append("cv", f.cv);
+    const d = await seekerFlow.req(seekerFlow.paths.create, { method: "POST", form: fd });
+    if (!d || !d.id) throw new Error("Something went wrong. Please try again.");
+    return { id: String(d.id) };
+  },
+  async readScreenshots(files) {
+    const fd = new FormData(); files.forEach((f) => fd.append("images", f));
+    const d = await seekerFlow.req(seekerFlow.paths.jobScreenshots, { method: "POST", form: fd });
+    return String((d && d.text) || "").trim();
+  },
+  async readLink(url) {
+    const d = await seekerFlow.req(seekerFlow.paths.jobLink, { method: "POST", body: { url } });
+    return String((d && d.text) || "").trim();
+  },
+  // true = readable, null = the backend has no CV check route (skip the "Readable" badge), throws if not readable
+  async checkCv(file) {
+    const fd = new FormData(); fd.append("cv", file);
+    try { await seekerFlow.req(seekerFlow.paths.cvCheck, { method: "POST", form: fd }); return true; }
+    catch (e) { if (e.status === 404 && e.code === "ROUTE_NOT_FOUND") return null; throw e; }
+  },
+  // "Was this useful?" -> existing POST /api/events
+  vote(name, helpful, analysisId) {
+    return api("/api/events", { method: "POST", body: { name, properties: { helpful, analysis_id: analysisId } } }).catch(() => {});
+  },
+
+  // ---- helpers shared by the pages ----
+  words(t) { t = String(t || "").trim(); return t ? t.split(/\s+/).length : 0; },
+  size(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB"; },
+  // the "Recent analyses" table used on the home page and My analyses
+  rowsHtml(list) {
+    const head = '<div class="hidden grid-cols-[1fr_150px_120px_100px] gap-4 border-b border-line pb-2 text-xs font-medium text-mute sm:grid"><span>Job</span><span>Match</span><span>Date</span><span></span></div>';
+    return head + list.map((a) => {
+      const done = a.state === "completed";
+      const href = done ? seekerFlow.url("analysis-result.html", { id: a.id }) : seekerFlow.url("analysing.html", { id: a.id });
+      const match = done ? '<strong class="font-display text-lg">' + esc(a.score == null ? "\u2013" : a.score) + '</strong> <span class="ml-1 text-xs font-semibold ' + seekerFlow.levelClass(a.level) + '">' + esc(a.level) + "</span>"
+        : a.state === "failed" ? '<span class="text-xs font-semibold text-rose-500">Failed</span>' : '<span class="text-xs font-semibold text-mute">Analysing...</span>';
+      const cta = done ? "View result" : a.state === "failed" ? "Try again" : "Open";
+      return '<a href="' + href + '" class="grid grid-cols-[1fr_auto] items-center gap-x-4 gap-y-1 border-b border-line py-4 last:border-0 hover:bg-slate-50 sm:grid-cols-[1fr_150px_120px_100px]">' +
+        '<span class="min-w-0"><span class="block truncate font-medium">' + esc(a.jobTitle || "Untitled job") + '</span><span class="block truncate text-xs text-mute">' + esc(a.company) + "</span></span>" +
+        "<span>" + match + '</span><span class="hidden text-sm text-mute sm:block">' + esc(fmtDate(a.createdAt)) + '</span><span class="justify-self-end text-sm font-semibold text-brand">' + cta + "</span></a>";
+    }).join("");
   }
 };

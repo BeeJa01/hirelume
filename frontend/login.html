@@ -163,7 +163,8 @@
     document.getElementById("login-form").addEventListener("submit", (e) => {
       e.preventDefault();
       const f = new FormData(e.target);
-      submitAuth(e.target, "/login", { email: f.get("email").trim(), password: f.get("password") });
+      const body = { email: f.get("email").trim(), password: f.get("password") }, next = applyFlow.safeNext();
+      if (next) applyFlow.login(e.target, body, next); else submitAuth(e.target, "/login", body);
     });
   </script>
 </body>

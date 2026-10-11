@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HireLume - Interview questions</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS (browser build, no install needed) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+      --color-brand: #2563eb;
+      --color-brand-soft: #eff6ff;
+      --color-ink: #0f172a;
+      --color-mute: #64748b;
+      --color-line: #e2e8f0;
+      --color-ok: #16a34a;
+    }
+    .icon { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</head>
+
+<body class="bg-[#f8fafc] font-sans text-ink antialiased">
+
+  <!-- Icons -->
+  <svg width="0" height="0" class="absolute" aria-hidden="true">
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4L12 3zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15z" /></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5M9 13h6M9 17h4" /></symbol>
+    <symbol id="i-case" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2M3 13h18" /></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01" /></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.5" /></symbol>
+    <symbol id="i-tick" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></symbol>
+    <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7 11v9H4v-9h3zM7 11l4-8a2 2 0 012 2v4h5.5a2 2 0 012 2.3l-1 6a2 2 0 01-2 1.7H7" /></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 013 3L8 19l-4 1zM14 7l3 3" /></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2" /></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H5a2 2 0 00-2 2v12a2 2 0 002 2h4M16 8l4 4-4 4M20 12H9" /></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" /></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="1.6" /><path d="M21 16l-5-5-8 8" /></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1" /></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z" /><path d="m9 12 2 2 4-4" /></symbol>
+    <symbol id="i-text" viewBox="0 0 24 24"><path d="M5 6h14M5 11h14M5 16h9" /></symbol>
+  </svg>
+
+  <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
+
+    <!-- SIDEBAR (desktop) / MENU (phone) -->
+    <aside id="sidebar" class="hidden flex-col border-r border-line bg-white px-4 py-5 lg:sticky lg:top-0 lg:flex lg:h-screen">
+      <a href="job-seeker-home.html" class="px-2 font-display text-xl font-bold">Hire<span class="text-brand">Lume</span></a>
+      <p class="mt-8 px-2 text-xs font-semibold text-mute">Job seeker</p>
+      <nav class="mt-3 flex flex-col gap-1 text-sm font-medium" aria-label="Main">
+        <a href="job-seeker-home.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink/80 hover:bg-[#f1f5f9]"><svg class="icon size-5"><use href="#i-spark" /></svg>New analysis</a>
+        <a href="my-analyses.html" aria-current="page" class="flex items-center gap-3 rounded-lg bg-brand-soft px-3 py-2.5 text-brand ring-1 ring-brand/30"><svg class="icon size-5"><use href="#i-file" /></svg>My analyses</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink/80 hover:bg-[#f1f5f9]"><svg class="icon size-5"><use href="#i-case" /></svg>My applications</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink/80 hover:bg-[#f1f5f9]"><svg class="icon size-5"><use href="#i-help" /></svg>Help</a>
+      </nav>
+      <div class="mt-auto flex items-center gap-3 border-t border-line px-2 pt-4">
+        <span class="grid size-9 place-items-center rounded-full bg-brand text-sm font-semibold text-white" data-user="initial">J</span>
+        <div class="min-w-0 flex-1 leading-tight"><p class="truncate text-sm font-semibold" data-user="name">Job seeker</p><p class="text-xs text-mute">Job seeker</p></div>
+        <button type="button" aria-label="Log out" onclick="logout()" class="text-mute hover:text-ink"><svg class="icon size-5"><use href="#i-logout" /></svg></button>
+      </div>
+    </aside>
+
+    <div class="min-w-0">
+      <!-- TOP BAR -->
+      <header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-white/90 px-5 py-3.5 backdrop-blur sm:px-8">
+        <div class="flex min-w-0 items-center gap-3">
+          <button id="menuBtn" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Toggle menu" class="grid size-9 place-items-center rounded-lg border border-line lg:hidden"><svg class="icon size-5"><use href="#i-menu" /></svg></button>
+          <p class="flex min-w-0 items-center gap-2 text-sm text-mute"><a href="my-analyses.html" class="hover:text-ink">My analyses</a><span aria-hidden="true">&rsaquo;</span><strong class="truncate font-semibold text-ink" id="crumbLast">Interview questions</strong></p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" aria-label="Help" class="grid size-9 place-items-center rounded-lg border border-line text-mute"><svg class="icon size-5"><use href="#i-help" /></svg></button>
+          <span class="flex items-center gap-2 text-sm font-medium"><span class="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-white" data-user="initial">J</span><span class="hidden sm:inline" data-user="first">Job seeker</span></span>
+        </div>
+      </header>
+
+      <main class="mx-auto grid max-w-6xl gap-5 px-5 py-6 sm:px-8 xl:grid-cols-[1fr_300px]">
+        <div class="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between xl:col-span-2">
+          <div class="min-w-0">
+            <h1 class="font-display text-2xl font-bold sm:text-3xl">Interview questions</h1>
+            <p id="sub" class="mt-1 text-sm text-mute">Loading your questions...</p>
+          </div>
+          <div class="flex shrink-0 flex-wrap gap-2">
+            <a id="backBtn" href="analysis-result.html" class="inline-flex h-10 items-center gap-2 rounded-lg border border-line bg-white px-4 text-sm font-semibold hover:bg-slate-50"><svg class="icon size-4"><use href="#i-back" /></svg>Back to your result</a>
+            <a href="new-analysis.html" class="inline-flex h-10 items-center gap-2 rounded-lg bg-brand px-4 text-sm font-semibold text-white hover:bg-blue-700"><svg class="icon size-4"><use href="#i-plus" /></svg>Analyse another job</a>
+          </div>
+        </div>
+
+        <section id="qSection" class="rounded-2xl border border-line bg-white p-5 sm:p-7"><p class="text-sm text-mute">Loading your questions...</p></section>
+
+        <aside class="space-y-5">
+          <div class="rounded-2xl border border-line bg-white p-5">
+            <h2 class="font-display font-semibold">How to use these</h2>
+            <ul class="mt-3 space-y-3 text-sm">
+              <li class="flex items-start gap-2.5"><span class="mt-0.5 text-ok"><svg class="icon size-4"><use href="#i-check" /></svg></span>Write short answers using real examples from your work.</li>
+              <li class="flex items-start gap-2.5"><span class="mt-0.5 text-ok"><svg class="icon size-4"><use href="#i-check" /></svg></span>Use numbers where you can.</li>
+              <li class="flex items-start gap-2.5"><span class="mt-0.5 text-ok"><svg class="icon size-4"><use href="#i-check" /></svg></span>Practise the gap questions out loud. They are the likeliest to come up.</li>
+            </ul>
+          </div>
+          <div class="rounded-2xl border border-line bg-white p-5">
+            <h2 class="font-display font-semibold">Was this useful?</h2>
+            <div class="mt-3 flex gap-2">
+              <button type="button" data-vote="1" class="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-line text-sm font-semibold hover:bg-slate-50"><svg class="icon size-4"><use href="#i-thumb" /></svg>Helpful</button>
+              <button type="button" data-vote="0" class="flex h-10 flex-1 items-center justify-center gap-2 rounded-lg border border-line text-sm font-semibold hover:bg-slate-50"><svg class="icon size-4 rotate-180"><use href="#i-thumb" /></svg>Not helpful</button>
+            </div>
+            <p id="thanks" class="mt-2 text-xs text-mute" style="display:none">Thanks for the feedback.</p>
+          </div>
+        </aside>
+      </main>
+
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    // Phone menu: show / hide the sidebar
+    document.getElementById("menuBtn").addEventListener("click", function () {
+      var side = document.getElementById("sidebar"), nowHidden = side.classList.toggle("hidden");
+      side.classList.toggle("flex", !nowHidden);
+      this.setAttribute("aria-expanded", String(!nowHidden));
+    });
+  </script>
+  <script>
+
+    (function () {
+      var id = seekerFlow.id();
+      if (!seekerFlow.guard("analysis-questions.html")) return;
+      var $ = function (x) { return document.getElementById(x); };
+      var GROUPS = { about: ["About the role", "i-case"], experience: ["Your experience", "i-file"], gaps: ["Gaps to prepare for", "i-target"], other: ["More questions", "i-list"] };
+      function msg(t, bad) { $("qSection").innerHTML = '<p class="text-sm ' + (bad ? "text-red-700" : "text-mute") + '">' + esc(t) + "</p>"; }
+      $("backBtn").href = seekerFlow.url("analysis-result.html", { id: id });
+
+      function render(a) {
+        var title = a.jobTitle || "Your analysis";
+        document.title = "HireLume - Interview questions";
+        $("crumbLast").textContent = "Interview questions";
+        $("sub").textContent = [a.jobTitle, a.company, a.questions.length + " questions based on this job and your CV"].filter(Boolean).join(" \u00b7 ");
+        if (!a.questions.length) { msg("No questions were listed for this job yet."); return; }
+        var order = ["about", "experience", "gaps", "other"], n = 0;
+        $("qSection").innerHTML = order.map(function (k) {
+          var qs = a.questions.filter(function (q) { return q.group === k; });
+          if (!qs.length) return "";
+          return '<h2 class="mt-7 flex items-center gap-3 font-display text-lg font-semibold first:mt-0"><span class="grid size-9 place-items-center rounded-lg bg-brand-soft text-brand"><svg class="icon size-5" aria-hidden="true"><use href="#' + GROUPS[k][1] + '" /></svg></span>' + GROUPS[k][0] + '</h2><ol class="mt-3 divide-y divide-line">' +
+            qs.map(function (q) { n++; return '<li class="flex items-start gap-3 py-3.5 text-sm"><span class="grid size-7 shrink-0 place-items-center rounded-lg bg-brand-soft text-xs font-semibold text-brand">' + n + '</span><span class="pt-1">' + esc(q.text) + "</span></li>"; }).join("") + "</ol>";
+        }).join("");
+      }
+      document.querySelectorAll("[data-vote]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          document.querySelectorAll("[data-vote]").forEach(function (x) { x.classList.remove("border-brand", "bg-brand-soft", "text-brand"); });
+          b.classList.add("border-brand", "bg-brand-soft", "text-brand"); $("thanks").style.display = "";
+          seekerFlow.vote("analysis_questions_feedback", b.dataset.vote === "1", id);
+        });
+      });
+      if (!id) { $("sub").textContent = ""; msg(seekerFlow.CODES.ANALYSIS_NOT_FOUND, true); return; }
+      seekerFlow.get(id).then(function (a) {
+        if (a.state !== "completed") { location.replace(seekerFlow.url("analysing.html", { id: id })); return; }
+        render(a);
+      }).catch(function (e) { $("sub").textContent = ""; msg(e.status === 404 ? seekerFlow.CODES.ANALYSIS_NOT_FOUND : e.message, true); });
+    })();
+
+  </script>
+</body>
+</html>

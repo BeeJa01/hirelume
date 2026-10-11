@@ -1,0 +1,354 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>HireLume - Add job and CV</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+  <!-- Tailwind CSS (browser build, no install needed) -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+      --color-brand: #2563eb;
+      --color-brand-soft: #eff6ff;
+      --color-ink: #0f172a;
+      --color-mute: #64748b;
+      --color-line: #e2e8f0;
+      --color-ok: #16a34a;
+    }
+    .icon { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</head>
+
+<body class="bg-[#f8fafc] font-sans text-ink antialiased">
+
+  <!-- Icons -->
+  <svg width="0" height="0" class="absolute" aria-hidden="true">
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4L12 3zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15z" /></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5M9 13h6M9 17h4" /></symbol>
+    <symbol id="i-case" viewBox="0 0 24 24"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M9 7V5a2 2 0 012-2h2a2 2 0 012 2v2M3 13h18" /></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 114 2c-.9.6-1.5 1.1-1.5 2.2M12 17h.01" /></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 11v5M12 8h.01" /></symbol>
+    <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></symbol>
+    <symbol id="i-check" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.5" /></symbol>
+    <symbol id="i-tick" viewBox="0 0 24 24"><path d="M5 12.5l4.5 4.5L19 7.5" /></symbol>
+    <symbol id="i-thumb" viewBox="0 0 24 24"><path d="M7 11v9H4v-9h3zM7 11l4-8a2 2 0 012 2v4h5.5a2 2 0 012 2.3l-1 6a2 2 0 01-2 1.7H7" /></symbol>
+    <symbol id="i-target" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9" /><circle cx="12" cy="12" r="5" /><circle cx="12" cy="12" r="1" /></symbol>
+    <symbol id="i-pen" viewBox="0 0 24 24"><path d="M4 20l1-4L16.5 4.5a2.1 2.1 0 013 3L8 19l-4 1zM14 7l3 3" /></symbol>
+    <symbol id="i-list" viewBox="0 0 24 24"><path d="M9 6h11M9 12h11M9 18h11M4 6l1 1 2-2M4 12l1 1 2-2M4 18l1 1 2-2" /></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 4H5a2 2 0 00-2 2v12a2 2 0 002 2h4M16 8l4 4-4 4M20 12H9" /></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18" /></symbol>
+    <symbol id="i-arrow" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6" /></symbol>
+    <symbol id="i-back" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6" /></symbol>
+    <symbol id="i-image" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="16" rx="2" /><circle cx="9" cy="10" r="1.6" /><path d="M21 16l-5-5-8 8" /></symbol>
+    <symbol id="i-link" viewBox="0 0 24 24"><path d="M10 14a4 4 0 005.7 0l3-3a4 4 0 00-5.7-5.7l-1 1M14 10a4 4 0 00-5.7 0l-3 3a4 4 0 005.7 5.7l1-1" /></symbol>
+    <symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3l7 3v5c0 5-3.5 8-7 10-3.5-2-7-5-7-10V6z" /><path d="m9 12 2 2 4-4" /></symbol>
+    <symbol id="i-text" viewBox="0 0 24 24"><path d="M5 6h14M5 11h14M5 16h9" /></symbol>
+  </svg>
+
+  <div class="min-h-screen lg:grid lg:grid-cols-[260px_1fr]">
+
+    <!-- SIDEBAR (desktop) / MENU (phone) -->
+    <aside id="sidebar" class="hidden flex-col border-r border-line bg-white px-4 py-5 lg:sticky lg:top-0 lg:flex lg:h-screen">
+      <a href="job-seeker-home.html" class="px-2 font-display text-xl font-bold">Hire<span class="text-brand">Lume</span></a>
+      <p class="mt-8 px-2 text-xs font-semibold text-mute">Job seeker</p>
+      <nav class="mt-3 flex flex-col gap-1 text-sm font-medium" aria-label="Main">
+        <a href="job-seeker-home.html" aria-current="page" class="flex items-center gap-3 rounded-lg bg-brand-soft px-3 py-2.5 text-brand ring-1 ring-brand/30"><svg class="icon size-5"><use href="#i-spark" /></svg>New analysis</a>
+        <a href="my-analyses.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink/80 hover:bg-[#f1f5f9]"><svg class="icon size-5"><use href="#i-file" /></svg>My analyses</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink/80 hover:bg-[#f1f5f9]"><svg class="icon size-5"><use href="#i-case" /></svg>My applications</a>
+        <a href="#" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-ink/80 hover:bg-[#f1f5f9]"><svg class="icon size-5"><use href="#i-help" /></svg>Help</a>
+      </nav>
+      <div class="mt-auto flex items-center gap-3 border-t border-line px-2 pt-4">
+        <span class="grid size-9 place-items-center rounded-full bg-brand text-sm font-semibold text-white" data-user="initial">J</span>
+        <div class="min-w-0 flex-1 leading-tight"><p class="truncate text-sm font-semibold" data-user="name">Job seeker</p><p class="text-xs text-mute">Job seeker</p></div>
+        <button type="button" aria-label="Log out" onclick="logout()" class="text-mute hover:text-ink"><svg class="icon size-5"><use href="#i-logout" /></svg></button>
+      </div>
+    </aside>
+
+    <div class="min-w-0">
+      <!-- TOP BAR -->
+      <header class="sticky top-0 z-10 flex items-center justify-between gap-3 border-b border-line bg-white/90 px-5 py-3.5 backdrop-blur sm:px-8">
+        <div class="flex min-w-0 items-center gap-3">
+          <button id="menuBtn" type="button" aria-expanded="false" aria-controls="sidebar" aria-label="Toggle menu" class="grid size-9 place-items-center rounded-lg border border-line lg:hidden"><svg class="icon size-5"><use href="#i-menu" /></svg></button>
+          <p class="flex min-w-0 items-center gap-2 text-sm text-mute"><a href="job-seeker-home.html" class="hover:text-ink">New analysis</a><span aria-hidden="true">&rsaquo;</span><strong class="truncate font-semibold text-ink" id="crumbLast">Add job and CV</strong></p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" aria-label="Help" class="grid size-9 place-items-center rounded-lg border border-line text-mute"><svg class="icon size-5"><use href="#i-help" /></svg></button>
+          <span class="flex items-center gap-2 text-sm font-medium"><span class="grid size-8 place-items-center rounded-full bg-brand text-xs font-semibold text-white" data-user="initial">J</span><span class="hidden sm:inline" data-user="first">Job seeker</span></span>
+        </div>
+      </header>
+
+      <main class="mx-auto grid max-w-6xl gap-5 px-5 py-6 sm:px-8 sm:py-8 xl:grid-cols-[1fr_320px]">
+        <div class="xl:col-span-2">
+          <h1 class="font-display text-2xl font-bold sm:text-3xl">Add the job and your CV</h1>
+          <p class="mt-1 text-sm text-mute">Step 1 of 2. Tell us about the job, then add your CV.</p>
+        </div>
+
+        <section class="rounded-2xl border border-line bg-white p-5 sm:p-7">
+          <h2 class="text-sm font-semibold">1. The job</h2>
+
+          <!-- how to add the job -->
+          <div role="tablist" aria-label="How to add the job" class="mt-3 inline-flex max-w-full flex-wrap rounded-xl bg-slate-100 p-1 text-sm font-medium">
+            <button type="button" role="tab" data-mode="text" class="flex items-center gap-2 rounded-lg px-3.5 py-2"><svg class="icon size-4"><use href="#i-text" /></svg>Paste text</button>
+            <button type="button" role="tab" data-mode="screenshot" class="flex items-center gap-2 rounded-lg px-3.5 py-2"><svg class="icon size-4"><use href="#i-image" /></svg>Upload screenshot</button>
+            <button type="button" role="tab" data-mode="link" class="flex items-center gap-2 rounded-lg px-3.5 py-2"><svg class="icon size-4"><use href="#i-link" /></svg>Paste link</button>
+          </div>
+
+          <!-- Paste text -->
+          <div id="pText" class="mt-4">
+            <textarea id="jobText" rows="8" placeholder="Paste the full job post here" class="w-full resize-y rounded-xl border border-line bg-white p-4 text-sm leading-relaxed outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"></textarea>
+            <p class="mt-2 flex items-center justify-between gap-3 text-xs text-mute"><span>Add the full job post for the best match. About 50 words or more works best.</span><span id="wc" class="shrink-0">0 words</span></p>
+          </div>
+
+          <!-- Upload screenshot -->
+          <div id="pShot" class="mt-4" style="display:none">
+            <div id="shotGrid" class="grid gap-3 sm:grid-cols-3"></div>
+            <input id="shots" type="file" accept="image/png,image/jpeg" multiple class="sr-only" />
+            <p class="mt-2 text-xs text-mute">JPG or PNG, up to 5 MB each.</p>
+          </div>
+
+          <!-- Paste link -->
+          <div id="pLink" class="mt-4" style="display:none">
+            <div class="flex flex-col gap-2 sm:flex-row">
+              <input id="jobUrl" type="url" inputmode="url" placeholder="https://..." class="h-11 min-w-0 flex-1 rounded-xl border border-line bg-white px-4 text-sm outline-none focus:border-brand focus:ring-2 focus:ring-brand/20" />
+              <button id="readLink" type="button" class="h-11 shrink-0 rounded-xl bg-brand px-5 text-sm font-semibold text-white hover:bg-blue-700">Read link</button>
+            </div>
+            <p class="mt-2 text-xs text-mute">Paste the link to the job post. If we cannot read it, you can paste the text instead.</p>
+          </div>
+
+          <!-- What we read (screenshots and link) -->
+          <div id="readBox" class="mt-4" style="display:none">
+            <div id="readInfo" class="flex items-start gap-3 rounded-xl border border-brand/20 bg-brand-soft px-4 py-3 text-sm">
+              <svg class="icon mt-0.5 size-5 shrink-0 text-brand"><use href="#i-spark" /></svg>
+              <p id="readInfoText"></p>
+            </div>
+            <div id="readFail" class="rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700" role="alert" style="display:none">
+              <p id="readFailText"></p>
+              <button id="toText" type="button" class="mt-2 font-semibold underline">Paste the text instead</button>
+            </div>
+            <div id="readEdit" style="display:none">
+              <p class="mt-4 text-sm font-semibold">Job text we read <span class="ml-1 text-xs font-normal text-mute">You can edit this</span></p>
+              <textarea id="readText" rows="8" class="mt-2 w-full resize-y rounded-xl border border-line bg-white p-4 text-sm leading-relaxed outline-none focus:border-brand focus:ring-2 focus:ring-brand/20"></textarea>
+            </div>
+          </div>
+
+          <!-- CV -->
+          <h2 class="mt-8 text-sm font-semibold">Your CV</h2>
+          <label id="cvDrop" for="cv" class="mt-3 flex cursor-pointer flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 px-4 py-8 text-center hover:bg-slate-100">
+            <svg class="icon size-6 text-brand"><use href="#i-plus" /></svg>
+            <span class="mt-1 text-sm font-semibold text-brand">Upload CV</span>
+            <span class="mt-0.5 text-xs text-mute">PDF, image or Word file. Up to 5 MB. In English.</span>
+          </label>
+          <div id="cvRow" class="mt-3 items-center gap-3 rounded-xl border border-line p-3" style="display:none">
+            <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-brand-soft text-brand"><svg class="icon size-5"><use href="#i-file" /></svg></span>
+            <div class="min-w-0 flex-1"><p id="cvName" class="truncate text-sm font-semibold"></p><p id="cvMeta" class="text-xs text-mute"></p></div>
+            <span id="cvChip" class="text-xs font-semibold"></span>
+            <button id="cvReplace" type="button" class="text-sm font-semibold text-brand hover:underline">Replace</button>
+          </div>
+          <input id="cv" type="file" accept=".pdf,.docx,image/png,image/jpeg" class="sr-only" />
+          <p id="cvHelp" class="mt-2 text-xs text-mute" style="display:none">PDF, image or Word file. Up to 5 MB. In English.</p>
+
+          <div id="err" role="alert" class="mt-5 rounded-lg bg-red-50 p-3 text-sm text-red-700" style="display:none"></div>
+
+          <div class="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <p class="flex items-center gap-2 text-xs text-mute"><svg class="icon size-4"><use href="#i-spark" /></svg><span id="quotaText">&nbsp;</span></p>
+            <button id="go" type="button" class="inline-flex h-11 items-center justify-center gap-2 rounded-xl bg-[#22b8e6] px-6 text-sm font-semibold text-white hover:bg-[#1aa7d3] disabled:cursor-not-allowed disabled:opacity-60">Analyse my fit <svg class="icon size-4"><use href="#i-arrow" /></svg></button>
+          </div>
+        </section>
+
+        <aside class="space-y-5">
+          <div class="rounded-2xl border border-line bg-white p-5">
+            <h2 class="font-display font-semibold">What you will get</h2>
+            <ul class="mt-3 space-y-3 text-sm">
+              <li class="flex items-start gap-2.5"><span class="mt-0.5 text-brand"><svg class="icon size-4"><use href="#i-target" /></svg></span>A match score with the reason behind it.</li>
+              <li class="flex items-start gap-2.5"><span class="mt-0.5 text-brand"><svg class="icon size-4"><use href="#i-list" /></svg></span>Each requirement: met, partly met or not found.</li>
+              <li class="flex items-start gap-2.5"><span class="mt-0.5 text-brand"><svg class="icon size-4"><use href="#i-pen" /></svg></span>Gaps, CV tips and next steps for this job.</li>
+              <li class="flex items-start gap-2.5"><span class="mt-0.5 text-brand"><svg class="icon size-4"><use href="#i-help" /></svg></span>8 to 10 interview questions.</li>
+            </ul>
+          </div>
+          <div class="flex items-start gap-3 rounded-2xl border border-emerald-200 bg-emerald-50 p-4 text-sm text-emerald-900">
+            <svg class="icon mt-0.5 size-5 shrink-0 text-ok"><use href="#i-shield" /></svg>
+            <p><strong class="font-semibold">Your privacy.</strong> We send only your CV content and the job text to the AI. Your email, phone and address are never sent.</p>
+          </div>
+        </aside>
+      </main>
+
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    // Phone menu: show / hide the sidebar
+    document.getElementById("menuBtn").addEventListener("click", function () {
+      var side = document.getElementById("sidebar"), nowHidden = side.classList.toggle("hidden");
+      side.classList.toggle("flex", !nowHidden);
+      this.setAttribute("aria-expanded", String(!nowHidden));
+    });
+  </script>
+  <script>
+
+    (function () {
+      if (!seekerFlow.guard("new-analysis.html")) return;
+      var $ = function (id) { return document.getElementById(id); };
+      var MAX = 5 * 1024 * 1024;
+      // shot / link: { status: "idle" | "reading" | "ok" | "failed", text, msg }
+      var st = { mode: "text", images: [], cv: null, cvState: "", cvSeq: 0, shot: { status: "idle", text: "", msg: "" }, link: { status: "idle", text: "", msg: "" }, readSeq: 0, quota: null };
+
+      function vis(id, on) { $(id).style.display = on ? "" : "none"; }
+      function setErr(msg) { $("err").textContent = msg || ""; vis("err", !!msg); }
+
+      // ---------- how to add the job ----------
+      function setMode(m) {
+        st.mode = m; setErr("");
+        document.querySelectorAll("[data-mode]").forEach(function (b) {
+          var on = b.dataset.mode === m;
+          b.className = "flex items-center gap-2 rounded-lg px-3.5 py-2 " + (on ? "bg-white text-ink shadow-sm" : "text-mute hover:text-ink");
+          b.setAttribute("aria-selected", String(on));
+        });
+        vis("pText", m === "text"); vis("pShot", m === "screenshot"); vis("pLink", m === "link");
+        renderRead();
+      }
+      document.querySelectorAll("[data-mode]").forEach(function (b) { b.addEventListener("click", function () { setMode(b.dataset.mode); }); });
+
+      // draft text survives a refresh (the CV file cannot)
+      try { $("jobText").value = sessionStorage.getItem("hl_draft_job") || ""; } catch (e) {}
+      function countWords() { var n = seekerFlow.words($("jobText").value); $("wc").textContent = n + (n === 1 ? " word" : " words"); }
+      $("jobText").addEventListener("input", function () { countWords(); try { sessionStorage.setItem("hl_draft_job", $("jobText").value); } catch (e) {} });
+      countWords();
+
+      // ---------- screenshots ----------
+      function renderShots() {
+        var h = "";
+        if (!st.images.length) {
+          for (var i = 0; i < 3; i++) h += '<button type="button" data-add class="flex h-24 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-center hover:bg-slate-100"><svg class="icon size-5 text-brand"><use href="#i-plus" /></svg><span class="mt-1 text-sm font-semibold text-brand">Upload image</span><span class="text-xs text-mute">Up to 3 images</span></button>';
+        } else {
+          st.images.forEach(function (f, i) {
+            h += '<div class="flex h-24 items-center gap-3 rounded-xl border border-line bg-white p-3"><span class="grid size-10 shrink-0 place-items-center overflow-hidden rounded-lg bg-brand-soft text-brand"><img alt="" data-thumb="' + i + '" class="size-full object-cover" /></span><div class="min-w-0 flex-1"><p class="truncate text-sm font-semibold">' + esc(f.name) + '</p><p class="text-xs text-mute">' + esc(seekerFlow.size(f.size)) + '</p></div><button type="button" data-rm="' + i + '" aria-label="Remove ' + esc(f.name) + '" class="grid size-7 place-items-center rounded-md text-mute hover:bg-slate-100"><svg class="icon size-4"><use href="#i-x" /></svg></button></div>';
+          });
+          if (st.images.length < 3) h += '<button type="button" data-add class="flex h-24 flex-col items-center justify-center rounded-xl border border-dashed border-slate-300 bg-slate-50 text-center hover:bg-slate-100"><svg class="icon size-5 text-brand"><use href="#i-plus" /></svg><span class="mt-1 text-sm font-semibold text-brand">Add another</span><span class="text-xs text-mute">Up to 3 images</span></button>';
+        }
+        $("shotGrid").innerHTML = h;
+        st.images.forEach(function (f, i) { var im = $("shotGrid").querySelector('[data-thumb="' + i + '"]'); if (im) im.src = URL.createObjectURL(f); });
+      }
+      $("shotGrid").addEventListener("click", function (e) {
+        var add = e.target.closest("[data-add]"), rm = e.target.closest("[data-rm]");
+        if (add) $("shots").click();
+        if (rm) { st.images.splice(Number(rm.dataset.rm), 1); renderShots(); readShots(); }
+      });
+      $("shots").addEventListener("change", function () {
+        setErr("");
+        var files = Array.prototype.slice.call(this.files); this.value = "";
+        for (var i = 0; i < files.length; i++) {
+          var f = files[i];
+          if (!/^image\/(png|jpeg)$/.test(f.type)) { setErr("Screenshots must be JPG or PNG."); continue; }
+          if (f.size > MAX) { setErr("Each screenshot must be 5 MB or less."); continue; }
+          if (st.images.length >= 3) { setErr("You can add up to 3 screenshots."); break; }
+          st.images.push(f);
+        }
+        renderShots(); readShots();
+      });
+      async function readShots() {
+        var seq = ++st.readSeq;
+        if (!st.images.length) { st.shot = { status: "idle", text: "", msg: "" }; renderRead(); return; }
+        st.shot = { status: "reading", text: "", msg: "" }; renderRead();
+        try {
+          var text = await seekerFlow.readScreenshots(st.images);
+          if (seq !== st.readSeq) return;
+          st.shot = text ? { status: "ok", text: text, msg: "" } : { status: "failed", text: "", msg: seekerFlow.CODES.JOB_TEXT_NOT_READABLE };
+        } catch (e) { if (seq !== st.readSeq) return; st.shot = { status: "failed", text: "", msg: e.message }; }
+        renderRead();
+      }
+
+      // ---------- link ----------
+      $("readLink").addEventListener("click", async function () {
+        setErr("");
+        var url = $("jobUrl").value.trim();
+        if (!/^https?:\/\/\S+\.\S+/i.test(url)) { setErr("Paste a full link that starts with http:// or https://"); return; }
+        st.link = { status: "reading", text: "", msg: "" }; renderRead(); this.disabled = true;
+        try {
+          var text = await seekerFlow.readLink(url);
+          st.link = text ? { status: "ok", text: text, msg: "" } : { status: "failed", text: "", msg: seekerFlow.CODES.JOB_LINK_NOT_READABLE };
+        } catch (e) { st.link = { status: "failed", text: "", msg: e.message }; }
+        this.disabled = false; renderRead();
+      });
+
+      // shared "what we read" box
+      function renderRead() {
+        var r = st.mode === "screenshot" ? st.shot : st.mode === "link" ? st.link : null;
+        var on = !!r && r.status !== "idle";
+        vis("readBox", on);
+        if (!on) return;
+        vis("readInfo", r.status === "reading" || r.status === "ok"); vis("readFail", r.status === "failed"); vis("readEdit", r.status === "ok");
+        if (r.status === "reading") $("readInfoText").innerHTML = "<strong class=\"font-semibold\">Reading...</strong> We are using AI to read the job. This can take a few seconds.";
+        if (r.status === "ok") { $("readInfoText").innerHTML = "<strong class=\"font-semibold\">Check what we read.</strong> We used AI to read your " + (st.mode === "link" ? "link" : "screenshots") + ". Fix anything that looks wrong before you continue."; if ($("readText").value !== r.text) $("readText").value = r.text; }
+        if (r.status === "failed") $("readFailText").textContent = (r.msg || "We could not read the job.") + " Paste the text instead.";
+      }
+      $("readText").addEventListener("input", function () { var r = st.mode === "screenshot" ? st.shot : st.link; r.text = this.value; });
+      $("toText").addEventListener("click", function () { setMode("text"); $("jobText").focus(); });
+
+      // ---------- CV ----------
+      function renderCv() {
+        var has = !!st.cv;
+        vis("cvDrop", !has); $("cvRow").style.display = has ? "flex" : "none"; vis("cvHelp", has);
+        if (!has) return;
+        $("cvName").textContent = st.cv.name; $("cvMeta").textContent = seekerFlow.size(st.cv.size) + " \u00b7 Added just now";
+        var chip = $("cvChip");
+        if (st.cvState === "checking") { chip.textContent = "Checking..."; chip.className = "text-xs font-semibold text-mute"; }
+        else if (st.cvState === "ok") { chip.textContent = "\u2713 Readable"; chip.className = "text-xs font-semibold text-ok"; }
+        else if (st.cvState === "bad") { chip.textContent = "Not readable"; chip.className = "text-xs font-semibold text-rose-500"; }
+        else { chip.textContent = ""; }
+      }
+      $("cvReplace").addEventListener("click", function () { $("cv").click(); });
+      $("cv").addEventListener("change", async function () {
+        setErr("");
+        var f = this.files[0]; this.value = "";
+        if (!f) return;
+        if (!/\.(pdf|docx|png|jpe?g)$/i.test(f.name)) { setErr("Upload a PDF, Word (.docx) or image file."); return; }
+        if (f.size > MAX) { setErr("Your CV is over 5 MB. Please upload a smaller file."); return; }
+        var seq = ++st.cvSeq;
+        st.cv = f; st.cvState = "checking"; renderCv();
+        try { var ok = await seekerFlow.checkCv(f); if (seq !== st.cvSeq) return; st.cvState = ok ? "ok" : ""; }
+        catch (e) { if (seq !== st.cvSeq) return; st.cvState = "bad"; setErr(e.message); }
+        renderCv();
+      });
+
+      // ---------- quota ----------
+      function renderQuota() {
+        var q = st.quota; if (!q) return;
+        $("quotaText").textContent = q.remaining + " of " + q.limit + " analyses left today";
+        if (q.remaining === 0) { $("go").disabled = true; setErr(seekerFlow.CODES.DAILY_LIMIT_REACHED); }
+      }
+      seekerFlow.list(1).then(function (d) { st.quota = d.quota; renderQuota(); }).catch(function () { $("quotaText").textContent = ""; });
+
+      // ---------- analyse ----------
+      $("go").addEventListener("click", async function () {
+        setErr("");
+        var jobText = st.mode === "text" ? $("jobText").value.trim() : (st[st.mode === "screenshot" ? "shot" : "link"].status === "ok" ? $("readText").value.trim() : "");
+        if (!jobText) { setErr(st.mode === "text" ? "Paste the job text first." : "Add the job first. We need the job text we read."); return; }
+        if (!st.cv) { setErr("Add your CV."); return; }
+        if (st.cvState === "bad") { setErr("We could not read that CV. Please replace it."); return; }
+        if (st.cvState === "checking") { setErr("Wait a moment while we check your CV."); return; }
+        var btn = this, label = btn.firstChild.textContent; btn.disabled = true; btn.firstChild.textContent = "Starting... ";
+        try {
+          var r = await seekerFlow.create({ jobText: jobText, source: st.mode, cv: st.cv });
+          try { sessionStorage.removeItem("hl_draft_job"); } catch (e) {}
+          location.href = seekerFlow.url("analysing.html", { id: r.id });
+        } catch (e) {
+          if (e.code === "CV_NOT_READABLE") { st.cvState = "bad"; renderCv(); }
+          setErr(e.message); btn.disabled = false; btn.firstChild.textContent = label;
+          if (e.code === "DAILY_LIMIT_REACHED") btn.disabled = true;
+        }
+      });
+
+      setMode("text"); renderShots(); renderCv();
+    })();
+
+  </script>
+</body>
+</html>

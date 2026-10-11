@@ -167,7 +167,7 @@
   <script>
   (function () {
     // Result page is for logged-in job seekers (they sign up from the "Yes, show me" step)
-    if (!session.token) { location.replace("login.html"); return; }
+    if (!session.token) { location.replace(applyFlow.page("login.html") + "?next=" + encodeURIComponent(applyFlow.link("application-result.html", true))); return; }
     var $ = function (id) { return document.getElementById(id); };
     var rt = applyFlow.resultToken(), stop = null;
     function note(msg, bad) { var n = $("loadNote"); n.textContent = msg; n.className = "mt-5 rounded-xl border px-4 py-3 text-sm " + (bad ? "border-red-200 bg-red-50 text-red-700" : "border-line bg-white text-mute"); n.classList.remove("hidden"); }
