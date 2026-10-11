@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Create Account</title>
 
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
 
@@ -108,7 +108,7 @@
         <h2 class="font-display text-2xl font-bold">Create your account</h2>
         <p class="mt-1 text-sm text-gray-500">Choose how you will use Hirelume, then add your details.</p>
 
-        <form id="signup-form" action="/api/auth/signup" method="post" class="mt-6">
+        <form id="signup-form" action="/api/auth/signup" method="post" class="mt-6" novalidate>
 
           <!-- Role cards:  rows on phones, side by side from 640px -->
           <fieldset>
@@ -154,12 +154,14 @@
               <label for="fullName" class="text-sm font-medium">Full name</label>
               <input id="fullName" name="fullName" type="text" autocomplete="name" required
                      class="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3.5 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm" />
+              <p id="err-fullName" role="alert" class="mt-1.5 items-start gap-1.5 text-xs font-medium text-red-600" style="display:none"><svg class="mt-px size-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></svg><span></span></p>
             </div>
 
             <div>
               <label for="email" class="text-sm font-medium">Email</label>
               <input id="email" name="email" type="email" autocomplete="email" required
                      class="mt-1.5 w-full rounded-lg border border-gray-200 bg-white px-3.5 py-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm" />
+              <p id="err-email" role="alert" class="mt-1.5 items-start gap-1.5 text-xs font-medium text-red-600" style="display:none"><svg class="mt-px size-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></svg><span></span></p>
             </div>
 
             <div>
@@ -173,10 +175,11 @@
                 </button>
               </div>
               <p id="password-hint" class="mt-1.5 text-xs text-gray-500">At least 8 characters.</p>
+              <p id="err-password" role="alert" class="mt-1.5 items-start gap-1.5 text-xs font-medium text-red-600" style="display:none"><svg class="mt-px size-4 shrink-0" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="10" /><path d="M12 8v4M12 16h.01" /></svg><span></span></p>
             </div>
           </div>
 
-          <p id="form-error" role="alert" class="mt-4 hidden text-sm text-red-600"></p>
+          <div id="form-error" role="alert" class="mt-5 hidden rounded-lg border border-red-200 bg-red-50 px-3.5 py-3 text-sm font-medium text-red-700"></div>
           <button type="submit"
                   class="mt-6 w-full rounded-lg bg-brand py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
             Create account
@@ -216,11 +219,130 @@
       toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
     });
 
+    // ---- email checks (pure) ----
+    var DISPOSABLE = ["mailinator.com","guerrillamail.com","10minutemail.com","tempmail.com","temp-mail.org","yopmail.com","trashmail.com","sharklasers.com","getnada.com","dispostable.com","maildrop.cc","throwawaymail.com","fakeinbox.com","mailnesia.com","mintemail.com","tempr.email","emailondeck.com"];
+    var TYPOS = { "gmial.com":"gmail.com","gmal.com":"gmail.com","gamil.com":"gmail.com","gmai.com":"gmail.com","gmail.con":"gmail.com","gmail.cm":"gmail.com","gmail.co":"gmail.com","gmail.comm":"gmail.com","gnail.com":"gmail.com",
+                  "yaho.com":"yahoo.com","yahooo.com":"yahoo.com","yahoo.con":"yahoo.com","hotmial.com":"hotmail.com","hotmal.com":"hotmail.com","hotmail.con":"hotmail.com","outlok.com":"outlook.com","outlook.con":"outlook.com","iclod.com":"icloud.com","icloud.con":"icloud.com" };
+    var EMAIL_RE = /^[A-Za-z0-9.!#$%&'*+\/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]*[A-Za-z0-9])?)*\.[A-Za-z]{2,}$/;
+    function checkEmailSync(raw) {
+      var v = String(raw || "").trim();
+      if (!v) return { msg: "Enter your email address." };
+      if (/\s/.test(v)) return { msg: "Your email cannot have spaces." };
+      if (v.indexOf("@") < 0) return { msg: "Your email needs an @ sign, like name@company.com." };
+      if (/\.\./.test(v) || !EMAIL_RE.test(v)) return { msg: "That email address does not look right. Check it and try again." };
+      var at = v.lastIndexOf("@"), local = v.slice(0, at), domain = v.slice(at + 1).toLowerCase();
+      if (TYPOS[domain]) return { msg: "Did you mean", fix: local + "@" + TYPOS[domain] };
+      if (DISPOSABLE.indexOf(domain) >= 0) return { msg: "Temporary email addresses are not allowed. Use your real email." };
+      return null;
+    }
+    // ---- end ----
+
+    function $(id) { return document.getElementById(id); }
+    var INPUT_OK = ["border-gray-200", "focus:border-brand", "focus:ring-brand/20"], INPUT_BAD = ["border-red-400", "focus:border-red-500", "focus:ring-red-200"];
+
+    // Show or clear the message under a field
+    function fieldError(id, msg, fix) {
+      var p = $("err-" + id), input = $(id);
+      INPUT_OK.forEach(function (c) { input.classList.toggle(c, !msg); });
+      INPUT_BAD.forEach(function (c) { input.classList.toggle(c, !!msg); });
+      input.setAttribute("aria-invalid", msg ? "true" : "false");
+      if (id === "password") $("password-hint").style.display = msg ? "none" : "";
+      if (!msg) { p.style.display = "none"; return; }
+      var span = p.querySelector("span");
+      span.textContent = msg;
+      if (fix) {
+        span.appendChild(document.createTextNode(" "));
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "font-semibold underline"; b.textContent = fix;
+        b.addEventListener("click", function () { input.value = fix; fieldError(id, ""); input.focus(); });
+        span.appendChild(b); span.appendChild(document.createTextNode("?"));
+      }
+      p.style.display = "flex";
+    }
+    function showBanner(msg, html) {
+      var b = $("form-error");
+      if (html) b.innerHTML = html; else b.textContent = msg;
+      b.classList.toggle("hidden", !msg && !html);
+    }
+
+    // Can this email's domain receive mail? (DNS lookup, asks only for the part after the @.)
+    // If the check itself fails or is slow, we do NOT block the person.
+    var domainCache = {};
+    async function dns(name, type) {
+      var ctl = new AbortController(), t = setTimeout(function () { ctl.abort(); }, 3500);
+      try {
+        var res = await fetch("https://cloudflare-dns.com/dns-query?name=" + encodeURIComponent(name) + "&type=" + type, { headers: { accept: "application/dns-json" }, signal: ctl.signal });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch (e) { return null; } finally { clearTimeout(t); }
+    }
+    async function domainCanReceiveMail(domain) {
+      if (domain in domainCache) return domainCache[domain];
+      var ok = true;
+      var mx = await dns(domain, "MX");
+      if (mx) {
+        if (mx.Status === 3) ok = false;                                   // the domain does not exist
+        else if (mx.Status === 0 && !(mx.Answer || []).some(function (a) { return a.type === 15; })) {
+          var a = await dns(domain, "A");                                  // no MX record: mail can still go to the domain's own address
+          if (a && a.Status === 3) ok = false;
+          else if (a && a.Status === 0 && !(a.Answer || []).some(function (r) { return r.type === 1; })) ok = false;
+        }
+      }
+      domainCache[domain] = ok; return ok;
+    }
+    async function checkEmail(value) {
+      var bad = checkEmailSync(value);
+      if (bad) return bad;
+      var domain = value.trim().split("@").pop().toLowerCase();
+      if (!(await domainCanReceiveMail(domain))) return { msg: "We could not find the email domain @" + domain + ". Check for typing mistakes." };
+      return null;
+    }
+
+    function checkName() { var v = $("fullName").value.trim(); var m = !v ? "Enter your full name." : v.length < 2 ? "Your name looks too short." : ""; fieldError("fullName", m); return !m; }
+    function checkPassword() { var v = $("password").value; var m = !v ? "Create a password." : v.length < 8 ? "Use at least 8 characters." : ""; fieldError("password", m); return !m; }
+    async function checkEmailField() {
+      var value = $("email").value, r = await checkEmail(value);
+      if ($("email").value !== value) return true;      // the person kept typing: ignore this result
+      fieldError("email", r ? r.msg : "", r && r.fix); return !r;
+    }
+
+    // Check as the person leaves a field, and clear the message as they fix it
+    $("fullName").addEventListener("blur", checkName);
+    $("password").addEventListener("blur", function () { if ($("password").value) checkPassword(); });
+    $("email").addEventListener("blur", function () { if ($("email").value.trim()) checkEmailField(); });
+    ["fullName", "email", "password"].forEach(function (id) { $(id).addEventListener("input", function () { fieldError(id, ""); showBanner(""); }); });
+
+    // Friendly text for the codes the server sends back
+    var FRIENDLY = { VALIDATION_ERROR: "Please check your details and try again.", INTERNAL_SERVER_ERROR: "The server had a problem. Please try again in a moment." };
+
     // Real signup
-    document.getElementById("signup-form").addEventListener("submit", (e) => {
+    $("signup-form").addEventListener("submit", async function (e) {
       e.preventDefault();
-      const f = new FormData(e.target);
-      submitAuth(e.target, "/register", { name: f.get("fullName").trim(), email: f.get("email").trim(), password: f.get("password"), role: f.get("role") }, "jobs.html");
+      showBanner("");
+      var form = e.target, btn = form.querySelector("[type=submit]"), label = btn.textContent;
+      var okName = checkName(), okPass = checkPassword();
+      var sync = checkEmailSync($("email").value);
+      if (sync) fieldError("email", sync.msg, sync.fix);
+      if (!okName || sync || !okPass) { (!okName ? $("fullName") : sync ? $("email") : $("password")).focus(); return; }
+
+      btn.disabled = true; btn.textContent = "Checking your email...";
+      var okEmail = await checkEmailField();
+      if (!okEmail) { btn.disabled = false; btn.textContent = label; $("email").focus(); return; }
+
+      btn.textContent = "Creating your account...";
+      var f = new FormData(form);
+      try {
+        var d = await api(ENDPOINTS.auth + "/register", { method: "POST", auth: false, body: { name: f.get("fullName").trim(), email: f.get("email").trim(), password: f.get("password"), role: f.get("role") } });
+        session.save(d);
+        location.href = ROLE_HOME[d.user.role] || "jobs.html";     // recruiter -> jobs.html, job seeker -> job-seeker-home.html
+      } catch (err) {
+        btn.disabled = false; btn.textContent = label;
+        if (err.message === "ACCOUNT_ALREADY_EXISTS") {
+          fieldError("email", "This email already has an account.");
+          showBanner("", 'An account with this email already exists. <a href="login.html" class="font-semibold underline">Log in instead</a>');
+        } else if (/^[A-Z_]{4,}$/.test(err.message)) showBanner(FRIENDLY[err.message] || "Something went wrong. Please try again.");
+        else showBanner(err.message);
+      }
     });
   </script>
 </body>
