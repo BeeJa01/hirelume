@@ -11,7 +11,9 @@ function errorHandler(error, req, res, next) {
     return res.status(422).json({ detail: 'VALIDATION_ERROR', errors: error.issues.map((issue) => ({ loc: issue.path, msg: issue.message, type: issue.code })) });
   }
   if (error?.code === 'LIMIT_FILE_SIZE') {
-    const detail = req.baseUrl === '/api/users' ? 'AVATAR_TOO_LARGE' : 'CV_TOO_LARGE';
+    const detail = req.baseUrl === '/api/users'
+      ? 'AVATAR_TOO_LARGE'
+      : (req.baseUrl === '/api/flow2' && error.field === 'screenshots' ? 'SCREENSHOT_TOO_LARGE' : 'CV_TOO_LARGE');
     return res.status(413).json({ detail });
   }
   if (error?.code === 'LIMIT_UNEXPECTED_FILE') return res.status(400).json({ detail: 'UNEXPECTED_FILE' });

@@ -160,6 +160,36 @@ Authentication required. Request: `{ "application_id":"optional-linked-applicati
 
 May be anonymous and is rate-limited. Request: `{ "name":"result.viewed", "anonymous_id":"anonymous-123", "properties":{"source":"email"}, "occurred_at":"2026-09-30T12:00:00Z" }`. Authenticated requests may omit `anonymous_id`; anonymous requests may not. Properties are limited to 10 KB. Response: `{ "accepted":true }`, status 202.
 
+## Flow 2 analysis
+
+Flow 2 is available to authenticated `job_seeker` accounts and has a configurable per-user UTC daily limit (`FLOW2_DAILY_LIMIT`, default 5). It resolves the job source, lets the user review the resulting text, validates that the CV is readable, and only then consumes quota and starts analysis.
+
+### `POST /flow2/analyses`
+
+Multipart request containing exactly one job source:
+
+- `job_text`: pasted job description of at least 50 characters;
+- `job_link`: a public HTTP(S) job page, fetched with private-network and response-size protections; or
+- up to three PNG/JPEG/WebP files named `screenshots`, processed by the configured vision model.
+
+Returns status `awaiting_confirmation`, extracted `job_text`, `source_type`, and `daily_limit`. Errors include `JOB_LINK_UNREADABLE` and `SCREENSHOT_TEXT_UNREADABLE`. Screenshot text is extracted locally. For backward compatibility, a readable PDF/DOCX field named `cv` may be included here, though the normal flow uploads it after confirmation.
+
+### `POST /flow2/analyses/{id}/confirm`
+
+Request: `{ "job_text":"Confirmed job description (at least 50 characters)" }`. Saves the corrected/confirmed text and returns status `awaiting_cv`. If a CV was included during draft creation, it immediately consumes quota and returns `pending`.
+
+### `POST /flow2/analyses/{id}/cv`
+
+Multipart request with one PDF/DOCX field named `cv`. The backend extracts its text immediately. An unreadable document returns 422 `CV_UNREADABLE`, allowing re-upload. A readable document consumes one daily slot, queues analysis, and returns `pending`. Error: 429 `FLOW2_DAILY_LIMIT_REACHED` after the configured allowance.
+
+### `POST /flow2/analyses/{id}/retry`
+
+Retries an owned analysis whose status is `failed` without consuming another daily slot. Other states return 409 `FLOW2_NOT_RETRYABLE`.
+
+### `GET /flow2/analyses/{id}`
+
+Returns the draft/status to its owning job seeker. A completed response also includes `score`, `match_level`, `reason`, `skills`, `experience`, `gaps`, `guidance`, `questions`, and `needs_review`. Other users receive 404 `FLOW2_ANALYSIS_NOT_FOUND`.
+
 ## Flow 1 analysis
 
-Set `ANALYSIS_PROVIDER=gemini` with `GEMINI_API_KEY`, or `ANALYSIS_PROVIDER=groq` with `GROQ_API_KEY`. Each submitted CV is parsed, optionally identity-redacted, scored in the background, and retried up to `ANALYSIS_MAX_ATTEMPTS`. Pending work is recovered when the server starts. With provider `none`, submissions remain pending. Flow 2 remains intentionally out of scope.
+Set `ANALYSIS_PROVIDER=gemini` with `GEMINI_API_KEY`, or `ANALYSIS_PROVIDER=groq` with `GROQ_API_KEY`. Each submitted CV is parsed, optionally identity-redacted, scored in the background, and retried up to `ANALYSIS_MAX_ATTEMPTS`. Pending Flow 1 and confirmed Flow 2 work is recovered when the server starts. With provider `none`, submissions remain pending.

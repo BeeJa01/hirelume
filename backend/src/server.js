@@ -2,6 +2,7 @@ const { app } = require('./app');
 const { port, secretKey, corsOrigins } = require('./config');
 const { connectDatabase, closeDatabase } = require('./config/db');
 const { recoverPendingAnalyses } = require('./services/analysis');
+const { recoverPendingFlow2Analyses } = require('./services/flow2Analysis');
 
 async function start() {
   if (process.env.NODE_ENV === 'production') {
@@ -15,6 +16,7 @@ async function start() {
 
   await connectDatabase();
   await recoverPendingAnalyses();
+  await recoverPendingFlow2Analyses();
   const server = app.listen(port, () => console.log(`Hirelume API listening on port ${port}`));
   const shutdown = () => server.close(async () => {
     await closeDatabase();

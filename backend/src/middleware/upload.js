@@ -6,4 +6,9 @@ const uploadCv = multer({
   limits: { fileSize: maxFileSizeMb * 1024 * 1024, files: 1 },
 });
 
-module.exports = { uploadCv };
+const uploadFlow2 = multer({
+  storage: multer.memoryStorage(),
+  limits: { fileSize: maxFileSizeMb * 1024 * 1024, files: 4 },
+});
+
+module.exports = { uploadCv, uploadFlow2 };

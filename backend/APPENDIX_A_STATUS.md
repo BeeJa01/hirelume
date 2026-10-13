@@ -1,6 +1,6 @@
 # Appendix A — backend status
 
-Updated 3 October 2026. Flow 2 is intentionally deferred.
+Updated 13 October 2026.
 
 ## A.1 Backend checklist
 
@@ -17,9 +17,9 @@ Updated 3 October 2026. Flow 2 is intentionally deferred.
 | 9 | Ranked list with reason, skills, experience, and needs-review flag | 3 | Done after analysis completes |
 | 10 | Applicant detail with CV link | 3 | Done |
 | 11 | Shortlist or reject, saving actor and time | 3 | Done |
-| 12 | Flow 2 analysis | 5, 6 | Deferred by product decision |
+| 12 | Flow 2 analysis | 5, 6 | Done; authenticated draft, confirm-text, queued analysis, private result |
 | 13 | Stable error codes | All | Done |
-| 14 | File limits and rate limits | 4, 5 | Done: size limits cover CVs/avatars; rate limits cover auth, applications, ratings, and events |
+| 14 | File limits and rate limits | 4, 5 | Done: size limits cover CVs/avatars; rate limits and the Flow 2 daily quota are enforced |
 | 15 | Store ratings and analytics events | 6 | Done; ratings require authentication and ownership, anonymous events are rate-limited |
 | 16 | Blind mode removes identity details before the AI call | 3 | Done |
 
@@ -29,13 +29,13 @@ Updated 3 October 2026. Flow 2 is intentionally deferred.
 |---:|---|---|
 | 1 | Contract lacked fields, status codes, error format, and examples | `API_CONTRACT.md` now documents every implemented route |
 | 2 | No route to link an application to a new account | Added `POST /applications/link` with token, email, and role checks |
-| 3 | Flow 2 read/confirm-text step | Deferred with Flow 2 |
+| 3 | Flow 2 read/confirm-text step | Added draft and explicit confirmation endpoints |
 | 4 | CV download/preview missing from contract and detail | Documented `GET /applications/{id}/cv`; detail now returns `cv_url` |
 | 5 | No applicant-data deletion | Added `DELETE /applications/{id}` for the linked applicant or owning recruiter |
 | 6 | Applicant list lacked filters, sorting, and paging | Added status/analysis filters, score/date sorting, and bounded paging |
 | 7 | Feedback rule not enforced | Results expose feedback only to an authenticated, linked, opted-in applicant when enabled by the job |
 | 8 | Logout, refresh, and current-user routes | All implemented |
-| 9 | Flow 2 daily quota | Deferred with Flow 2 |
+| 9 | Flow 2 daily quota | Enforced per user and UTC date; configurable with `FLOW2_DAILY_LIMIT` |
 | 10 | Requirement-lock error code | Added `JOB_REQUIREMENTS_LOCKED` |
 | 11 | Public job lacked consent wording/version | Both are returned and the submitted version is checked |
 | 12 | Ratings/events validation and access rules | Implemented authenticated ratings and rate-limited anonymous events |

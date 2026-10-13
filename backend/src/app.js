@@ -8,6 +8,7 @@ const jobRoutes = require('./routes/jobRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const cvRoutes = require('./routes/cvRoutes');
 const engagementRoutes = require('./routes/engagementRoutes');
+const flow2Routes = require('./routes/flow2Routes');
 
 const app = express();
 app.disable('x-powered-by');
@@ -26,6 +27,7 @@ app.use('/api/auth', authRoutes);
 app.use('/api/users', userRoutes);
 app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
+app.use('/api/flow2', flow2Routes);
 app.use('/api', cvRoutes);
 app.use('/api', engagementRoutes);
 app.use(notFound);

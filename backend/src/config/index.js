@@ -14,6 +14,7 @@ module.exports = {
   consentText: process.env.CONSENT_TEXT || 'I consent to Hirelume storing and processing my application data for recruitment.',
   analysisProvider: (process.env.ANALYSIS_PROVIDER || 'none').toLowerCase(),
   analysisMaxAttempts: Number(process.env.ANALYSIS_MAX_ATTEMPTS || 3),
+  flow2DailyLimit: Math.max(1, Number(process.env.FLOW2_DAILY_LIMIT || 5)),
   geminiApiKey: process.env.GEMINI_API_KEY || '',
   geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
   groqApiKey: process.env.GROQ_API_KEY || '',

@@ -7,4 +7,5 @@ module.exports = {
   RefreshToken: require('./RefreshToken'),
   Rating: require('./Rating'),
   AnalyticsEvent: require('./AnalyticsEvent'),
+  Flow2Analysis: require('./Flow2Analysis'),
 };

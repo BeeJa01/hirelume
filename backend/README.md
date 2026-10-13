@@ -51,7 +51,7 @@ See [API_CONTRACT.md](API_CONTRACT.md) for endpoints and request fields.
 
 ## Current scope
 
-The backend includes accounts and refresh sessions, jobs, public applications, account linking, CV parsing, optional blind mode, background Gemini/Groq analysis, recruiter review, private applicant results, ratings, and analytics events. Flow 2 is intentionally deferred.
+The backend includes accounts and refresh sessions, jobs, public applications, account linking, CV parsing, optional blind mode, background Gemini/Groq analysis, recruiter review, private applicant results, the authenticated Flow 2 job-match workflow, ratings, and analytics events.
 
 ## Data and configuration
 
@@ -59,7 +59,7 @@ The app connects to MongoDB using `MONGODB_URI`. The example uses a local MongoD
 
 Set a strong `SECRET_KEY` and the deployed frontend's origin in `CORS_ORIGIN` before deployment. Never commit `.env`, database files, uploaded CVs, or credentials.
 
-To enable Flow 1 analysis, set `ANALYSIS_PROVIDER` to `gemini` or `groq` and provide the matching API key. Without a configured provider, applications remain pending. Local uploaded files must be placed on persistent private storage in production.
+To enable Flow 1 and Flow 2 analysis, set `ANALYSIS_PROVIDER` to `gemini` or `groq` and provide the matching API key. Screenshot text is extracted locally with English OCR and does not require a vision API. Without a configured analysis provider, confirmed analyses remain pending. `FLOW2_DAILY_LIMIT` controls the per-job-seeker UTC daily allowance. Local uploaded files must be placed on persistent private storage in production.
 
 Run `npm run migrate` once for an existing database before deploying this version. It removes superseded duplicate analysis-result records and creates the required indexes.
 

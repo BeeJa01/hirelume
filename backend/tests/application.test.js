@@ -11,6 +11,7 @@ const temporaryDirectory = fsSync.mkdtempSync(path.join(os.tmpdir(), 'hirelume-a
 process.env.UPLOAD_DIR = path.join(temporaryDirectory, 'cvs');
 process.env.USER_UPLOAD_DIR = path.join(temporaryDirectory, 'users');
 process.env.SECRET_KEY = 'test-secret-for-automated-tests';
+process.env.ANALYSIS_PROVIDER = 'none';
 if (externalTestUri) process.env.MONGODB_URI = externalTestUri;
 
 const request = require('supertest');
@@ -36,6 +37,7 @@ beforeEach(async () => {
     models.RefreshToken.deleteMany({}),
     models.Rating.deleteMany({}),
     models.AnalyticsEvent.deleteMany({}),
+    models.Flow2Analysis.deleteMany({}),
   ]);
 });
 
@@ -75,6 +77,28 @@ function apply(publicToken, email = 'candidate@example.com') {
     .field('consent', 'true')
     .field('consent_version', 'v1')
     .attach('cv', Buffer.from('%PDF-1.4 test'), 'resume.pdf');
+}
+
+function readablePdf(text = 'Backend engineer with Node.js and MongoDB experience') {
+  const stream = `BT /F1 12 Tf 72 720 Td (${text}) Tj ET`;
+  const objects = [
+    '<< /Type /Catalog /Pages 2 0 R >>',
+    '<< /Type /Pages /Kids [3 0 R] /Count 1 >>',
+    '<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 4 0 R >> >> /Contents 5 0 R >>',
+    '<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>',
+    `<< /Length ${Buffer.byteLength(stream)} >>\nstream\n${stream}\nendstream`,
+  ];
+  let pdf = '%PDF-1.4\n';
+  const offsets = [0];
+  objects.forEach((object, index) => {
+    offsets.push(Buffer.byteLength(pdf));
+    pdf += `${index + 1} 0 obj\n${object}\nendobj\n`;
+  });
+  const xref = Buffer.byteLength(pdf);
+  pdf += `xref\n0 ${objects.length + 1}\n0000000000 65535 f \n`;
+  pdf += offsets.slice(1).map((offset) => `${String(offset).padStart(10, '0')} 00000 n \n`).join('');
+  pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;
+  return Buffer.from(pdf);
 }
 
 test('recruiter can create a job, receive an application, and manage its status', async () => {
@@ -222,4 +246,73 @@ test('frontend origin is allowed by CORS', async () => {
     .set('Origin', 'https://hirelume-kappa.vercel.app')
     .set('Access-Control-Request-Method', 'POST');
   assert.equal(deployedResponse.headers['access-control-allow-origin'], 'https://hirelume-kappa.vercel.app');
+});
+
+test('Flow 2 requires text confirmation, scopes results, and enforces the daily quota', async () => {
+  const seekerToken = await register('seeker@example.com', 'job_seeker');
+  const otherToken = await register('other-seeker@example.com', 'job_seeker');
+  const recruiterToken = await register('flow2-recruiter@example.com', 'recruiter');
+  const auth = { Authorization: `Bearer ${seekerToken}` };
+  const jobText = 'We need a backend engineer with Node.js, MongoDB, API design, testing, and production operations experience.';
+
+  const invalidScreenshot = await request(app).post('/api/flow2/analyses').set(auth)
+    .attach('screenshots', Buffer.from('not an image'), 'job.png');
+  assert.equal(invalidScreenshot.status, 400, invalidScreenshot.text);
+  assert.equal(invalidScreenshot.body.detail, 'SCREENSHOT_INVALID_CONTENT');
+
+  const createDraft = () => request(app)
+    .post('/api/flow2/analyses')
+    .set(auth)
+    .field('job_text', jobText);
+
+  const first = await createDraft();
+  assert.equal(first.status, 201, first.text);
+  assert.equal(first.body.status, 'awaiting_confirmation');
+  assert.equal(first.body.job_text, jobText);
+  assert.equal((await request(app).get(`/api/flow2/analyses/${first.body.id}`).set('Authorization', `Bearer ${otherToken}`)).status, 404);
+  assert.equal((await request(app).get(`/api/flow2/analyses/${first.body.id}`).set('Authorization', `Bearer ${recruiterToken}`)).status, 403);
+
+  const confirmed = await request(app)
+    .post(`/api/flow2/analyses/${first.body.id}/confirm`)
+    .set(auth)
+    .send({ job_text: jobText });
+  assert.equal(confirmed.status, 200, confirmed.text);
+  assert.equal(confirmed.body.status, 'awaiting_cv');
+  assert.equal((await request(app).post(`/api/flow2/analyses/${first.body.id}/confirm`).set(auth).send({ job_text: jobText })).status, 409);
+  const unreadable = await request(app).post(`/api/flow2/analyses/${first.body.id}/cv`).set(auth)
+    .attach('cv', Buffer.from('%PDF-1.4 not readable'), 'resume.pdf');
+  assert.equal(unreadable.status, 422, unreadable.text);
+  assert.equal(unreadable.body.detail, 'CV_UNREADABLE');
+  const uploaded = await request(app).post(`/api/flow2/analyses/${first.body.id}/cv`).set(auth)
+    .attach('cv', readablePdf(), 'resume.pdf');
+  assert.equal(uploaded.status, 200, uploaded.text);
+  assert.equal(uploaded.body.status, 'pending');
+  await models.Flow2Analysis.updateOne({ _id: first.body.id }, { $set: { status: 'failed', attempts: 3 } });
+  const retried = await request(app).post(`/api/flow2/analyses/${first.body.id}/retry`).set(auth);
+  assert.equal(retried.status, 200, retried.text);
+  assert.equal(retried.body.status, 'pending');
+  await models.Flow2Analysis.updateOne({ _id: first.body.id }, { $set: {
+    status: 'completed', score: 82, match_level: 'strong', reason: 'Good backend fit',
+    skills: ['Node.js'], gaps: ['Cloud certification'], guidance: ['Quantify API impact'],
+    questions: ['How do you design resilient APIs?'],
+  } });
+  const result = await request(app).get(`/api/flow2/analyses/${first.body.id}`).set(auth);
+  assert.equal(result.body.score, 82);
+  assert.deepEqual(result.body.gaps, ['Cloud certification']);
+
+  for (let index = 1; index < 5; index += 1) {
+    const draft = await createDraft();
+    assert.equal(draft.status, 201, draft.text);
+    const confirm = await request(app).post(`/api/flow2/analyses/${draft.body.id}/confirm`).set(auth).send({ job_text: jobText });
+    assert.equal(confirm.body.status, 'awaiting_cv');
+    assert.equal((await request(app).post(`/api/flow2/analyses/${draft.body.id}/cv`).set(auth)
+      .attach('cv', readablePdf(), 'resume.pdf')).status, 200);
+  }
+  const overLimit = await createDraft();
+  assert.equal(overLimit.status, 201, overLimit.text);
+  await request(app).post(`/api/flow2/analyses/${overLimit.body.id}/confirm`).set(auth).send({ job_text: jobText });
+  const limited = await request(app).post(`/api/flow2/analyses/${overLimit.body.id}/cv`).set(auth)
+    .attach('cv', readablePdf(), 'resume.pdf');
+  assert.equal(limited.status, 429, limited.text);
+  assert.equal(limited.body.detail, 'FLOW2_DAILY_LIMIT_REACHED');
 });
