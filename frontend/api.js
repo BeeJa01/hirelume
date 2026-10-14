@@ -383,7 +383,7 @@ const seekerFlow = {
     "/api/flow2/analyses/" + encodeURIComponent(id),
 
   retry: (id) =>
-    "/api/flow2/analyses/" + encodeURIComponent(id) + "/retry"
+    "/api/flow2/analyses/" + encodeURIComponent(id) + "/retry",
     jobScreenshots: "/api/analyses/job/screenshots",                              
     jobLink:        "/api/analyses/job/link",                                    
     cvCheck:        "/api/analyses/cv/check"                                      
