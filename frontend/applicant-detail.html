@@ -166,7 +166,8 @@
               <h2 class="flex items-center justify-center gap-2 text-lg font-semibold wide:justify-start"><span id="aLevelText"></span> <span id="aLevel" class="rounded-full bg-brand-soft px-2.5 py-0.5 text-[11px] font-semibold text-brand-dark"></span></h2>
               <p id="aReason" class="mt-2 text-[13px] leading-relaxed text-ink2"></p>
               <div class="mt-3 flex flex-wrap items-center justify-center gap-2 text-xs wide:justify-start">
-                <span class="inline-flex items-center gap-1.5 rounded-full bg-ok-soft px-2.5 py-1 font-medium text-ok"><svg class="size-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>No review flags</span>
+                <span id="flagOk" class="inline-flex items-center gap-1.5 rounded-full bg-ok-soft px-2.5 py-1 font-medium text-ok"><svg class="size-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" aria-hidden="true"><path d="M5 12.5l4.5 4.5L19 7.5" /></svg>No review flags</span>
+                <span id="flagReview" hidden class="inline-flex items-center gap-1.5 rounded-full bg-warn-bg px-2.5 py-1 font-medium text-warn-ink"><svg class="size-3.5 fill-none stroke-current stroke-2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3 2 20h20z" /><path d="M12 10v4M12 17h.01" /></svg>Needs your review</span>
                 <span id="aConf" class="text-mute2"></span>
               </div>
             </div>
@@ -191,34 +192,16 @@
             <ul id="reqList" class="divide-y divide-line px-5 pb-2 wide:hidden"></ul>
           </section>
 
-          <!-- Skills -->
-          <section hidden class="card grid gap-6 sm:grid-cols-2">
-            <div>
-              <h2 class="text-[15px] font-semibold">Matched skills</h2>
-              <div class="mt-3 flex flex-wrap gap-2 text-xs text-ink2">
-                <span class="rounded-full border border-line px-3 py-1">Field sales</span>
-                <span class="rounded-full border border-line px-3 py-1">Excel reporting</span>
-                <span class="rounded-full border border-line px-3 py-1">Customer visits</span>
-                <span class="rounded-full border border-line px-3 py-1">Business degree</span>
-              </div>
-            </div>
-            <div>
-              <h2 class="text-[15px] font-semibold">Missing skills</h2>
-              <div class="mt-3 flex flex-wrap gap-2 text-xs text-mute2">
-                <span class="inline-flex items-center gap-2 rounded-full border border-line py-1 pl-3 pr-1.5">Negotiation <b class="rounded-full bg-ink px-2 py-0.5 text-[11px] font-semibold text-white">Required</b></span>
-                <span class="inline-flex items-center gap-2 rounded-full border border-line py-1 pl-3 pr-1.5">CRM tools <b class="rounded-full bg-ink px-2 py-0.5 text-[11px] font-semibold text-white">Required</b></span>
-              </div>
-            </div>
+          <!-- Skills found by the AI -->
+          <section hidden id="skillsSection" class="card">
+            <h2 class="text-[15px] font-semibold">Skills found in the CV</h2>
+            <div id="aSkills" class="mt-3 flex flex-wrap gap-2 text-xs text-ink2"></div>
           </section>
 
-          <!-- Relevant experience -->
-          <section hidden class="card">
+          <!-- Relevant experience (from the AI) -->
+          <section hidden id="expSection" class="card">
             <h2 class="text-[15px] font-semibold">Relevant experience</h2>
-            <ul class="mt-3 flex flex-col gap-3 text-[13px] text-ink2">
-              <li class="flex items-start gap-2.5"><svg class="ico mt-0.5 size-4 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>Visited 15 to 20 retail customers a week and agreed delivery schedules.</li>
-              <li class="flex items-start gap-2.5"><svg class="ico mt-0.5 size-4 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>Prepared weekly sales reports for the sales manager.</li>
-              <li class="flex items-start gap-2.5"><svg class="ico mt-0.5 size-4 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>Handled customer complaints and renewals.</li>
-            </ul>
+            <ul id="aExp" class="mt-3 flex flex-col gap-3 text-[13px] text-ink2"></ul>
           </section>
         </div>
 
@@ -237,7 +220,7 @@
               <h2 class="text-[15px] font-semibold">Original CV</h2>
               <a href="#" id="cvOpen" class="btn h-8 border border-line bg-white px-3 text-xs hover:bg-chip"><svg class="ico size-3.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 4v11M7 11l5 5 5-5M5 20h14" /></svg>Open</a>
             </div>
-            <p class="mt-3 text-xs text-mute">Opens the applicant\'s CV. If the applicant turned on Blind Mode you will see an anonymised text version.</p>
+            <p class="mt-3 text-xs text-mute">Opens the applicant's CV. If the applicant turned on Blind Mode you will see an anonymised text version.</p>
           </section>
 
           <!-- Application details -->
@@ -272,14 +255,14 @@
     toastTimer = setTimeout(() => $("toast").removeAttribute("data-show"), 2200);
   }
 
-  // Load the applicant. The list endpoint has the summary; find this applicant in it.
+  // Load the applicant with GET /api/applications/:id (the list endpoint only returns the first 20).
   const qs = new URLSearchParams(location.search), jobId = qs.get("job"), appId = qs.get("id");
+  const LEVEL = { strong: "Strong", moderate: "Good", weak: "Fair" };
   const STATUS = { shortlisted: ["Shortlisted", "bg-ok-soft text-ok"], rejected: ["Rejected", "bg-[#FDECEA] text-danger"] };
-  (async () => {
+  async function load() {
     try {
-      const [job, list] = await Promise.all([api(ENDPOINTS.jobs + "/" + jobId), api(ENDPOINTS.jobs + "/" + jobId + "/applications")]);
-      const a = list.applicants.find((x) => x.id === appId);
-      if (!a) throw new Error("Applicant not found");
+      const [job, a] = await Promise.all([api(ENDPOINTS.jobs + "/" + jobId), api(ENDPOINTS.applications + "/" + appId)]);
+      if (!a || !a.id) throw new Error("Applicant not found");
       document.querySelectorAll("[data-job-title]").forEach((el) => { el.textContent = job.title; el.href = "applicants.html?job=" + jobId; });
       document.querySelectorAll("[data-applicant-name]").forEach((el) => (el.textContent = a.name));
       $("aName").textContent = a.name;
@@ -293,16 +276,25 @@
       if (a.score != null) {
         $("aScore").textContent = a.score;
         $("aRing").setAttribute("stroke-dasharray", (326.7 * a.score / 100).toFixed(1) + " 326.7");
-        $("aLevelText").textContent = (a.level || levelOf(a.score)) + " match";
-        $("aLevel").textContent = a.level || levelOf(a.score);
+        const lvl = LEVEL[String(a.match_level || "").toLowerCase()] || levelOf(a.score);
+        $("aLevelText").textContent = lvl + " match";
+        $("aLevel").textContent = lvl;
         $("aReason").textContent = a.reason || "";
-        $("aConf").textContent = a.needs_review ? "Needs your review" : "";
+        $("aConf").textContent = "";
+        $("flagOk").hidden = !!a.needs_review;
+        $("flagReview").hidden = !a.needs_review;
+        const tick = '<svg class="ico mt-0.5 size-4 shrink-0 text-ok" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg>';
+        const skills = Array.isArray(a.skills) ? a.skills : [], exp = Array.isArray(a.experience) ? a.experience : [];
+        if (skills.length) { $("aSkills").innerHTML = skills.map((x) => '<span class="rounded-full border border-line px-3 py-1">' + esc(x) + '</span>').join(""); $("skillsSection").hidden = false; }
+        if (exp.length) { $("aExp").innerHTML = exp.map((x) => '<li class="flex items-start gap-2.5">' + tick + esc(x) + '</li>').join(""); $("expSection").hidden = false; }
       } else {
         $("aLevelText").textContent = "Analysis in progress";
-        $("aReason").textContent = "The score will appear when the analysis finishes. Refresh in a moment.";
+        $("aReason").textContent = a.analysis_status === "failed" ? "The analysis could not be completed. Review the CV manually." : "The score will appear when the analysis finishes. This page updates by itself.";
+        if (a.analysis_status !== "failed") setTimeout(load, 5000);
       }
     } catch (e) { toast(e.message); }
-  })();
+  }
+  load();
 
   // Open CV (uses openCV from api.js)
   $("cvOpen").addEventListener("click", async (e) => {
