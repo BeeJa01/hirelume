@@ -14,12 +14,15 @@ import { styles } from '@/style';
 import { SpecialInput } from '@/components/SpecialInput';
 import { SpecialButton } from '@/components/SpecialButton';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
+import { getFieldErrors } from '@/services/errorMessages';
 
 type LoginScreenProps = {
   navigation: any;
 };
 
 export const LoginScreen = ({ navigation }: LoginScreenProps) => {
+  const { login } = useAuth();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
@@ -39,12 +42,21 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleLogin = () => {
+  const handleLogin = async () => {
+    if (!validate()) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      await login({ email, password });
+      // Navigation is handled by AuthContext
+    } catch (err: any) {
       setLoading(false);
-      navigation.navigate('Home');
-    }, 250);
+      const apiError = err;
+      if (apiError?.error?.details) {
+        const fieldErrors = getFieldErrors(apiError.error.details);
+        setErrors(fieldErrors);
+      }
+      Alert.alert('Login Failed', apiError?.error?.message || 'Something went wrong');
+    }
   };
 
   return (

@@ -14,12 +14,15 @@ import { styles } from '@/style';
 import { SpecialInput } from '@/components/SpecialInput';
 import { SpecialButton } from '@/components/SpecialButton';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
+import { getFieldErrors } from '@/services/errorMessages';
 
 type CreateAccountScreenProps = {
   navigation: any;
 };
 
 export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) => {
+  const { signup } = useAuth();
   const [fullName, setFullName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -61,12 +64,27 @@ export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) =>
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleCreateAccount = () => {
+  const handleCreateAccount = async () => {
+    if (!validate()) return;
     setLoading(true);
-    setTimeout(() => {
+    try {
+      // Privacy agreement is UI-only, not sent to backend
+      await signup({
+        name: fullName,
+        email,
+        password,
+        role: 'job_seeker',
+      });
+      // Navigation is handled by AuthContext
+    } catch (err: any) {
       setLoading(false);
-      navigation.navigate('Home');
-    }, 250);
+      const apiError = err;
+      if (apiError?.error?.details) {
+        const fieldErrors = getFieldErrors(apiError.error.details);
+        setErrors(fieldErrors);
+      }
+      Alert.alert('Sign Up Failed', apiError?.error?.message || 'Something went wrong');
+    }
   };
 
   return (

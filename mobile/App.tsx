@@ -3,6 +3,7 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
+import { AuthProvider, useAuth } from './src/contexts/AuthContext';
 import { SplashScreen } from './src/screens/SplashScreen';
 import { WelcomeScreen } from './src/screens/WelcomeScreen';
 import { CreateAccountScreen } from './src/screens/CreateAccountScreen';
@@ -33,23 +34,38 @@ export type RootStackParamList = {
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
 
-export default function App() {
+function RootNavigator() {
+  const { isLoading, isAuthenticated } = useAuth();
+
+  // While loading, show splash
+  if (isLoading) {
+    return (
+      <Stack.Navigator
+        initialRouteName="Splash"
+        screenOptions={{
+          headerShown: false,
+          animation: 'slide_from_right',
+          contentStyle: { backgroundColor: '#FFFFFF' },
+        }}
+      >
+        <Stack.Screen name="Splash" component={SplashScreen} />
+      </Stack.Navigator>
+    );
+  }
+
+  // If authenticated, show app screens starting from Home
+  // If not authenticated, show auth screens
   return (
-    <SafeAreaProvider>
-      <StatusBar style="dark" />
-      <NavigationContainer>
-        <Stack.Navigator
-          initialRouteName="Splash"
-          screenOptions={{
-            headerShown: false,
-            animation: 'slide_from_right',
-            contentStyle: { backgroundColor: '#FFFFFF' },
-          }}
-        >
-          <Stack.Screen name="Splash" component={SplashScreen} />
-          <Stack.Screen name="Welcome" component={WelcomeScreen} />
-          <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
-          <Stack.Screen name="Login" component={LoginScreen} />
+    <Stack.Navigator
+      initialRouteName={isAuthenticated ? 'Home' : 'Welcome'}
+      screenOptions={{
+        headerShown: false,
+        animation: 'slide_from_right',
+        contentStyle: { backgroundColor: '#FFFFFF' },
+      }}
+    >
+      {isAuthenticated ? (
+        <>
           <Stack.Screen name="Home" component={HomeScreen} />
           <Stack.Screen name="AddJobPasteText" component={AddJobPasteTextScreen} />
           <Stack.Screen name="AddJobScreenshot" component={AddJobScreenshotScreen} />
@@ -58,8 +74,28 @@ export default function App() {
           <Stack.Screen name="Analysing" component={AnalysingScreen} />
           <Stack.Screen name="AnalysisResult" component={AnalysisResultScreen} />
           <Stack.Screen name="MyAnalyses" component={MyAnalysesScreen} />
-        </Stack.Navigator>
-      </NavigationContainer>
+        </>
+      ) : (
+        <>
+          <Stack.Screen name="Splash" component={SplashScreen} />
+          <Stack.Screen name="Welcome" component={WelcomeScreen} />
+          <Stack.Screen name="CreateAccount" component={CreateAccountScreen} />
+          <Stack.Screen name="Login" component={LoginScreen} />
+        </>
+      )}
+    </Stack.Navigator>
+  );
+}
+
+export default function App() {
+  return (
+    <SafeAreaProvider>
+      <StatusBar style="dark" />
+      <AuthProvider>
+        <NavigationContainer>
+          <RootNavigator />
+        </NavigationContainer>
+      </AuthProvider>
     </SafeAreaProvider>
   );
 }

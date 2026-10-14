@@ -9,14 +9,17 @@ import {
   Image,
   StyleSheet,
   Platform,
+  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
 
 type HomeScreenProps = {
   navigation: any;
 };
 
 export const HomeScreen = ({ navigation }: HomeScreenProps) => {
+  const { user, logout } = useAuth();
   const recentAnalyses = [
     {
       id: '1',
@@ -61,7 +64,7 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
           {/* Header Row */}
           <View style={styles.headerRow}>
             <View style={styles.headerTextCol}>
-              <Text style={styles.greetingTitle}>Hi Tobi</Text>
+              <Text style={styles.greetingTitle}>Hi {user?.name || 'there'}</Text>
               <Text style={styles.greetingSubtitle}>
                 Check how well you fit any job, and know what to improve before you apply.
               </Text>
@@ -69,7 +72,22 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
             <TouchableOpacity
               style={styles.avatarButton}
               activeOpacity={0.8}
-              onPress={() => {}}
+              onPress={() => {
+                Alert.alert(
+                  'Account',
+                  'What would you like to do?',
+                  [
+                    { text: 'Cancel', style: 'cancel' },
+                    {
+                      text: 'Log out',
+                      style: 'destructive',
+                      onPress: async () => {
+                        await logout();
+                      },
+                    },
+                  ]
+                );
+              }}
             >
               <Image
                 source={require('../../assets/avatar.png')}

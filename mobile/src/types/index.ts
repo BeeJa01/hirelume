@@ -1,4 +1,4 @@
-export type UserRole = 'recruiter' | 'admin' | 'candidate';
+export type UserRole = 'recruiter' | 'job_seeker';
 
 export interface User {
   id: string;
@@ -6,13 +6,27 @@ export interface User {
   name: string;
   email: string;
   role: UserRole;
-  created_at?: string;
+  avatar_filename?: string | null;
+  avatar_mime_type?: string | null;
+  avatar_uploaded_at?: string | null;
+  avatar_url?: string | null;
 }
 
 export interface AuthResponse {
   access_token: string;
-  token_type?: string;
+  token_type: 'bearer';
+  expires_in: number;
+  refresh_token: string;
   user: User;
+}
+
+export interface ApiError {
+  success: false;
+  error: {
+    code: string;
+    message: string;
+    details?: any;
+  };
 }
 
 export interface LoginCredentials {
@@ -24,7 +38,7 @@ export interface RegisterCredentials {
   name: string;
   email: string;
   password: string;
-  role?: UserRole;
+  role: UserRole;
 }
 
 export type RequirementType = 'required' | 'preferred' | 'nice-to-have';

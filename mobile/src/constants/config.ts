@@ -1,6 +1,6 @@
 import { Platform } from 'react-native';
 
-// Default base URL depending on platform
+// Base URL from environment variable, with platform-specific defaults
 // Android emulator uses 10.0.2.2 to access host machine localhost
 // iOS simulator & Web can use localhost:8000
 export const DEFAULT_API_URL = Platform.select({
@@ -8,6 +8,9 @@ export const DEFAULT_API_URL = Platform.select({
   ios: 'http://localhost:8000/api',
   default: 'http://localhost:8000/api',
 });
+
+// The actual API URL used in apiClient.ts comes from EXPO_PUBLIC_API_URL env var
+// or falls back to DEFAULT_API_URL
 
 export const STORAGE_KEYS = {
   AUTH_TOKEN: '@hirelume_auth_token',
