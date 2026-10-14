@@ -384,9 +384,9 @@ const seekerFlow = {
 
   retry: (id) =>
     "/api/flow2/analyses/" + encodeURIComponent(id) + "/retry"
-    jobScreenshots: "/api/flow2/analyses/job/screenshots",                              
-    jobLink:        "/api/flow2/analyses/job/link",                                    
-    cvCheck:        "/api/flow2/analyses/cv/check"                                      
+    jobScreenshots: "/api/analyses/job/screenshots",                              
+    jobLink:        "/api/analyses/job/link",                                    
+    cvCheck:        "/api/analyses/cv/check"                                      
   },
 
   CODES: {
