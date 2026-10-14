@@ -1,11 +1,11 @@
-// ---- Config: the only block you edit when deploying ----
+// Config: the only block you edit when deploying
 const API_BASE = ["localhost", "127.0.0.1"].includes(location.hostname)
   ? "http://localhost:8000"                       // your local backend port (check PORT in backend/src/config.js)
   : "https://hirelume-api.onrender.com";      // your deployed backend URL, no trailing slash
 const ENDPOINTS = { auth: "/api/auth", jobs: "/api/jobs", applications: "/api/applications", cvs: "/api/cvs", analysis: "/api/analysis", pub: "/api/public", results: "/api/results" };
 const ROLE_HOME = { recruiter: "jobs.html", job_seeker: "job-seeker-home.html" };   // job seekers land on the "Check your fit" home
 
-// ---- Session ----
+//  Session 
 const session = {
   get token() { return localStorage.getItem("hl_token"); },
   get user() { try { return JSON.parse(localStorage.getItem("hl_user")); } catch (e) { return null; } },
@@ -21,7 +21,7 @@ document.addEventListener("click", (e) => {
   if (a) { e.preventDefault(); logout(); }
 });
 
-// ---- Helpers ----
+// Helpers 
 const applyLink = (token) => location.origin + "/public-job-page?t=" + token;   // new applicant flow (old /apply links still work)
 const levelOf = (s) => (s >= 80 ? "Strong" : s >= 60 ? "Good" : "Fair");
 const fmtDate = (d) => (d ? new Date(d).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" }) : "");
@@ -85,7 +85,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.querySelectorAll("[data-user]").forEach((el) => { el.textContent = map[el.dataset.user] || ""; });
 });
 
-// ---- Open an applicant's CV (your original, unchanged) ----
+// Open an applicant's CV 
 async function openCV(applicationId) {
   const tab = window.open("", "_blank");
   if (!tab) throw new Error("Allow pop-ups to open the CV");
@@ -114,15 +114,6 @@ async function openCV(applicationId) {
   }
 }
 
-// =====================================================================
-// ---- PUBLIC APPLICATION FLOW (new applicant pages) ----
-// Everything ABOVE this line is unchanged (older pages depend on it).
-// Everything below is new and lives under one name, `applyFlow`, so it
-// cannot clash with anything in the older pages.
-// Used by: public-job-page, application-form, application-received,
-//          application-result, interview-questions-application.
-// Route paths: change only the `paths` block if the backend differs.
-// =====================================================================
 const applyFlow = {
   paths: {
     job:    (t) => ENDPOINTS.pub + "/jobs/" + encodeURIComponent(t),                    // GET
@@ -152,7 +143,7 @@ const applyFlow = {
     APPLICATION_EMAIL_MISMATCH: "Please use the same email address you applied with."
   },
 
-  // ---- tokens carried from page to page (?t=job token, ?r=result token) ----
+  // tokens carried from page to page (?t=job token, ?r=result token) 
   qs(k) { return new URLSearchParams(location.search).get(k) || ""; },
   jobToken() {
     const t = applyFlow.qs("t") || sessionStorage.getItem("hl_job_token") || "";
@@ -197,7 +188,7 @@ const applyFlow = {
     }
   },
 
-  // ---- request helper: like api() but keeps status/code on the error and never logs the user out ----
+  // request helper: like api() but keeps status/code on the error and never logs the user out
   async req(path, opts = {}) {
     const useAuth = !!(opts.auth && session.token);
     const go = (withAuth) => fetch(API_BASE + path, { method: opts.method || "GET", headers: withAuth ? { Authorization: "Bearer " + session.token } : {}, body: opts.form });
@@ -222,7 +213,7 @@ const applyFlow = {
     return data;
   },
 
-  // ---- small normalisers (so pages don't care about exact field names) ----
+  //  small normalisers (so pages don't care about exact field names) 
   txt(x) {
     if (x == null) return "";
     if (typeof x === "object") return String(x.text || x.title || x.name || x.skill || x.requirement || x.gap || x.description || x.question || x.label || "").trim();
@@ -242,7 +233,7 @@ const applyFlow = {
     return s ? s.charAt(0).toUpperCase() + s.slice(1) : "";
   },
 
-  // ---- 1) Public job: GET /api/public/jobs/:token ----
+  // 1) Public job: GET /api/public/jobs/:token 
   normReqs(j) {
     const out = [];
     const push = (x, req) => {
@@ -285,7 +276,7 @@ const applyFlow = {
   async getJob(token) { return applyFlow.normJob(await applyFlow.req(applyFlow.paths.job(token))); },
   isClosedError(e) { return !!e && (e.status === 410 || e.code === "JOB_CLOSED" || /closed|no longer|expired|not accepting/i.test((e.code || "") + " " + (e.message || ""))); },
 
-  // ---- 2) Submit: POST /api/public/jobs/:token/applications (multipart) ----
+  // 2) Submit: POST /api/public/jobs/:token/applications (multipart) 
   // f = { name, email, phone, file, consentVersion, feedbackOptIn }  -> returns the result token
   async submit(token, f) {
     if (!f.consentVersion) throw new Error("Please reload the page and try again.");
@@ -312,7 +303,7 @@ const applyFlow = {
     return e.message;
   },
 
-  // ---- 3) Result: GET /api/results/:token ----
+  //  3) Result: GET /api/results/:token 
   // Backend (cvController.getResult + services/analysis) sends:
   //   analysis_status, application_id, feedback_enabled, feedback_opt_in, feedback_available, questions[] (strings)
   //   and only when feedback_available: score, match_level (strong|moderate|weak), reason, skills[], experience[], guidance[] (strings)
@@ -417,14 +408,32 @@ const seekerFlow = {
     return !!ok;
   },
 
-  async req(path, opts = {}) {
-    const headers = { Authorization: "Bearer " + session.token };
-    let body;
-    if (opts.form) body = opts.form;
-    else if (opts.body !== undefined) { headers["Content-Type"] = "application/json"; body = JSON.stringify(opts.body); }
-    let res;
-    try { res = await fetch(API_BASE + path, { method: opts.method || "GET", headers, body }); }
-    catch (e) { const er = new Error("Can't reach the server. Check your connection and try again."); er.network = true; throw er; }
+ async req(path, opts = {}) {
+  // 1. Initialize headers with Authorization
+  const headers = { Authorization: "Bearer " + session.token };
+  let body;
+
+  // 2. Handle form data vs JSON body
+  if (opts.form) {
+    body = opts.form;
+    // Do not set Content-Type for FormData; let the browser handle the boundary automatically
+  } else if (opts.body !== undefined) {
+    headers["Content-Type"] = "application/json";
+    body = JSON.stringify(opts.body);
+  }
+
+  let res;
+  try {
+    res = await fetch(API_BASE + path, { 
+      method: opts.method || "GET", 
+      headers, 
+      body 
+    });
+  } catch (e) {
+    const er = new Error("Can't reach the server. Check your connection and try again.");
+    er.network = true;
+    throw er;
+  }
     const data = await res.json().catch(() => null);
     if (res.status === 401) {
       session.clear();
@@ -443,7 +452,7 @@ const seekerFlow = {
     return data;
   },
 
-  //  normalisers (the contract fixes the names; these only protect against missing parts) ----
+  //  normalisers (the contract fixes the names; these only protect against missing parts) 
   T: (x) => (x == null ? "" : String(typeof x === "object" ? (x.text || x.title || x.name || "") : x).trim()),
   strs(v) { return (Array.isArray(v) ? v : []).map((x) => seekerFlow.T(x)).filter(Boolean); },
   levelLabel(k) {
@@ -482,7 +491,7 @@ const seekerFlow = {
     return { limit, used, remaining: q.remaining != null ? Math.max(0, Number(q.remaining)) : Math.max(0, limit - used) };
   },
 
-  // ---- calls ----
+  // calls
   async list(n) {
     const d = await seekerFlow.req(seekerFlow.paths.list(n));
     return { quota: seekerFlow.normQuota(d && d.quota), analyses: ((d && d.analyses) || []).map(seekerFlow.norm) };
@@ -552,7 +561,7 @@ const seekerFlow = {
     return api("/api/events", { method: "POST", body: { name, properties: { helpful, analysis_id: analysisId } } }).catch(() => {});
   },
 
-  // ---- helpers shared by the pages ----
+  // helpers shared by the pages
   words(t) { t = String(t || "").trim(); return t ? t.split(/\s+/).length : 0; },
   size(b) { return b >= 1048576 ? (b / 1048576).toFixed(1) + " MB" : Math.max(1, Math.round(b / 1024)) + " KB"; },
   // the "Recent analyses" table used on the home page and My analyses
