@@ -31,7 +31,14 @@ async function callGroq(prompt) {
     headers: { Authorization: `Bearer ${groqApiKey}`, 'Content-Type': 'application/json' },
     body: JSON.stringify({ model: groqModel, messages: [{ role: 'user', content: prompt }], response_format: { type: 'json_object' }, temperature: 0 }),
   });
-  if (!response.ok) throw new Error(`Groq request failed (${response.status})`);
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    const detail = String(body?.error?.message || body?.message || 'Unknown Groq error')
+      .replace(/[\r\n]+/g, ' ').slice(0, 500);
+    const permanent = response.status >= 400 && response.status < 500
+      && ![408, 409, 429].includes(response.status);
+    throw Object.assign(new Error(`Groq request failed (${response.status}): ${detail}`), { permanent });
+  }
   const body = await response.json();
   return JSON.parse(body.choices?.[0]?.message?.content || '{}');
 }

@@ -1,5 +1,10 @@
 require('dotenv').config();
 
+const groqModelAliases = {
+  'llama-3.3-70b-versatile': 'openai/gpt-oss-20b',
+};
+const configuredGroqModel = (process.env.GROQ_MODEL || 'openai/gpt-oss-20b').trim();
+
 module.exports = {
   port: Number(process.env.PORT || 8000),
   mongoUri: process.env.MONGODB_URI || 'mongodb://127.0.0.1:27017/hirelume',
@@ -18,7 +23,7 @@ module.exports = {
   geminiApiKey: process.env.GEMINI_API_KEY || '',
   geminiModel: process.env.GEMINI_MODEL || 'gemini-2.5-flash',
   groqApiKey: process.env.GROQ_API_KEY || '',
-  groqModel: process.env.GROQ_MODEL || 'llama-3.3-70b-versatile',
+  groqModel: groqModelAliases[configuredGroqModel] || configuredGroqModel,
   publicRateLimit: Number(process.env.PUBLIC_RATE_LIMIT || 60),
   publicRateWindowMinutes: Number(process.env.PUBLIC_RATE_WINDOW_MINUTES || 15),
   corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173,https://hirelume-kappa.vercel.app')
