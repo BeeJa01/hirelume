@@ -63,7 +63,7 @@
         <a href="/create-job.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
           <svg class="icon size-5" aria-hidden="true"><use href="#i-plus-circle" /></svg>Create job
         </a>
-        <a href="/applicant-detail.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+        <a href="/applicants.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
           <svg class="icon size-5" aria-hidden="true"><use href="#i-users" /></svg>Applicants
         </a>
         <a href="/help.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
@@ -108,7 +108,7 @@
         <nav id="nav-menu" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-line bg-white px-5 py-4 text-sm text-gray-500 sm:px-8 lg:hidden!">
           <a href="/jobs" class="font-semibold text-brand">Jobs</a>
           <a href="/create-job.html" class="hover:text-black">Create job</a>
-          <a href="/applicant-detail.html" class="hover:text-black">Applicants</a>
+          <a href="/applicants.html" class="hover:text-black">Applicants</a>
           <a href="/help" class="hover:text-black">Help</a>
           <a href="/logout" class="hover:text-black">Log out</a>
         </nav>
@@ -150,7 +150,10 @@
     } catch (e) { rows.innerHTML = '<li class="p-6 text-center text-sm text-red-600">' + esc(e.message) + '</li>'; }
   }
   document.querySelectorAll("[data-sort]").forEach(function (b) { b.addEventListener("click", function () { sort = b.dataset.sort; load(); }); });
-  load();
+  if (jobId) load();
+  else api(ENDPOINTS.jobs).then(function (list) {
+    location.replace(list.length ? "applicants.html?job=" + list[0].id : "jobs.html");
+  }).catch(function () { location.replace("jobs.html"); });
   // Mobile menu
   const menuBtn = document.getElementById("menu-btn");
   const menu = document.getElementById("nav-menu");
