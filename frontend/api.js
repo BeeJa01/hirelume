@@ -367,22 +367,26 @@ const applyFlow = {
 };
 
 
-// =====================================================================
-// ---- JOB SEEKER STANDALONE FLOW ("Check your fit for a job you found") ----
-// Pages: job-seeker-home, my-analyses, new-analysis, analysing,
-//        analysis-result, analysis-questions.
-// The backend routes below are the contract in analysis-api-contract.md.
-// If the backend dev changes a path or field name, change it HERE only.
-// =====================================================================
 const seekerFlow = {
-  paths: {
-    list:           (n) => "/api/analyses" + (n ? "?limit=" + n : ""),             // GET  -> { quota, analyses[] }
-    create:         "/api/analyses",                                              // POST multipart: job_text, source, cv -> { id, status }
-    one:            (id) => "/api/analyses/" + encodeURIComponent(id),            // GET  -> one analysis (see contract)
-    retry:          (id) => "/api/analyses/" + encodeURIComponent(id) + "/retry", // POST -> { id, status }
-    jobScreenshots: "/api/analyses/job/screenshots",                              // POST multipart: images[] -> { text }
-    jobLink:        "/api/analyses/job/link",                                     // POST json: { url } -> { text }
-    cvCheck:        "/api/analyses/cv/check"                                      // POST multipart: cv -> { readable: true }
+ paths: {
+  list: "/api/flow2/analyses",
+
+  create: "/api/flow2/analyses",
+
+  confirm: (id) =>
+    "/api/flow2/analyses/" + encodeURIComponent(id) + "/confirm",
+
+  cv: (id) =>
+    "/api/flow2/analyses/" + encodeURIComponent(id) + "/cv",
+
+  one: (id) =>
+    "/api/flow2/analyses/" + encodeURIComponent(id),
+
+  retry: (id) =>
+    "/api/flow2/analyses/" + encodeURIComponent(id) + "/retry"
+    jobScreenshots: "/api/flow2/analyses/job/screenshots",                              
+    jobLink:        "/api/flow2/analyses/job/link",                                    
+    cvCheck:        "/api/flow2/analyses/cv/check"                                      
   },
 
   CODES: {
@@ -439,7 +443,7 @@ const seekerFlow = {
     return data;
   },
 
-  // ---- normalisers (the contract fixes the names; these only protect against missing parts) ----
+  //  normalisers (the contract fixes the names; these only protect against missing parts) ----
   T: (x) => (x == null ? "" : String(typeof x === "object" ? (x.text || x.title || x.name || "") : x).trim()),
   strs(v) { return (Array.isArray(v) ? v : []).map((x) => seekerFlow.T(x)).filter(Boolean); },
   levelLabel(k) {
@@ -485,13 +489,49 @@ const seekerFlow = {
   },
   async get(id) { return seekerFlow.norm(await seekerFlow.req(seekerFlow.paths.one(id))); },
   async retry(id) { return seekerFlow.req(seekerFlow.paths.retry(id), { method: "POST" }); },
-  async create(f) {            // f = { jobText, source, cv }  -> { id }
-    const fd = new FormData();
-    fd.append("job_text", f.jobText); fd.append("source", f.source); fd.append("cv", f.cv);
-    const d = await seekerFlow.req(seekerFlow.paths.create, { method: "POST", form: fd });
-    if (!d || !d.id) throw new Error("Something went wrong. Please try again.");
-    return { id: String(d.id) };
-  },
+ async create(f) {
+  // 1. Create the analysis
+  const d = await seekerFlow.req(
+    seekerFlow.paths.create,
+    {
+      method: "POST",
+      body: {
+        job_text: f.jobText,
+        source: f.source
+      }
+    }
+  );
+
+  if (!d || !d.id) {
+    throw new Error("The server did not return an analysis ID.");
+  }
+
+  const id = String(d.id);
+
+  // 2. Upload the CV
+  const fd = new FormData();
+  fd.append("cv", f.cv);
+
+  await seekerFlow.req(
+    seekerFlow.paths.cv(id),
+    {
+      method: "POST",
+      form: fd
+    }
+  );
+
+  // 3. Confirm and start the analysis
+  const confirmed = await seekerFlow.req(
+    seekerFlow.paths.confirm(id),
+    {
+      method: "POST"
+    }
+  );
+
+  return {
+    id: String(confirmed?.id || id)
+  };
+},
   async readScreenshots(files) {
     const fd = new FormData(); files.forEach((f) => fd.append("images", f));
     const d = await seekerFlow.req(seekerFlow.paths.jobScreenshots, { method: "POST", form: fd });
