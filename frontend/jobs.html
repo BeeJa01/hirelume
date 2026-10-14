@@ -63,7 +63,7 @@
         <a href="/create-job.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
           <svg class="icon size-5" aria-hidden="true"><use href="#i-plus-circle" /></svg>Create job
         </a>
-        <a href="/applicant-detail.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+        <a href="/applicants.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
           <svg class="icon size-5" aria-hidden="true"><use href="#i-users" /></svg>Applicants
         </a>
         <a href="/help.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
@@ -108,7 +108,7 @@
         <nav id="nav-menu" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-line bg-white px-5 py-4 text-sm text-gray-500 sm:px-8 lg:hidden!">
           <a href="/jobs" class="font-semibold text-brand">Jobs</a>
           <a href="/create-job.html" class="hover:text-black">Create job</a>
-          <a href="/applicant-detail.html" class="hover:text-black">Applicants</a>
+          <a href="/applicants.html" class="hover:text-black">Applicants</a>
           <a href="/help" class="hover:text-black">Help</a>
           <a href="/logout" class="hover:text-black">Log out</a>
         </nav>
@@ -194,7 +194,7 @@
   // Job rows
   function rowDesktop(j) {
     return '<li class="grid ' + cols + ' items-center gap-4 border-b border-line px-5 py-4 text-sm last:border-b-0">' +
-      '<div><a href="applicants.html?job=' + j.id + '" class="font-display font-semibold hover:text-brand">' + esc(j.title) + '</a><p class="text-xs text-gray-500">' + (j.blind ? "Blind mode on" : "") + '</p></div>' +
+      '<div><a href="applicants.html?job=' + j.id + '" class="font-display font-semibold hover:text-brand">' + esc(j.title) + '</a><p class="text-xs text-gray-500">' + (j.location || (j.blind ? "Blind mode on" : "")) + '</p></div>' +
       '<div>' + badge(j.status, statusCls[j.status]) + '</div>' +
       '<p>' + j.applicants + '</p>' +
       '<p class="flex items-center gap-2"><span class="font-semibold">' + (j.score == null ? "-" : j.score) + '</span>' + (j.tag ? badge(j.tag, tagCls[j.tag]) : "") + '</p>' +
@@ -207,7 +207,7 @@
     return '<li class="card p-4">' +
       '<div class="flex items-start justify-between gap-2"><div>' +
       '<p class="flex flex-wrap items-center gap-2"><a href="applicants.html?job=' + j.id + '" class="font-display font-semibold hover:text-brand">' + esc(j.title) + '</a>' + badge(j.status, statusCls[j.status]) + '</p>' +
-      '<p class="mt-0.5 text-xs text-gray-500">' + (j.blind ? "Blind mode on" : "") + '</p></div>' + moreBtn + '</div>' +
+      '<p class="mt-0.5 text-xs text-gray-500">' + (j.location || (j.blind ? "Blind mode on" : "")) + '</p></div>' + moreBtn + '</div>' +
       '<div class="mt-4 flex items-center justify-between text-sm">' +
       '<p><span class="font-semibold">' + j.applicants + '</span> <span class="text-gray-500">applicants</span></p>' +
       '<p class="flex items-center gap-2"><span class="text-xs text-gray-500">Top match</span><span class="font-semibold">' + (j.score == null ? "-" : j.score) + '</span>' + (j.tag ? badge(j.tag, tagCls[j.tag]) : "") + '</p></div>' +
@@ -232,7 +232,7 @@
         const top = a.filter(function (x) { return x.score != null; }).sort(function (x, y) { return y.score - x.score; })[0];
         return {
           id: j.id, token: j.public_token, title: j.title, status: j.status === "closed" ? "Closed" : "Open",
-          applicants: j.applicants, blind: j.blind_mode, score: top ? top.score : null, tag: top ? levelOf(top.score) : null,
+          applicants: j.applicants, blind: j.blind_mode, location: j.location, score: top ? top.score : null, tag: top ? levelOf(top.score) : null,
           created: fmtDate(j.created_at),
           pending: a.filter(function (x) { return x.analysis_status && !/done|complete|fail/i.test(x.analysis_status); }).length,
           shortlisted: a.filter(function (x) { return x.status === "shortlisted"; }).length
