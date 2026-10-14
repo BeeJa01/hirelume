@@ -336,7 +336,11 @@
         if (st.cvState === "checking") { setErr("Wait a moment while we check your CV."); return; }
         var btn = this, label = btn.firstChild.textContent; btn.disabled = true; btn.firstChild.textContent = "Starting... ";
         try {
-          var r = await seekerFlow.create({ jobText: jobText, source: st.mode, cv: st.cv });
+         var r = await seekerFlow.create({
+              jobText: jobText,
+              source: st.mode,
+              cv: st.cv
+            });
           try { sessionStorage.removeItem("hl_draft_job"); } catch (e) {}
           location.href = seekerFlow.url("analysing.html", { id: r.id });
         } catch (e) {
