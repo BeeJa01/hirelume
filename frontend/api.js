@@ -400,6 +400,7 @@ const seekerFlow = {
     JOB_IMAGES_REQUIRED: "Upload at least one screenshot of the job.",
     JOB_IMAGE_UNSUPPORTED: "Screenshots must be JPG or PNG.",
     JOB_IMAGE_TOO_LARGE: "Each screenshot must be 5 MB or less.",
+    SCREENSHOT_TOO_LARGE: "Each screenshot must be 5 MB or less.",
     JOB_TEXT_NOT_READABLE: "We could not read the text in your screenshots.",
     JOB_LINK_INVALID: "That does not look like a valid link.",
     JOB_LINK_NOT_READABLE: "We could not read that link.",
