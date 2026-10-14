@@ -58,7 +58,7 @@
       <a href="create-job.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
         <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></svg>Create job
       </a>
-      <a href="#" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+      <a href="applicants.html" data-applicants-link class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
         <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14c2 .8 3.5 2.9 3.5 6" /></svg>Applicants
       </a>
       <a href="#" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
@@ -90,7 +90,7 @@
       <nav id="mobileNav" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-1 border-b border-line bg-white px-4 py-3 text-sm data-[open]:flex">
         <a href="jobs.html" aria-current="page" class="rounded-lg bg-brand-soft px-3 py-2.5 font-medium text-brand-dark">Jobs</a>
         <a href="create-job.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Create job</a>
-        <a href="#" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Applicants</a>
+        <a href="applicants.html" data-applicants-link class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Applicants</a>
         <a href="#" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Help</a>
         <a href="login.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Log out</a>
       </nav>
@@ -264,6 +264,7 @@
       const [job, a] = await Promise.all([api(ENDPOINTS.jobs + "/" + jobId), api(ENDPOINTS.applications + "/" + appId)]);
       if (!a || !a.id) throw new Error("Applicant not found");
       document.querySelectorAll("[data-job-title]").forEach((el) => { el.textContent = job.title; el.href = "applicants.html?job=" + jobId; });
+      document.querySelectorAll("[data-applicants-link]").forEach((el) => { el.href = "applicants.html?job=" + jobId; });
       document.querySelectorAll("[data-applicant-name]").forEach((el) => (el.textContent = a.name));
       $("aName").textContent = a.name;
       $("aInit").textContent = a.name.split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
@@ -294,7 +295,8 @@
       }
     } catch (e) { toast(e.message); }
   }
-  load();
+  if (!jobId || !appId) location.replace(jobId ? "applicants.html?job=" + jobId : "jobs.html");
+  else load();
 
   // Open CV (uses openCV from api.js)
   $("cvOpen").addEventListener("click", async (e) => {
