@@ -1,30 +1,26 @@
-const jwt = require("jsonwebtoken");
-const { secretKey } = require("../config");
+const jwt = require('jsonwebtoken');
+const { User } = require('../models');
+const { secretKey } = require('../config');
 
-const authenticate = (req, res, next) => {
-  try {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
-      return res.status(401).json({
-        message: "Authentication required",
-      });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    const decoded = jwt.verify(token, secretKey);
-
-    req.user = decoded;
-
-    next();
-  } catch (error) {
-    console.error("Authentication error:", error);
-
-    return res.status(401).json({
-      message: "Invalid or expired token",
-    });
+async function authenticate(req, res, next) {
+  const [scheme, token] = (req.get('authorization') || '').split(' ');
+  if (scheme?.toLowerCase() !== 'bearer' || !token) {
+    return res.status(401).json({ detail: 'NOT_AUTHENTICATED' });
   }
-};
+  try {
+    const payload = jwt.verify(token, secretKey, { algorithms: ['HS256'] });
+    const user = await User.findById(payload.sub).lean();
+    if (!user) return res.status(401).json({ detail: 'USER_NOT_FOUND' });
+    req.user = user;
+    next();
+  } catch {
+    return res.status(401).json({ detail: 'INVALID_ACCESS_TOKEN' });
+  }
+}
 
-module.exports = authenticate;
+async function optionalAuthenticate(req, res, next) {
+  if (!req.get('authorization')) return next();
+  return authenticate(req, res, next);
+}
+
+module.exports = { authenticate, optionalAuthenticate };

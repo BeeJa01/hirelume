@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>HireLume | Hire the right people. Find the right job.</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Poppins:wght@600;700&family=Instrument+Serif:ital@1&display=swap" rel="stylesheet">
+<style>
+:root{--brand:#1f6feb;--brand-d:#1558c4;--ink:#16202e;--mute:#5d6b7e;--line:#e3e9f2;--sky:#dcebfb;--teal:#12a594;--green:#0f9d6a;--amber:#d9712b;
+/* Set these to your own photos: --hero-photo:url(images/hero.jpg); --nigeria-photo:url(images/laptop.jpg); */
+--hero-photo:url(https://res.cloudinary.com/nymcjtq4/image/upload/v1792004585/photo_2026-10-14_19-57-46_tjapw9.jpg);--nigeria-photo:url(https://res.cloudinary.com/nymcjtq4/image/upload/v1792004585/photo_2026-10-14_19-57-52_qd9c8r.jpg)}
+*{box-sizing:border-box;margin:0}
+html{scroll-behavior:smooth}
+body{font-family:Inter,system-ui,sans-serif;color:var(--ink);background:#eaf2ff;line-height:1.55;-webkit-font-smoothing:antialiased}
+h1,h2,h3{font-family:Poppins,Inter,sans-serif;line-height:1.15;letter-spacing:-.01em}
+a{color:inherit;text-decoration:none}
+.wrap{max-width:1120px;margin:0 auto;padding:0 20px}
+.pill{display:inline-block;background:#e8f1fe;color:var(--brand);font-size:12px;font-weight:600;padding:5px 12px;border-radius:99px}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;font-weight:600;font-size:15px;padding:12px 24px;border-radius:99px;border:1.5px solid var(--brand);transition:.15s}
+.btn-p{background:var(--brand);color:#eaf2ff}.btn-p:hover{background:var(--brand-d)}
+.btn-o{background:#eaf2ff;color:var(--brand)}.btn-o:hover{background:#f1f6fe}
+.sec{padding:84px 0}
+.head{text-align:center;max-width:640px;margin:0 auto 44px}
+.head h2{font-size:clamp(28px,4vw,40px);margin-top:14px}
+.head p{color:var(--mute);margin-top:12px}
+.card{background:#eaf2ff;border:1px solid var(--line);border-radius:20px}
+.ava{display:grid;place-items:center;width:36px;height:36px;border-radius:50%;background:#cfe0f7;color:var(--brand-d);font-weight:600;font-size:13px;flex:none}
+.tag{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;white-space:nowrap}
+.t-s{background:#e3f6ee;color:var(--green)}.t-g{background:#fdeadc;color:var(--amber)}.t-p{background:#e8f1fe;color:var(--brand)}
+/* nav */
+header{position:sticky;top:0;z-index:20;background:rgba(255,255,255,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--line)}
+nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+nav img{height:28px;width:auto}
+.links{display:flex;gap:30px;font-size:14px;color:var(--mute)}.links a:hover{color:var(--ink)}
+.navr{display:flex;align-items:center;gap:10px}
+.navr .btn{padding:9px 20px;font-size:14px}
+#mb{display:none;background:none;border:1px solid var(--line);border-radius:10px;width:40px;height:40px;cursor:pointer}
+/* hero */
+.hero{background:linear-gradient(180deg,#cfe3fa 0,#e9f2fd 55%,#eaf2ff 100%);position:relative;overflow:hidden;padding:56px 0 70px}
+.hero::before{content:"";position:absolute;inset:0;background:var(--hero-photo) center/cover;opacity:.55}
+.hero .wrap{position:relative}
+.hero-t{text-align:center;max-width:760px;margin:0 auto}
+.hero h1{font-size:clamp(34px,6vw,60px);margin-top:20px}
+.hero h1 em{font-family:"Instrument Serif",Georgia,serif;font-weight:400;color:var(--brand)}
+.hero-t>p{color:#40506a;margin:18px auto 0;max-width:560px}
+.checks{display:flex;flex-wrap:wrap;justify-content:center;gap:8px 22px;margin-top:20px;font-size:13px;color:var(--mute);list-style:none;padding:0}
+.checks li{display:flex;gap:6px;align-items:center}.checks svg{width:14px;height:14px;color:var(--mute)}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-top:44px}
+.duo .card{padding:26px;background:rgba(255,255,255,.88);backdrop-filter:blur(6px)}
+.duo h2{font-size:22px;margin:14px 0 8px}
+.duo p.s{color:var(--mute);font-size:14px;margin-bottom:18px}
+.mini{margin-top:20px;border-top:1px solid var(--line);padding-top:6px}
+.mini .r{display:flex;align-items:center;gap:12px;padding:10px 0;border-bottom:1px solid var(--line);font-size:14px}
+.mini .r:last-child{border:0}
+.mini b{display:block;font-weight:600}.mini small{color:var(--mute);font-size:12px}
+.mini .r>div:nth-child(2){flex:1}
+.mini .ttl{font-family:Poppins;font-weight:600;font-size:13px;padding:6px 0}
+/* testimonials */
+.th{display:flex;align-items:end;justify-content:space-between;gap:20px;margin-bottom:28px}
+.th h2{font-size:clamp(26px,3.6vw,36px);margin-top:12px}
+.arrows{display:flex;gap:8px}
+.arrows button{width:40px;height:40px;border-radius:50%;border:1px solid var(--line);background:#eaf2ff;cursor:pointer;font-size:16px}
+.arrows button.on{background:var(--brand);border-color:var(--brand);color:#eaf2ff}
+.track{display:flex;gap:20px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none;padding-bottom:6px}
+.track::-webkit-scrollbar{display:none}
+.quote{flex:0 0 calc((100% - 40px)/3);scroll-snap-align:start;padding:26px;display:flex;flex-direction:column;gap:22px;background:#f5f9ff}
+.quote .q{width:42px;height:42px;border-radius:50%;background:#eaf2ff;display:grid;place-items:center;color:var(--brand);font-size:18px}
+.quote p{font-size:15px;color:#33425a;flex:1}
+.who{display:flex;gap:12px;align-items:center;border-top:1px solid var(--line);padding-top:16px;font-size:14px}
+.who small{display:block;color:var(--mute);font-size:12px}
+.dots{display:flex;justify-content:center;gap:6px;margin-top:20px}
+.dots i{width:7px;height:7px;border-radius:50%;background:#cdd8e8}.dots i.on{width:22px;border-radius:9px;background:var(--brand)}
+/* inside */
+.inside{background:linear-gradient(180deg,#bcd8f6,#dcebfb 70%,#eaf2ff);}
+/* steps */
+.steps{display:grid;grid-template-columns:1fr 1fr;gap:34px 60px;align-items:center}
+.steps+.steps{margin-top:60px}
+.lab{font-size:12px;font-weight:700;letter-spacing:.08em;color:var(--brand);margin-bottom:18px}
+.step{display:flex;gap:14px;margin-bottom:22px}
+.step .n{width:30px;height:30px;border-radius:50%;background:#1a5fd6;color:#eaf2ff;display:grid;place-items:center;font-size:13px;font-weight:600;flex:none}
+.step.t .n{background:#1e90e0}
+.step h3{font-size:17px;margin-bottom:4px}.step p{color:var(--mute);font-size:14px}
+.panel{background:#dcebfb;border-radius:24px;padding:14px}.panel .card{padding:18px}
+/* nigeria */
+.ng{background:linear-gradient(180deg,#9fc7f2,#cfe3fa);}
+.ng .head p,.ng .head h2{color:#12294a}
+.ngrid{display:grid;grid-template-columns:1.25fr 1fr 1fr;grid-template-rows:auto auto;gap:16px}
+.photo{grid-row:1/3;border-radius:22px;min-height:360px;background:var(--nigeria-photo) center/cover,linear-gradient(145deg,#3a2d5c,#1a2a4a)}
+.feat{padding:22px;border-radius:18px;background:rgba(255,255,255,.9)}
+.feat .ic{width:34px;height:34px;border-radius:10px;display:grid;place-items:center;margin-bottom:34px;font-size:17px}
+.feat h3{font-size:15px;margin-bottom:6px}.feat p{font-size:13px;color:var(--mute)}
+/* promises */
+.pro{display:grid;grid-template-columns:repeat(3,1fr);gap:18px}
+.pro .card{padding:26px;border:0}
+.pro .card:nth-child(1){background:#dbe9f8}.pro .card:nth-child(2){background:#d8f0ea}.pro .card:nth-child(3){background:#e0e3f4}
+.pro .ic{width:34px;height:34px;border-radius:10px;background:#eaf2ff;color:var(--brand);display:grid;place-items:center;margin-bottom:36px;font-size:17px}
+.pro h3{font-size:17px;margin-bottom:8px}.pro p{font-size:14px;color:#4a5a72}
+/* cta */
+.cta{position:relative;overflow:hidden;border-radius:28px;background:linear-gradient(180deg,#0a3fe0 0,#1a86f0 100%);color:#fff;text-align:center;padding:64px 24px}
+.cta h2{font-size:clamp(28px,4.4vw,44px)}.cta p{margin:14px 0 26px;opacity:.9}
+.cta .btn-p{background:#fff;color:var(--brand);border-color:#eaf2ff}.cta .btn-o{background:transparent;color:#eaf2ff;border-color:#eaf2ff}
+.crowd{position:absolute;right:2%;bottom:0;width:300px;height:auto}
+.cta .btns{position:relative;display:flex;gap:12px;justify-content:center;flex-wrap:wrap}
+footer{padding:34px 0;font-size:13px;color:var(--mute)}
+footer .wrap{display:flex;align-items:center;gap:30px;flex-wrap:wrap}
+footer img{height:24px}footer a:hover{color:var(--ink)}
+.i{width:1em;height:1em;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;flex:none}
+.pill.w{background:#fff;color:var(--ink);box-shadow:0 1px 4px rgba(20,40,80,.1)}.pill.w.b{color:var(--brand-d)}
+.dot{display:inline-block;width:6px;height:6px;border-radius:50%;background:var(--brand);margin-right:7px;vertical-align:middle}
+.duo .btn-p{background:#2a96ee;border-color:#2a96ee}
+.only-m{display:none}
+.arrows button{display:grid;place-items:center}
+.mi{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-size:16px;flex:none}
+.stage{position:relative;max-width:1040px;margin:0 auto;padding-bottom:70px}
+.win{background:#eaf2ff;border-radius:16px;border:1px solid var(--line);box-shadow:0 20px 50px rgba(31,80,150,.18);overflow:hidden;width:84%}
+.dotsw{display:flex;gap:6px;padding:12px 16px}.dotsw i{width:10px;height:10px;border-radius:50%;background:#ff6058}.dotsw i:nth-child(2){background:#ffbd2e}.dotsw i:nth-child(3){background:#27c93f}
+.app{display:grid;grid-template-columns:180px 1fr;border-top:1px solid var(--line)}
+.app aside{padding:18px 14px;border-right:1px solid var(--line);font-size:13px}
+.app aside img{height:24px;margin:0 0 22px 6px}
+.app aside .rl{font-size:10px;font-weight:700;letter-spacing:.08em;color:var(--mute);margin:0 0 8px 8px}
+.app aside a{display:flex;gap:10px;align-items:center;padding:9px 10px;border-radius:9px;color:var(--mute);margin-bottom:4px}
+.app aside a.on{background:#e3effd;color:var(--brand);font-weight:600}
+.app .main{padding:18px 24px 26px;min-width:0}
+.crumb{font-size:12px;color:var(--mute);margin-bottom:22px}.crumb b{color:var(--ink)}
+.main h3{font-size:24px;display:flex;gap:10px;align-items:center}.main>small{color:var(--mute);font-size:12px}
+.note{display:flex;gap:9px;align-items:flex-start;background:#f0f6ff;border:1px solid #dbe8fb;border-radius:10px;font-size:12px;color:var(--mute);padding:10px 12px;margin:14px 0}.note .i{color:var(--brand);margin-top:2px}.note b{color:var(--ink)}
+.tabs{display:flex;gap:6px;margin-bottom:12px}.tabs span{font-size:12px;padding:6px 12px;border-radius:8px;color:var(--mute)}.tabs .on{background:#eef4fd;color:var(--ink);font-weight:600}
+.th2,.tr{display:grid;grid-template-columns:22px 1.5fr 110px 2fr;gap:14px;align-items:center;font-size:12px}
+.th2{color:var(--mute);padding:8px 0;font-size:11px}
+.tr{padding:12px 0;border-top:1px solid var(--line)}.tr p{color:var(--mute);margin:0}
+.ap{display:flex;gap:10px;align-items:center}.ap b{display:block;font-size:13px}.ap small{color:var(--mute);font-size:11px}
+.sc{display:flex;gap:10px;align-items:center;font-size:14px}
+.phone{position:absolute;right:0;top:110px;width:290px;background:#eaf2ff;border:8px solid #243044;border-radius:38px;padding:14px 16px 18px;box-shadow:0 24px 50px rgba(20,40,80,.3)}
+.phone .sb{display:flex;justify-content:space-between;font-size:11px;margin-bottom:10px}
+.phone .pn{display:flex;justify-content:space-between;color:var(--mute);margin-bottom:6px}
+.phone h4{font-family:Poppins;font-size:17px;line-height:1.2;margin-bottom:4px}
+.phone small{color:var(--mute);font-size:11px}
+.ptabs{display:flex;gap:4px;margin:12px 0;background:#f1f5fb;border-radius:10px;padding:3px}.ptabs span{flex:1;text-align:center;font-size:11px;padding:6px 0;border-radius:8px;color:var(--mute)}.ptabs .on{background:#eaf2ff;color:var(--ink);font-weight:600}
+.note.sm{font-size:10.5px;padding:8px 10px;margin:0 0 6px}
+.ring{width:96px;height:96px;margin:14px auto 8px;display:grid;place-items:center;border-radius:50%;background:conic-gradient(var(--brand) 0 67%,#e1e9f5 0);position:relative;text-align:center}
+.ring:before{content:"";position:absolute;inset:8px;background:#eaf2ff;border-radius:50%}.ring span{position:relative;line-height:1.1}.ring b{font-family:Poppins;font-size:26px;display:block}.ring small{font-size:9px}
+.gm{display:flex;gap:8px;justify-content:center;align-items:center;font-size:14px;font-weight:600;margin-bottom:8px}
+.pt{font-size:10.5px;color:var(--mute);margin:0 0 12px}
+.ms{font-size:12px;font-family:Poppins}
+.sk{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.sk span{background:#e8f1fe;color:var(--brand);font-size:10px;padding:4px 9px;border-radius:99px}
+.why{position:absolute;left:0;bottom:0;width:300px;background:#243044;color:#eaf2ff;border-radius:14px;padding:18px 20px;font-size:12.5px;box-shadow:0 14px 30px rgba(20,30,50,.3)}
+.why b{display:block;font-family:Poppins;font-size:14px;margin-bottom:6px}
+@media(max-width:900px){
+ .links,.navr .login{display:none}#mb{display:grid;place-items:center}
+ .links.open .only-m{display:block}.app aside,.th2 span:nth-child(4),.tr p{display:none}.app{grid-template-columns:1fr}.th2,.tr{grid-template-columns:22px 1fr 110px}.crowd{width:180px}
+ .links.open{display:flex;flex-direction:column;position:absolute;top:64px;left:0;right:0;background:#eaf2ff;padding:16px 20px;border-bottom:1px solid var(--line);gap:14px}
+ .duo,.steps,.pro{grid-template-columns:1fr}
+ .quote{flex-basis:84%}
+ .th{align-items:start}.arrows{display:none}
+ .win{width:100%}.phone{position:relative;width:min(260px,100%);margin:-20px auto 0}
+ .why{position:relative;width:auto;margin-top:-30px;margin-left:10px;margin-right:10px}
+ .ngrid{grid-template-columns:1fr 1fr}.photo{grid-column:1/3;grid-row:auto;min-height:260px}
+ .sec{padding:60px 0}
+}
+@media(max-width:520px){.ngrid{grid-template-columns:1fr}.photo{grid-column:auto}.tr .tag{display:none}}
+</style>
+</head>
+<body>
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><defs><symbol id="i-quote" viewBox="0 0 24 24"><path d="M7 7h4v4c0 3-1.5 5-4 6M15 7h4v4c0 3-1.5 5-4 6"/></symbol><symbol id="i-phone" viewBox="0 0 24 24"><rect x="7" y="2" width="10" height="20" rx="2"/><path d="M11 18h2"/></symbol><symbol id="i-link" viewBox="0 0 24 24"><path d="M10 13a5 5 0 0 0 7 0l3-3a5 5 0 0 0-7-7l-1 1M14 11a5 5 0 0 0-7 0l-3 3a5 5 0 0 0 7 7l1-1"/></symbol><symbol id="i-cap" viewBox="0 0 24 24"><path d="M22 10 12 5 2 10l10 5 10-5zM6 12v5c3 2 9 2 12 0v-5"/></symbol><symbol id="i-shield" viewBox="0 0 24 24"><path d="M12 3 4 6v6c0 5 3.5 8 8 9 4.5-1 8-4 8-9V6l-8-3z"/><path d="m9 12 2 2 4-4"/></symbol><symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5"/><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M16 4.5a3.5 3.5 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6"/></symbol><symbol id="i-checks" viewBox="0 0 24 24"><path d="m3 6 1.5 1.5L7 5M3 12l1.5 1.5L7 11M3 18l1.5 1.5L7 17M11 6h10M11 12h10M11 18h10"/></symbol><symbol id="i-bulb" viewBox="0 0 24 24"><path d="M9 18h6M10 21h4M12 3a6 6 0 0 0-4 10.5c.7.7 1 1.5 1 2.5h6c0-1 .3-1.8 1-2.5A6 6 0 0 0 12 3z"/></symbol><symbol id="i-palette" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><circle cx="8.5" cy="10" r="1"/><circle cx="12" cy="7.5" r="1"/><circle cx="15.5" cy="10" r="1"/><path d="M12 21c-2 0-2-2 0-3 2-1 2-3 0-3"/></symbol><symbol id="i-code" viewBox="0 0 24 24"><path d="m8 7-5 5 5 5M16 7l5 5-5 5"/></symbol><symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><path d="m20 20-3.5-3.5"/></symbol><symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 11v5M12 8h.01"/></symbol><symbol id="i-back" viewBox="0 0 24 24"><path d="m15 6-6 6 6 6"/></symbol><symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5M12 17h.01"/></symbol><symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"/></symbol><symbol id="i-plus" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><path d="M8 12h8M12 8v8"/></symbol><symbol id="i-arl" viewBox="0 0 24 24"><path d="M19 12H5M11 6l-6 6 6 6"/></symbol><symbol id="i-arr" viewBox="0 0 24 24"><path d="M5 12h14M13 6l6 6-6 6"/></symbol><symbol id="i-check" viewBox="0 0 24 24"><path d="m5 12 4 4 10-10"/></symbol></defs></svg>
+<header>
+ <nav class="wrap" aria-label="Main">
+  <a href="/landingpage.html" aria-label="HireLume home"><img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" width="120" height="28"></a>
+  <div class="links" id="links">
+   <a href="#how-it-works">How it works</a><a href="#recruiters">For recruiters</a><a href="#job-seekers">For job seekers</a><a href="#promises">Our promises</a><a href="/login.html" class="only-m">Log in</a>
+  </div>
+  <div class="navr">
+   <a href="/signup.html" class="btn btn-p">Get started</a>
+   <button id="mb" aria-label="Open menu" aria-expanded="false"><svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+  </div>
+ </nav>
+</header>
+
+<main>
+<section class="hero">
+ <div class="wrap">
+  <div class="hero-t">
+   <span class="pill w"><i class="dot"></i>AI hiring assistant for Nigerian small businesses</span>
+   <h1>Hire the right people. Find the right <em>job</em>.</h1>
+   <p>Post a job once, share one link and see every applicant ranked with clear reasons. Job seekers get instant guidance and interview prep.</p>
+   <ul class="checks"><li><svg class="i " aria-hidden="true"><use href="#i-check"/></svg>No account needed to apply</li><li><svg class="i " aria-hidden="true"><use href="#i-check"/></svg>Works on any phone</li><li><svg class="i " aria-hidden="true"><use href="#i-check"/></svg>Built for WhatsApp links</li></ul>
+  </div>
+  <div class="duo">
+   <div class="card" id="recruiters">
+    <span class="pill">For recruiters</span>
+    <h2>Stop reading every CV from the top.</h2>
+    <p class="s">Share one link and see every applicant ranked, with the reason behind each score.</p>
+    <a href="/signup.html" class="btn btn-p">I'm hiring</a>
+    <div class="mini">
+     <div class="ttl">Sales Executive Applicants</div>
+     <div class="r"><span class="ava">NE</span><div><b>Ngozi E.</b><small>Meets all necessary skills</small></div><span class="tag t-s">88 · Strong</span></div>
+     <div class="r"><span class="ava">EN</span><div><b>Emeka N.</b><small>5 years in B2B sales</small></div><span class="tag t-s">81 · Strong</span></div>
+     <div class="r"><span class="ava">FB</span><div><b>Fatima B.</b><small>CRM use only partly shown</small></div><span class="tag t-g">72 · Good</span></div>
+    </div>
+   </div>
+   <div class="card" id="job-seekers">
+    <span class="pill">For job seekers</span>
+    <h2>Know where you stand before you apply.</h2>
+    <p class="s">Get a match score, skill gaps, CV tips and interview questions.</p>
+    <a href="/check" class="btn btn-o">Check my fit</a>
+    <div class="mini">
+          <div class="r"><div><b>Product Designer</b><small>Remote · Full-time</small></div><span class="tag t-s">Strong match</span></div>
+     <div class="r"><div><b>Frontend Engineer</b><small>Hybrid · Full-time</small></div><span class="tag t-g">Good match</span></div>
+     <div class="r"><div><b>Data Analyst</b><small>Remote · Contract</small></div><span class="tag t-p">Partial match</span></div>
+    </div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="sec">
+ <div class="wrap">
+  <div class="th">
+   <div><span class="pill">Testimonials</span><h2>Hiring and job hunting, made clearer</h2></div>
+   <div class="arrows"><button id="prev" aria-label="Previous"><svg class="i " aria-hidden="true"><use href="#i-arl"/></svg></button><button id="next" class="on" aria-label="Next"><svg class="i " aria-hidden="true"><use href="#i-arr"/></svg></button></div>
+  </div>
+  <div class="track" id="track">
+   <figure class="card quote"><span class="q"><svg class="i " aria-hidden="true"><use href="#i-quote"/></svg></span><p>I used to open every CV one by one. Now I open the ranked list, read the reasons and shortlist in minutes. The reasons are what make me trust it.</p><figcaption class="who"><span class="ava">CO</span><div>Chidi O.<small>Founder, 12-person logistics company</small></div></figcaption></figure>
+   <figure class="card quote"><span class="q"><svg class="i " aria-hidden="true"><use href="#i-quote"/></svg></span><p>I post the link in our WhatsApp groups and applications just come in. Nobody has to create an account, so more people actually finish applying.</p><figcaption class="who"><span class="ava">AE</span><div>Amaka E.<small>HR officer, retail chain</small></div></figcaption></figure>
+   <figure class="card quote"><span class="q"><svg class="i " aria-hidden="true"><use href="#i-quote"/></svg></span><p>It never rejects anyone, it only explains. That is exactly what I wanted, because the final call should stay with me.</p><figcaption class="who"><span class="ava">TA</span><div>Tunde A.<small>Operations lead, 25-person agency</small></div></figcaption></figure>
+  </div>
+  <div class="dots" id="dots"><i class="on"></i><i></i><i></i></div>
+ </div>
+</section>
+
+<section class="sec inside" id="how-it-works">
+ <div class="wrap">
+  <div class="head"><span class="pill w b">Inside HireLume</span><h2>Every score comes with a reason</h2><p>Recruiters see who fits best and why.<br>Job seekers see exactly how they match.</p></div>
+  <div class="stage">
+   <div class="win">
+    <div class="dotsw"><i></i><i></i><i></i></div>
+    <div class="app">
+     <aside><img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume"><p class="rl">RECRUITER</p><a class="on"><svg class="i " aria-hidden="true"><use href="#i-briefcase"/></svg>Jobs</a><a><svg class="i " aria-hidden="true"><use href="#i-plus"/></svg>Create job</a><a><svg class="i " aria-hidden="true"><use href="#i-users"/></svg>Applicants</a><a><svg class="i " aria-hidden="true"><use href="#i-help"/></svg>Help</a></aside>
+     <div class="main">
+      <div class="crumb">Jobs › Sales Executive › <b>Applicants</b></div>
+      <h3>Sales Executive <span class="tag t-s">Open</span></h3>
+      <small>Sunrise Logistics Ltd · Ikeja, Lagos · 24 applicants</small>
+      <div class="note"><svg class="i " aria-hidden="true"><use href="#i-info"/></svg><span><b>The AI can be wrong. You decide.</b> HireLume ranks and explains. Nobody is hidden or removed from the list.</span></div>
+      <div class="tabs"><span class="on">All 24</span><span>Shortlisted 3</span><span>Undecided 19</span><span>Rejected 2</span></div>
+      <div class="th2"><span>#</span><span>Applicant</span><span>Score</span><span>Why this score</span></div>
+      <div class="tr"><span>1</span><div class="ap"><i class="ava">NE</i><div><b>Ngozi Eze</b><small>ngozi.eze@email.com</small></div></div><div class="sc"><b>88</b><span class="tag t-s">Strong</span></div><p>Meets all Required skills. 4 years in retail, with strong CRM and negotiation evidence.</p></div>
+      <div class="tr"><span>2</span><div class="ap"><i class="ava">EN</i><div><b>Emeka Nwosu</b><small>emeka.nwosu@email.com</small></div></div><div class="sc"><b>81</b><span class="tag t-s">Strong</span></div><p>5 years in B2B sales. Weekly targets and negotiation shown in context.</p></div>
+      <div class="tr"><span>3</span><div class="ap"><i class="ava">FB</i><div><b>Fatima Bello</b><small>fatima.bello@email.com</small></div></div><div class="sc"><b>72</b><span class="tag t-g">Good</span></div><p>Strong customer-facing record. CRM use only partly shown. No Lagos experience stated.</p></div>
+      <div class="tr"><span>4</span><div class="ap"><i class="ava">SO</i><div><b>Seun Ogunleye</b><small>seun.ogunleye@email.com</small></div></div><div class="sc"><b>65</b><span class="tag t-p">Score ready</span></div><p>Meets some Required skills. Others not found in the CV.</p></div>
+     </div>
+    </div>
+   </div>
+   <div class="phone">
+    <div class="sb"><b>9:41</b><span>▂▄▆ ▮</span></div>
+    <div class="pn"><svg class="i " aria-hidden="true"><use href="#i-back"/></svg><svg class="i " aria-hidden="true"><use href="#i-help"/></svg></div>
+    <h4>Business Development Officer</h4><small>Greenfield Agro Ltd · Analysed 1 Oct 2026</small>
+    <div class="ptabs"><span class="on">Overview</span><span>Requirements</span><span>Questions</span></div>
+    <div class="note sm"><svg class="i " aria-hidden="true"><use href="#i-info"/></svg><span><b>This is AI guidance and it can be wrong.</b> Use it to improve your CV and prepare. It is not a decision about you.</span></div>
+    <div class="ring"><span><b>67</b><small>out of 100</small></span></div>
+    <div class="gm">Good match <span class="tag t-p">Good</span></div>
+    <p class="pt">You meet three of the five Required skills fully and two partly. Your sales record and degree fit well. Proposal writing and CRM use are only partly shown, and the agribusiness sector is not mentioned in your CV.</p>
+    <b class="ms">Matched skills</b>
+    <div class="sk"><span>Sales experience</span><span>Customer presentations</span><span>Business degree</span></div>
+   </div>
+   <div class="why"><b>Why this score?</b>Every score comes with a reason and evidence from the CV, so you can check it and decide for yourself.</div>
+  </div>
+ </div>
+</section>
+
+<section class="sec">
+ <div class="wrap">
+  <div class="head"><span class="pill">How it works</span><h2>Simple for both sides</h2></div>
+  <div class="steps">
+   <div>
+    <div class="lab">FOR RECRUITERS</div>
+    <div class="step"><span class="n">1</span><div><h3>Create a job</h3><p>Add the title, the description and your requirements. Mark each one Required or Nice-to-have.</p></div></div>
+    <div class="step"><span class="n">2</span><div><h3>Share one link</h3><p>Post it on WhatsApp, LinkedIn or X. Applicants apply from their phones with no account.</p></div></div>
+    <div class="step"><span class="n">3</span><div><h3>Review ranked applicants</h3><p>See every applicant best first, with a reason for each score. Then shortlist or decline.</p></div></div>
+   </div>
+   <div class="panel"><div class="card"><b style="font-family:Poppins;font-size:14px">Sales Executive applicants</b>
+    <div class="mini"><div class="r"><span class="ava">NE</span><div><b>Ngozi E.</b><small>Meets all required skills</small></div><span class="tag t-s">88 · Strong</span></div><div class="r"><span class="ava">EN</span><div><b>Emeka N.</b><small>5 years in B2B sales</small></div><span class="tag t-s">81 · Strong</span></div><div class="r"><span class="ava">FB</span><div><b>Fatima B.</b><small>CRM use only partly shown</small></div><span class="tag t-g">72 · Good</span></div></div></div></div>
+  </div>
+  <div class="steps">
+   <div class="panel"><div class="card"><b style="font-family:Poppins;font-size:14px">My job matches</b>
+    <div class="mini"><div class="r"><span class="mi" style="background:#e3f6ee;color:#0f9d6a"><svg class="i " aria-hidden="true"><use href="#i-palette"/></svg></span><div><b>Product Designer</b><small>Remote</small></div><span class="tag t-s">Strong match</span></div><div class="r"><span class="mi" style="background:#fdeadc;color:#d9712b"><svg class="i " aria-hidden="true"><use href="#i-code"/></svg></span><div><b>Frontend Engineer</b><small>Hybrid</small></div><span class="tag t-g">Good match</span></div><div class="r"><span class="mi" style="background:#e8f1fe;color:#1f6feb"><svg class="i " aria-hidden="true"><use href="#i-search"/></svg></span><div><b>UX Researcher</b><small>Remote</small></div><span class="tag t-p">Partial match</span></div></div></div></div>
+   <div>
+    <div class="lab">FOR JOB SEEKERS</div>
+    <div class="step t"><span class="n">1</span><div><h3>Add the job</h3><p>Paste the job text, upload a screenshot, or paste a link to the job post.</p></div></div>
+    <div class="step t"><span class="n">2</span><div><h3>Add your CV</h3><p>Upload a PDF, image or Word file. We only use it to compare it with this job.</p></div></div>
+    <div class="step t"><span class="n">3</span><div><h3>Get your match</h3><p>See your score, your gaps, tips to improve your CV and interview questions for this job.</p></div></div>
+   </div>
+  </div>
+ </div>
+</section>
+
+<section class="sec ng">
+ <div class="wrap">
+  <div class="head"><span class="pill w b">Built for Nigeria</span><h2>Made for how Nigerians hire and apply</h2></div>
+  <div class="ngrid">
+   <div class="photo" role="img" aria-label="A job seeker applying on her laptop"></div>
+   <div class="feat"><div class="ic" style="background:#fdeceb;color:#e5594f"><svg class="i " aria-hidden="true"><use href="#i-phone"/></svg></div><h3>Phone first</h3><p>Every screen works on a phone. Most job seekers apply from one.</p></div>
+   <div class="feat"><div class="ic" style="background:#ece8fb;color:#7a5af0"><svg class="i " aria-hidden="true"><use href="#i-link"/></svg></div><h3>Link friendly</h3><p>One link that works in WhatsApp groups, LinkedIn posts and more.</p></div>
+   <div class="feat"><div class="ic" style="background:#e3f6ee;color:#0f9d6a"><svg class="i " aria-hidden="true"><use href="#i-cap"/></svg></div><h3>Local qualifications</h3><p>HND, OND, NCE, B.Sc. and NYSC are understood and never penalised.</p></div>
+   <div class="feat"><div class="ic" style="background:#e8f1fe;color:#1f6feb"><svg class="i " aria-hidden="true"><use href="#i-shield"/></svg></div><h3>Privacy by design</h3><p>Consent before you apply. We follow the Nigeria Data Protection Act 2023.</p></div>
+  </div>
+ </div>
+</section>
+
+<section class="sec" id="promises">
+ <div class="wrap">
+  <div class="head"><span class="pill">Our promises</span><h2>Three rules that never change</h2><p>People told us they would not trust an AI that decides for them. So ours does not.</p></div>
+  <div class="pro">
+   <div class="card"><div class="ic"><svg class="i " aria-hidden="true"><use href="#i-users"/></svg></div><h3>The AI never rejects anyone</h3><p>It ranks and explains. Only the recruiter changes a status, and everyone stays on the list.</p></div>
+   <div class="card"><div class="ic"><svg class="i " aria-hidden="true"><use href="#i-checks"/></svg></div><h3>Every score has a reason</h3><p>See which requirements were met, partly met or not found, with evidence from the CV.</p></div>
+   <div class="card"><div class="ic"><svg class="i " aria-hidden="true"><use href="#i-bulb"/></svg></div><h3>Guidance, not verdicts</h3><p>Applicants get strengths, gaps and next steps in plain language. Never a pass or fail.</p></div>
+  </div>
+  <div class="cta" style="margin-top:70px">
+   <svg class="crowd" viewBox="0 0 320 170" aria-hidden="true"><g fill="#fff" fill-opacity=".2"><circle cx="40" cy="62" r="30"/><circle cx="278" cy="64" r="30"/><circle cx="160" cy="38" r="38"/><ellipse cx="45" cy="175" rx="55" ry="60"/><ellipse cx="280" cy="178" rx="55" ry="60"/></g><ellipse cx="160" cy="180" rx="82" ry="78" fill="#fff" fill-opacity=".3"/><path d="M152 102h16l-3 12 6 40-11 12-11-12 6-40z" fill="#1565e8"/></svg>
+   <h2>See why. Hire<br>with confidence.</h2>
+   <p>Create a job in minutes, or check your fit for a role you found.</p>
+   <div class="btns"><a href="/signup.html" class="btn btn-p">I'm hiring</a><a href="/check" class="btn btn-o">Check my fit</a></div>
+  </div>
+ </div>
+</section>
+</main>
+
+<footer>
+ <div class="wrap">
+  <a href="/landingpage.html"><img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" width="110" height="24"></a>
+  <a href="/privacy">Privacy notice</a><a href="/scoring">How scoring works</a><a href="/contact">Contact</a><span style="margin-left:auto;text-align:right;max-width:300px;font-size:12px">Hirelume is a TechCrush Cohort 8 capstone project. Group 18.</span>
+ </div>
+</footer>
+
+<script>
+(function(){
+ var mb=document.getElementById("mb"),links=document.getElementById("links");
+ mb.addEventListener("click",function(){var o=links.classList.toggle("open");mb.setAttribute("aria-expanded",o);});
+ links.addEventListener("click",function(e){if(e.target.tagName==="A")links.classList.remove("open");});
+ var t=document.getElementById("track"),d=document.querySelectorAll("#dots i");
+ function step(){var c=t.firstElementChild;return c.offsetWidth+20;}
+ document.getElementById("next").onclick=function(){t.scrollBy({left:step(),behavior:"smooth"});};
+ document.getElementById("prev").onclick=function(){t.scrollBy({left:-step(),behavior:"smooth"});};
+ t.addEventListener("scroll",function(){var i=Math.round(t.scrollLeft/step());d.forEach(function(x,k){x.classList.toggle("on",k===i);});});
+})();
+</script>
+</body>
+</html>

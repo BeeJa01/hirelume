@@ -1,98 +1,27 @@
-const fs = require("fs");
-const path = require("path");
-const crypto = require("crypto");
+const fs = require('node:fs/promises');
+const path = require('node:path');
+const { uploadDirectory } = require('../config');
+const { token } = require('../utils');
 
-const privateCvDirectory = path.join(
-  process.cwd(),
-  "private",
-  "cvs"
-);
-
-function ensureCvDirectory() {
-  if (!fs.existsSync(privateCvDirectory)) {
-    fs.mkdirSync(privateCvDirectory, {
-      recursive: true,
-    });
-  }
+function storedFilePath(filePath) {
+  const root = path.resolve(uploadDirectory);
+  const target = path.resolve(filePath);
+  const relative = path.relative(root, target);
+  if (!relative || relative.startsWith('..') || path.isAbsolute(relative)) return null;
+  return target;
 }
 
-function generateStoredFilename(originalName) {
-  const extension = path.extname(originalName).toLowerCase();
-  const randomName = crypto.randomBytes(32).toString("hex");
-
-  return `${randomName}${extension}`;
-}
-
-function getCvStoragePath(filename) {
-  return path.join(privateCvDirectory, filename);
-}
-
-/**
- * Save a CV buffer inside the private CV directory.
- */
-async function saveCv(buffer, extension = "") {
-  ensureCvDirectory();
-
-  const normalizedExtension = extension.startsWith(".")
-    ? extension.toLowerCase()
-    : `.${extension.toLowerCase()}`;
-
-  const filename = `${crypto.randomBytes(32).toString("hex")}${normalizedExtension}`;
-
-  const filePath = getCvStoragePath(filename);
-
-  await fs.promises.writeFile(filePath, buffer);
-
+async function saveCv(buffer, extension) {
+  const directory = path.resolve(uploadDirectory);
+  await fs.mkdir(directory, { recursive: true });
+  const filePath = path.join(directory, `${token(16)}${extension}`);
+  await fs.writeFile(filePath, buffer, { flag: 'wx' });
   return filePath;
 }
 
-/**
- * Check whether a stored CV path is inside
- * the private CV directory.
- *
- * Returns the resolved path when valid,
- * otherwise null.
- */
-function storedFilePath(filePath) {
-  const privateDirectory = path.resolve(privateCvDirectory);
-  const resolvedPath = path.resolve(filePath);
-
-  const relativePath = path.relative(
-    privateDirectory,
-    resolvedPath
-  );
-
-  // Reject paths outside privateCvDirectory.
-  if (
-    relativePath === "" ||
-    relativePath.startsWith(`..${path.sep}`) ||
-    path.isAbsolute(relativePath)
-  ) {
-    return null;
-  }
-
-  return resolvedPath;
-}
-
-/**
- * Remove a stored CV.
- */
 async function removeCv(filePath) {
   const safePath = storedFilePath(filePath);
-
-  if (!safePath) {
-    throw new Error("Invalid CV storage path");
-  }
-
-  await fs.promises.unlink(safePath);
+  if (safePath) await fs.unlink(safePath).catch(() => {});
 }
 
-module.exports = {
-  privateCvDirectory,
-  ensureCvDirectory,
-  generateStoredFilename,
-  getCvStoragePath,
-  saveCv,
-  removeCv,
-  storedFilePath,
-};
+module.exports = { saveCv, removeCv, storedFilePath };

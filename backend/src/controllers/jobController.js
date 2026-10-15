@@ -16,10 +16,18 @@ const createSchema = z.object({
 });
 const updateSchema = z.object({
   title: z.string().trim().min(1).max(200).optional(),
-  description: z.string().optional(),
-  requirements: z.array(requirementSchema).optional(),
+  description: z.string().min(1).optional(),
+  requirements: z.array(requirementSchema).min(1).optional(),
   feedback_enabled: z.boolean().optional(),
   blind_mode: z.boolean().optional(),
+});
+const listApplicantsSchema = z.object({
+  status: z.enum(['shortlisted', 'rejected', 'undecided']).optional(),
+  analysis_status: z.enum(['pending', 'processing', 'completed', 'failed']).optional(),
+  sort: z.enum(['score', 'date']).default('score'),
+  order: z.enum(['asc', 'desc']).default('desc'),
+  page: z.coerce.number().int().min(1).default(1),
+  page_size: z.coerce.number().int().min(1).max(100).default(20),
 });
 
 function serializeJob(job) {
@@ -68,15 +76,22 @@ const listJobs = asyncRoute(async (req, res) => {
 });
 
 const listApplicants = asyncRoute(async (req, res) => {
+  const query = validate(listApplicantsSchema, req.query);
   const job = await ownedJob(req.params.id, req.user._id);
   if (!job) return res.status(404).json({ detail: 'JOB_NOT_FOUND' });
-  const sort = req.query.sort === 'date' ? { applied_at: -1 } : { analysis_score: -1, applied_at: -1 };
-  const applications = await Application.find({ job_id: job._id }).sort(sort).lean();
+  const direction = query.order === 'asc' ? 1 : -1;
+  const sort = query.sort === 'date' ? { applied_at: direction } : { analysis_score: direction, applied_at: -1 };
+  const filter = { job_id: job._id };
+  if (query.status) filter.status = query.status;
+  if (query.analysis_status) filter.analysis_status = query.analysis_status;
+  const total = await Application.countDocuments(filter);
+  const applications = await Application.find(filter).sort(sort).skip((query.page - 1) * query.page_size).limit(query.page_size).lean();
   res.json({
-    total: applications.length,
+    total, page: query.page, page_size: query.page_size, pages: Math.ceil(total / query.page_size),
     applicants: applications.map((item) => ({
       id: String(item._id), name: item.name, score: item.analysis_score, level: item.match_level,
-      reason: item.reason, needs_review: item.needs_review, status: item.status,
+      reason: item.reason, skills: item.skills, experience: item.experience,
+      needs_review: item.needs_review, status: item.status,
       analysis_status: item.analysis_status, applied_at: item.applied_at,
     })),
   });
@@ -84,16 +99,16 @@ const listApplicants = asyncRoute(async (req, res) => {
 
 const getJob = asyncRoute(async (req, res) => {
   const job = await ownedJob(req.params.id, req.user._id);
-  if (!job) return res.status(404).json({ detail: 'Job not found' });
+  if (!job) return res.status(404).json({ detail: 'JOB_NOT_FOUND' });
   res.json(serializeJob(job));
 });
 
 const updateJob = asyncRoute(async (req, res) => {
   const input = validate(updateSchema, req.body);
   const job = await ownedJob(req.params.id, req.user._id);
-  if (!job) return res.status(404).json({ detail: 'Job not found' });
+  if (!job) return res.status(404).json({ detail: 'JOB_NOT_FOUND' });
   if (input.requirements && job.requirements_locked) {
-    return res.status(409).json({ detail: 'Job requirements are locked after the first application' });
+    return res.status(409).json({ detail: 'JOB_REQUIREMENTS_LOCKED' });
   }
   const { requirements, ...fields } = input;
   Object.assign(job, fields);
@@ -104,7 +119,7 @@ const updateJob = asyncRoute(async (req, res) => {
 
 async function setJobStatus(req, res, status) {
   const job = await ownedJob(req.params.id, req.user._id);
-  if (!job) return res.status(404).json({ detail: 'Job not found' });
+  if (!job) return res.status(404).json({ detail: 'JOB_NOT_FOUND' });
   job.status = status;
   job.closed_at = status === 'closed' ? new Date() : null;
   await job.save();

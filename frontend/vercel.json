@@ -1,0 +1,21 @@
+{
+  "cleanUrls": true,
+  "redirects": [
+    {
+      "source": "/",
+      "destination": "/landingpage.html",
+      "permanent": false
+    },
+    {
+      "source": "/check",
+      "destination": "/job-seeker-home",
+      "permanent": false
+    }
+  ],
+  "rewrites": [
+    {
+      "source": "/apply/:token",
+      "destination": "/apply.html"
+    }
+  ]
+}
