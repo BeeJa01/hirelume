@@ -1,28 +1,46 @@
 const jwt = require("jsonwebtoken");
+const { secretKey } = require("../config");
+const { User } = require("../models");
 
-const authenticate = (req, res, next) => {
+const authenticate = async (req, res, next) => {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith("Bearer ")) {
+    return res.status(401).json({
+      success: false,
+      error: { code: "UNAUTHORIZED", message: "Authentication required." },
+    });
+  }
+
+  let decoded;
   try {
-    const authHeader = req.headers.authorization;
+    decoded = jwt.verify(authHeader.split(" ")[1], secretKey);
+  } catch (error) {
+    const expired = error.name === "TokenExpiredError";
+    const code = expired ? "TOKEN_EXPIRED" : "UNAUTHORIZED";
+    return res.status(401).json({
+      success: false,
+      error: {
+        code,
+        message: expired ? "Your session has expired." : "Authentication required.",
+      },
+    });
+  }
 
-    if (!authHeader || !authHeader.startsWith("Bearer ")) {
+  try {
+    const userId = decoded.sub || decoded.id || decoded._id;
+    const user = await User.findById(userId);
+
+    if (!user) {
       return res.status(401).json({
-        message: "Authentication required",
+        success: false,
+        error: { code: "UNAUTHORIZED", message: "Authentication required." },
       });
     }
 
-    const token = authHeader.split(" ")[1];
-
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    req.user = decoded;
-
+    req.user = user;
     next();
   } catch (error) {
-    console.error("Authentication error:", error);
-
-    return res.status(401).json({
-      message: "Invalid or expired token",
-    });
+    return next(error);
   }
 };
 

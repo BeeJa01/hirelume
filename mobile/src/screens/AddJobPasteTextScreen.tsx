@@ -10,27 +10,66 @@ import {
   StyleSheet,
   Platform,
   KeyboardAvoidingView,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { apiClient } from '@/services/apiClient';
+import type { JobDescription } from '@/types';
+
+const MIN_JOB_DESCRIPTION_LENGTH = 50;
+const MAX_JOB_DESCRIPTION_LENGTH = 50000;
 
 type AddJobPasteTextScreenProps = {
   navigation: any;
+  route?: {
+    params?: {
+      sourceUrl?: string;
+    };
+  };
 };
 
-const DEFAULT_JOB_TEXT = `Greenfield Agro Ltd is hiring a Business Development Officer in Ibadan. You will find and win new business customers for our farm produce and packaging services.
+export const AddJobPasteTextScreen = ({ navigation, route }: AddJobPasteTextScreenProps) => {
+  const [jobText, setJobText] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const sourceUrl = route?.params?.sourceUrl;
 
-Requirements: 2+ years in sales or business development. Experience writing proposals or quotes. Comfortable presenting to business owners. Familiarity with CRM tools (HubSpot or Zoho). Degree or HND in a business-related field.
-
-Nice to have: knowledge of the agribusiness sector. Willingness to travel across the South-West.`;
-
-export const AddJobPasteTextScreen = ({ navigation }: AddJobPasteTextScreenProps) => {
-  const [jobText, setJobText] = useState(DEFAULT_JOB_TEXT);
-
-  // Calculate word count
   const wordCount = jobText
     .trim()
     .split(/\s+/)
     .filter((word) => word.length > 0).length;
+  const characterCount = jobText.trim().length;
+  const visibleError = errorMessage || (
+    characterCount > 0 && characterCount < MIN_JOB_DESCRIPTION_LENGTH
+      ? `Enter at least ${MIN_JOB_DESCRIPTION_LENGTH} characters.`
+      : ''
+  );
+
+  const handleContinue = async () => {
+    if (loading) return;
+    if (characterCount < MIN_JOB_DESCRIPTION_LENGTH) {
+      setErrorMessage(`Enter at least ${MIN_JOB_DESCRIPTION_LENGTH} characters.`);
+      return;
+    }
+
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const savedJob = await apiClient.post<JobDescription>('/job-descriptions', {
+        rawText: jobText.trim(),
+      });
+      navigation.navigate('AddCv', {
+        jobDescriptionId: savedJob.id,
+        rawText: savedJob.rawText,
+        source: 'text',
+      });
+    } catch (error) {
+      const message = (error as { error?: { message?: string } })?.error?.message;
+      setErrorMessage(message || 'Could not save the job description. Please try again.');
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -78,7 +117,7 @@ export const AddJobPasteTextScreen = ({ navigation }: AddJobPasteTextScreenProps
             <TouchableOpacity
               style={styles.segmentTab}
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('AddJobScreenshot')}
+              onPress={() => navigation.navigate('AddJobScreenshot', { sourceUrl })}
             >
               <Text style={styles.segmentTabText}>Screenshot</Text>
             </TouchableOpacity>
@@ -86,11 +125,16 @@ export const AddJobPasteTextScreen = ({ navigation }: AddJobPasteTextScreenProps
             <TouchableOpacity
               style={styles.segmentTab}
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('AddJobLinkFallback')}
+              onPress={() => navigation.navigate('AddJobLinkFallback', { sourceUrl })}
             >
               <Text style={styles.segmentTabText}>Link</Text>
             </TouchableOpacity>
           </View>
+          {sourceUrl ? (
+            <Text style={styles.sourceUrlHint} numberOfLines={2}>
+              Original job link: {sourceUrl}
+            </Text>
+          ) : null}
 
           {/* Main Multiline Input */}
           <View style={styles.inputCard}>
@@ -98,7 +142,11 @@ export const AddJobPasteTextScreen = ({ navigation }: AddJobPasteTextScreenProps
               style={styles.textInput}
               multiline
               value={jobText}
-              onChangeText={setJobText}
+              onChangeText={(value) => {
+                setJobText(value);
+                if (errorMessage) setErrorMessage('');
+              }}
+              maxLength={MAX_JOB_DESCRIPTION_LENGTH}
               placeholder="Paste job description here..."
               placeholderTextColor="#94A3B8"
               textAlignVertical="top"
@@ -112,11 +160,14 @@ export const AddJobPasteTextScreen = ({ navigation }: AddJobPasteTextScreenProps
                 Add the full job post for the best match.
               </Text>
               <Text style={styles.hintSecondary}>
-                About 50 words or more works best.
+                At least 50 characters.
               </Text>
             </View>
-            <Text style={styles.wordCountText}>{wordCount} words</Text>
+            <Text style={styles.wordCountText}>
+              {characterCount} characters · {wordCount} words
+            </Text>
           </View>
+          {visibleError ? <Text style={styles.errorText}>{visibleError}</Text> : null}
         </ScrollView>
 
         {/* Bottom Sticky Action */}
@@ -124,9 +175,14 @@ export const AddJobPasteTextScreen = ({ navigation }: AddJobPasteTextScreenProps
           <TouchableOpacity
             style={styles.continueButton}
             activeOpacity={0.9}
-            onPress={() => navigation.navigate('AddCv')}
+            onPress={handleContinue}
+            disabled={loading || characterCount < MIN_JOB_DESCRIPTION_LENGTH}
           >
-            <Text style={styles.continueButtonText}>Continue</Text>
+            {loading ? (
+              <ActivityIndicator color="#FFFFFF" size="small" />
+            ) : (
+              <Text style={styles.continueButtonText}>Continue</Text>
+            )}
           </TouchableOpacity>
         </View>
       </KeyboardAvoidingView>
@@ -257,6 +313,18 @@ const styles = StyleSheet.create({
     fontSize: 11.5,
     color: '#94A3B8',
     fontWeight: '500',
+  },
+  errorText: {
+    color: '#DC2626',
+    fontSize: 12,
+    marginTop: 8,
+  },
+  sourceUrlHint: {
+    color: '#64748B',
+    fontSize: 11.5,
+    lineHeight: 16,
+    marginTop: 2,
+    marginBottom: 8,
   },
   bottomBar: {
     paddingHorizontal: 20,

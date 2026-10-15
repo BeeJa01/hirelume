@@ -9,15 +9,63 @@ export interface User {
   avatar_filename?: string | null;
   avatar_mime_type?: string | null;
   avatar_uploaded_at?: string | null;
+  avatar_updated_at?: string | null;
   avatar_url?: string | null;
 }
 
 export interface AuthResponse {
   access_token: string;
-  token_type: 'bearer';
-  expires_in: number;
-  refresh_token: string;
+  token_type?: 'bearer';
   user: User;
+}
+
+export interface JobDescription {
+  id: string;
+  source: 'text' | 'image' | 'link';
+  rawText: string;
+  title: string | null;
+  company: string | null;
+  createdAt: string;
+}
+
+export interface CvSummary {
+  id: string;
+  fileName: string;
+  mimeType: string;
+  size: number;
+  parsingStatus: 'pending' | 'processing' | 'completed' | 'failed';
+}
+
+export type InterviewQuestionCategory = 'technical' | 'behavioral' | 'cv_gaps';
+
+export interface InterviewQuestion {
+  category: InterviewQuestionCategory;
+  question: string;
+  tip: string;
+}
+
+export interface ResumeAnalysis {
+  id: string;
+  score: number;
+  matchLevel: 'strong' | 'good' | 'partial';
+  summary: string;
+  breakdown: {
+    skills: number;
+    experience: number;
+    education: number;
+    keywords: number;
+  };
+  matchedKeywords: string[];
+  missingKeywords: string[];
+  strengths: string[];
+  gaps: string[];
+  suggestions: string[];
+  questions: InterviewQuestion[];
+  jobDescription: {
+    title: string | null;
+    company: string | null;
+  } | null;
+  createdAt: string;
 }
 
 export interface ApiError {

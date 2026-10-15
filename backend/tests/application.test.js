@@ -5,11 +5,14 @@ const fsSync = require('node:fs');
 const os = require('node:os');
 const path = require('node:path');
 
+process.env.NODE_ENV = 'test';
 const testUri = process.env.MONGODB_TEST_URI;
 const temporaryDirectory = fsSync.mkdtempSync(path.join(os.tmpdir(), 'hirelume-api-'));
 process.env.UPLOAD_DIR = path.join(temporaryDirectory, 'cvs');
 process.env.SECRET_KEY = 'test-secret-for-automated-tests';
 if (testUri) process.env.MONGODB_URI = testUri;
+const config = require('../src/config');
+if (testUri) config.mongoUri = testUri;
 
 const request = require('supertest');
 const { app } = require('../src/app');

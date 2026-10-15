@@ -1,21 +1,21 @@
-require("dotenv").config();
+const path = require("path");
+require("dotenv").config({ path: path.resolve(__dirname, "../.env") });
 
-    const { app } = require("./app");
+const { app } = require("./app");
 const connectDB = require("./config/db");
+const { port } = require("./config");
 
 const {
   ensureCvDirectory,
 } = require("./services/fileStorage");
-
-const PORT = process.env.PORT || 5000;
 
 const startServer = async () => {
   await connectDB();
 
   ensureCvDirectory();
 
-  app.listen(PORT, () => {
-    console.log(`Server running on port ${PORT}`);
+  app.listen(port, "0.0.0.0", () => {
+    console.log(`Server running on 0.0.0.0:${port}`);
   });
 };
 

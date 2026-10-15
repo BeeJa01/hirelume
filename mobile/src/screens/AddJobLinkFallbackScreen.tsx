@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
   View,
   Text,
   TextInput,
@@ -11,13 +12,86 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { apiClient } from '@/services/apiClient';
+import type { ApiError, JobDescription } from '@/types';
+
+const MIN_JOB_DESCRIPTION_LENGTH = 50;
+const MAX_JOB_DESCRIPTION_LENGTH = 50000;
 
 type AddJobLinkFallbackScreenProps = {
   navigation: any;
+  route?: {
+    params?: {
+      sourceUrl?: string;
+    };
+  };
 };
 
-export const AddJobLinkFallbackScreen = ({ navigation }: AddJobLinkFallbackScreenProps) => {
-  const [jobUrl, setJobUrl] = useState('https://example.com/jobs/business-develo...');
+export const AddJobLinkFallbackScreen = ({ navigation, route }: AddJobLinkFallbackScreenProps) => {
+  const [jobUrl, setJobUrl] = useState(route?.params?.sourceUrl || '');
+  const [extractedText, setExtractedText] = useState('');
+  const [reviewReady, setReviewReady] = useState(false);
+  const [loadingAction, setLoadingAction] = useState<'extract' | 'save' | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  const [linkFailed, setLinkFailed] = useState(false);
+  const characterCount = extractedText.trim().length;
+
+  const extractLinkText = async () => {
+    if (loadingAction) return;
+    if (!jobUrl.trim()) {
+      setErrorMessage('Enter the link to the job post.');
+      return;
+    }
+
+    setLoadingAction('extract');
+    setErrorMessage('');
+    setLinkFailed(false);
+    setReviewReady(false);
+    try {
+      const response = await apiClient.post<{ rawText: string }>('/job-descriptions/links/extract', {
+        url: jobUrl.trim(),
+      });
+      setExtractedText(response.rawText);
+      setReviewReady(true);
+    } catch (error) {
+      const apiError = error as ApiError;
+      setErrorMessage(apiError.error?.message || 'Could not read the job page. Please try again.');
+      setLinkFailed(true);
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const saveJobDescription = async () => {
+    if (loadingAction) return;
+    if (characterCount < MIN_JOB_DESCRIPTION_LENGTH) {
+      setErrorMessage(`The job description must be at least ${MIN_JOB_DESCRIPTION_LENGTH} characters.`);
+      return;
+    }
+
+    setLoadingAction('save');
+    setErrorMessage('');
+    try {
+      const savedJob = await apiClient.post<JobDescription>('/job-descriptions', {
+        rawText: extractedText.trim(),
+        source: 'link',
+      });
+      navigation.navigate('AddCv', {
+        jobDescriptionId: savedJob.id,
+        rawText: savedJob.rawText,
+        source: 'link',
+      });
+    } catch (error) {
+      const apiError = error as ApiError;
+      setErrorMessage(apiError.error?.message || 'Could not save the job description. Please try again.');
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const openAlternateInput = (screen: 'AddJobPasteText' | 'AddJobScreenshot') => {
+    navigation.navigate(screen, { sourceUrl: jobUrl.trim() });
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -55,7 +129,7 @@ export const AddJobLinkFallbackScreen = ({ navigation }: AddJobLinkFallbackScree
             <TouchableOpacity
               style={styles.segmentTab}
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('AddJobPasteText')}
+              onPress={() => navigation.navigate('AddJobPasteText', { sourceUrl: jobUrl.trim() })}
             >
               <Text style={styles.segmentTabText}>Paste text</Text>
             </TouchableOpacity>
@@ -63,7 +137,7 @@ export const AddJobLinkFallbackScreen = ({ navigation }: AddJobLinkFallbackScree
             <TouchableOpacity
               style={styles.segmentTab}
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('AddJobScreenshot')}
+              onPress={() => navigation.navigate('AddJobScreenshot', { sourceUrl: jobUrl.trim() })}
             >
               <Text style={styles.segmentTabText}>Screenshot</Text>
             </TouchableOpacity>
@@ -89,7 +163,17 @@ export const AddJobLinkFallbackScreen = ({ navigation }: AddJobLinkFallbackScree
               <TextInput
                 style={styles.textInput}
                 value={jobUrl}
-                onChangeText={setJobUrl}
+                onChangeText={(value) => {
+                  setJobUrl(value);
+                  if (errorMessage) {
+                    setErrorMessage('');
+                    setLinkFailed(false);
+                  }
+                  if (reviewReady) {
+                    setReviewReady(false);
+                    setExtractedText('');
+                  }
+                }}
                 placeholder="https://..."
                 placeholderTextColor="#94A3B8"
                 autoCapitalize="none"
@@ -99,25 +183,27 @@ export const AddJobLinkFallbackScreen = ({ navigation }: AddJobLinkFallbackScree
             <Text style={styles.inputHint}>We try to read the page for you.</Text>
           </View>
 
-          {/* Fallback Warning Box */}
-          <View style={styles.warningBox}>
-            <Ionicons
-              name="warning-outline"
-              size={18}
-              color="#D97706"
-              style={{ marginRight: 8, marginTop: 1 }}
-            />
-            <Text style={styles.warningText}>
-              <Text style={styles.warningBold}>We could not read that page.</Text> Some sites block this. Paste the job text or upload a screenshot instead.
-            </Text>
-          </View>
+          {errorMessage ? (
+            <View style={styles.warningBox}>
+              <Ionicons
+                name="warning-outline"
+                size={18}
+                color="#D97706"
+                style={{ marginRight: 8, marginTop: 1 }}
+              />
+              <Text style={styles.warningText}>
+                <Text style={styles.warningBold}>{linkFailed ? 'We could not read that page. ' : ''}</Text>
+                {errorMessage}
+              </Text>
+            </View>
+          ) : null}
 
           {/* Fallback Action Buttons */}
-          <View style={styles.actionButtonsCol}>
+          {linkFailed ? <View style={styles.actionButtonsCol}>
             <TouchableOpacity
               style={styles.fallbackButton}
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('AddJobPasteText')}
+              onPress={() => openAlternateInput('AddJobPasteText')}
             >
               <Ionicons
                 name="document-text-outline"
@@ -131,7 +217,7 @@ export const AddJobLinkFallbackScreen = ({ navigation }: AddJobLinkFallbackScree
             <TouchableOpacity
               style={styles.fallbackButton}
               activeOpacity={0.8}
-              onPress={() => navigation.navigate('AddJobScreenshot')}
+              onPress={() => openAlternateInput('AddJobScreenshot')}
             >
               <Ionicons
                 name="images-outline"
@@ -141,16 +227,60 @@ export const AddJobLinkFallbackScreen = ({ navigation }: AddJobLinkFallbackScree
               />
               <Text style={styles.fallbackButtonText}>Upload a screenshot instead</Text>
             </TouchableOpacity>
-          </View>
+          </View> : null}
+
+          {reviewReady ? (
+            <View style={styles.reviewSection}>
+              <View style={styles.reviewHeader}>
+                <Text style={styles.reviewTitle}>Job text we read</Text>
+                <Text style={styles.reviewHint}>Review and edit before saving</Text>
+              </View>
+              <View style={styles.reviewCard}>
+                <TextInput
+                  style={styles.reviewInput}
+                  multiline
+                  value={extractedText}
+                  onChangeText={(value) => {
+                    setExtractedText(value);
+                    if (errorMessage) setErrorMessage('');
+                  }}
+                  maxLength={MAX_JOB_DESCRIPTION_LENGTH}
+                  placeholder="Extracted job text..."
+                  placeholderTextColor="#94A3B8"
+                  textAlignVertical="top"
+                />
+              </View>
+              <Text style={styles.reviewHint}>
+                {characterCount} / {MAX_JOB_DESCRIPTION_LENGTH} characters · at least {MIN_JOB_DESCRIPTION_LENGTH} required
+              </Text>
+            </View>
+          ) : null}
         </ScrollView>
 
-        {/* Bottom Disabled Button */}
         <View style={styles.bottomBar}>
           <TouchableOpacity
-            style={styles.continueButtonDisabled}
-            disabled={true}
+            style={[styles.continueButtonDisabled, styles.continueButtonEnabled]}
+            activeOpacity={0.9}
+            onPress={reviewReady ? saveJobDescription : extractLinkText}
+            disabled={
+              loadingAction !== null
+              || (reviewReady
+                ? characterCount < MIN_JOB_DESCRIPTION_LENGTH
+                : !jobUrl.trim())
+            }
           >
-            <Text style={styles.continueButtonDisabledText}>Continue</Text>
+            {loadingAction ? (
+              <View style={styles.buttonContent}>
+                <ActivityIndicator color="#FFFFFF" size="small" />
+                <Text style={styles.continueButtonDisabledText}>
+                  {loadingAction === 'extract' ? 'Reading job link...' : 'Saving...'}
+                </Text>
+              </View>
+            ) : (
+              <Text style={styles.continueButtonDisabledText}>
+                {reviewReady ? 'Save and continue' : 'Read job link'}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -327,9 +457,48 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
+  continueButtonEnabled: {
+    backgroundColor: '#0066FF',
+  },
   continueButtonDisabledText: {
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
+  },
+  reviewSection: {
+    marginTop: 18,
+    marginBottom: 8,
+  },
+  reviewHeader: {
+    marginBottom: 8,
+  },
+  reviewTitle: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#0F172A',
+  },
+  reviewHint: {
+    fontSize: 11.5,
+    color: '#94A3B8',
+    marginTop: 5,
+  },
+  reviewCard: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    padding: 12,
+    minHeight: 140,
+  },
+  reviewInput: {
+    fontSize: 13,
+    color: '#1E293B',
+    lineHeight: 19,
+    minHeight: 120,
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
   },
 });

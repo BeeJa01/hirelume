@@ -1,5 +1,9 @@
 import React, { useState } from 'react';
 import {
+  ActivityIndicator,
+  Alert,
+  Image,
+  Linking,
   View,
   Text,
   TextInput,
@@ -9,46 +13,179 @@ import {
   StatusBar,
   StyleSheet,
   Platform,
-  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+import { apiClient } from '@/services/apiClient';
+import type { ApiError, JobDescription } from '@/types';
 
 type AddJobScreenshotScreenProps = {
   navigation: any;
+  route?: {
+    params?: {
+      sourceUrl?: string;
+    };
+  };
 };
 
-type UploadedFile = {
-  id: string;
-  name: string;
-  size: string;
-};
+const MAX_IMAGES = 5;
+const MIN_JOB_DESCRIPTION_LENGTH = 50;
+const MAX_JOB_DESCRIPTION_LENGTH = 50000;
 
-const DEFAULT_EXTRACTED_TEXT = `Greenfield Agro Ltd is hiring a Business Development Officer in Ibadan. You will find and win new business customers for our farm produce and packaging services.
+export const AddJobScreenshotScreen = ({ navigation, route }: AddJobScreenshotScreenProps) => {
+  const [images, setImages] = useState<ImagePicker.ImagePickerAsset[]>([]);
+  const [extractedText, setExtractedText] = useState('');
+  const [reviewReady, setReviewReady] = useState(false);
+  const [loadingAction, setLoadingAction] = useState<'ocr' | 'save' | null>(null);
+  const [errorMessage, setErrorMessage] = useState('');
+  const characterCount = extractedText.trim().length;
 
-Requirements: 2+ years in sales or business development. Experience writing proposals or quotes. Comfortable presenting to business owners. Familiarity with CRM tools (HubSpot or Zoho). Degree or HND in a business-related field.`;
-
-export const AddJobScreenshotScreen = ({ navigation }: AddJobScreenshotScreenProps) => {
-  const [files, setFiles] = useState<UploadedFile[]>([
-    { id: '1', name: 'job-post-1.png', size: '340 KB' },
-    { id: '2', name: 'job-post-2.png', size: '410 KB' },
-  ]);
-
-  const [extractedText, setExtractedText] = useState(DEFAULT_EXTRACTED_TEXT);
-
-  const removeFile = (id: string) => {
-    setFiles((prev) => prev.filter((f) => f.id !== id));
+  const readableSize = (bytes?: number) => {
+    if (bytes === undefined) return 'Image';
+    return bytes < 1024 * 1024
+      ? `${Math.max(1, Math.round(bytes / 1024))} KB`
+      : `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
   };
 
-  const handleAddAnother = () => {
-    if (files.length >= 3) {
-      Alert.alert('Limit Reached', 'You can upload up to 3 screenshots.');
+  const handlePermissionDenied = (canAskAgain: boolean) => {
+    setErrorMessage('Allow photo access to select job-description screenshots.');
+    if (!canAskAgain) {
+      Alert.alert(
+        'Photo access is off',
+        'Allow Hirelume to access your photos in Settings to upload screenshots.',
+        [
+          { text: 'Cancel', style: 'cancel' },
+          { text: 'Open settings', onPress: () => void Linking.openSettings() },
+        ],
+      );
+    }
+  };
+
+  const handleAddImages = async () => {
+    const remaining = MAX_IMAGES - images.length;
+    if (remaining <= 0) {
+      setErrorMessage(`You can select up to ${MAX_IMAGES} screenshots.`);
       return;
     }
-    const nextNum = files.length + 1;
-    setFiles((prev) => [
-      ...prev,
-      { id: Date.now().toString(), name: `job-post-${nextNum}.png`, size: '385 KB' },
-    ]);
+
+    try {
+      const currentPermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+      const permission = currentPermission.granted
+        ? currentPermission
+        : currentPermission.canAskAgain
+          ? await ImagePicker.requestMediaLibraryPermissionsAsync()
+          : currentPermission;
+      if (!permission.granted) {
+        handlePermissionDenied(permission.canAskAgain);
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsMultipleSelection: true,
+        selectionLimit: remaining,
+        quality: 1,
+      });
+      if (result.canceled) return;
+      const selected = result.assets.filter((asset) => asset.type === 'image');
+      if (!selected.length) {
+        setErrorMessage('Select one or more image screenshots.');
+        return;
+      }
+
+      setImages((current) => [...current, ...selected].slice(0, MAX_IMAGES));
+      setReviewReady(false);
+      setExtractedText('');
+      setErrorMessage('');
+    } catch {
+      setErrorMessage('Could not open your photo library. Please try again.');
+    }
+  };
+
+  const removeImage = (uri: string) => {
+    setImages((current) => current.filter((image) => image.uri !== uri));
+    setReviewReady(false);
+    setExtractedText('');
+  };
+
+  const readErrorMessage = (error: unknown) => {
+    const apiError = error as ApiError;
+    switch (apiError.error?.code) {
+      case 'FILE_TOO_LARGE':
+        return 'A screenshot is too large to upload. Try selecting fewer or smaller images.';
+      case 'UNSUPPORTED_FILE_TYPE':
+        return 'Use JPEG, PNG, or WebP screenshots.';
+      case 'NO_TEXT_FOUND':
+        return apiError.error.message || 'No readable text was found. Try clearer screenshots or paste the text instead.';
+      case 'OCR_FAILED':
+        return apiError.error.message || 'Could not read the screenshots. Please try again.';
+      case 'TOO_MANY_IMAGES':
+        return `Select no more than ${MAX_IMAGES} screenshots.`;
+      default:
+        return apiError.error?.message || 'Could not upload the screenshots. Check your connection and try again.';
+    }
+  };
+
+  const readScreenshots = async () => {
+    if (!images.length || loadingAction) return;
+    setLoadingAction('ocr');
+    setErrorMessage('');
+    try {
+      const formData = new FormData();
+      for (let index = 0; index < images.length; index += 1) {
+        const image = images[index];
+        const manipulator = ImageManipulator.manipulate(image.uri);
+        if (image.width > 1800) manipulator.resize({ width: 1800 });
+        const compressed = await manipulator.renderAsync();
+        const saved = await compressed.saveAsync({
+          format: SaveFormat.JPEG,
+          compress: 0.75,
+        });
+        formData.append('images', {
+          uri: saved.uri,
+          name: `job-screenshot-${index + 1}.jpg`,
+          type: 'image/jpeg',
+        } as unknown as Blob);
+      }
+
+      const response = await apiClient.upload<{ rawText: string }>(
+        '/job-descriptions/images/extract',
+        formData,
+      );
+      setExtractedText(response.rawText);
+      setReviewReady(true);
+    } catch (error) {
+      setErrorMessage(readErrorMessage(error));
+    } finally {
+      setLoadingAction(null);
+    }
+  };
+
+  const saveJobDescription = async () => {
+    if (loadingAction) return;
+    if (characterCount < MIN_JOB_DESCRIPTION_LENGTH) {
+      setErrorMessage(`The job description must be at least ${MIN_JOB_DESCRIPTION_LENGTH} characters.`);
+      return;
+    }
+
+    setLoadingAction('save');
+    setErrorMessage('');
+    try {
+      const savedJob = await apiClient.post<JobDescription>('/job-descriptions', {
+        rawText: extractedText.trim(),
+        source: 'image',
+      });
+      navigation.navigate('AddCv', {
+        jobDescriptionId: savedJob.id,
+        rawText: savedJob.rawText,
+        source: 'image',
+      });
+    } catch (error) {
+      setErrorMessage(readErrorMessage(error));
+    } finally {
+      setLoadingAction(null);
+    }
   };
 
   return (
@@ -87,7 +224,7 @@ export const AddJobScreenshotScreen = ({ navigation }: AddJobScreenshotScreenPro
             <TouchableOpacity
               style={styles.segmentTab}
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('AddJobPasteText')}
+              onPress={() => navigation.navigate('AddJobPasteText', { sourceUrl: route?.params?.sourceUrl })}
             >
               <Text style={styles.segmentTabText}>Paste text</Text>
             </TouchableOpacity>
@@ -102,7 +239,7 @@ export const AddJobScreenshotScreen = ({ navigation }: AddJobScreenshotScreenPro
             <TouchableOpacity
               style={styles.segmentTab}
               activeOpacity={0.7}
-              onPress={() => navigation.navigate('AddJobLinkFallback')}
+              onPress={() => navigation.navigate('AddJobLinkFallback', { sourceUrl: route?.params?.sourceUrl })}
             >
               <Text style={styles.segmentTabText}>Link</Text>
             </TouchableOpacity>
@@ -110,20 +247,24 @@ export const AddJobScreenshotScreen = ({ navigation }: AddJobScreenshotScreenPro
 
           {/* Uploaded Files List */}
           <View style={styles.filesList}>
-            {files.map((file) => (
-              <View key={file.id} style={styles.fileCard}>
+            {images.map((image) => (
+              <View key={image.uri} style={styles.fileCard}>
                 <View style={styles.fileIconBox}>
-                  <Ionicons name="image-outline" size={20} color="#0066FF" />
+                  <Image source={{ uri: image.uri }} style={styles.thumbnail} />
                 </View>
 
                 <View style={styles.fileDetails}>
-                  <Text style={styles.fileName}>{file.name}</Text>
-                  <Text style={styles.fileSize}>{file.size}</Text>
+                  <Text style={styles.fileName} numberOfLines={1}>
+                    {image.fileName || `Screenshot ${images.indexOf(image) + 1}`}
+                  </Text>
+                  <Text style={styles.fileSize}>{readableSize(image.fileSize)}</Text>
                 </View>
 
                 <TouchableOpacity
                   style={styles.deleteButton}
-                  onPress={() => removeFile(file.id)}
+                  onPress={() => removeImage(image.uri)}
+                  accessibilityRole="button"
+                  accessibilityLabel="Remove screenshot"
                   hitSlop={{ top: 8, bottom: 8, left: 8, right: 8 }}
                 >
                   <Ionicons name="close" size={18} color="#94A3B8" />
@@ -133,51 +274,74 @@ export const AddJobScreenshotScreen = ({ navigation }: AddJobScreenshotScreenPro
           </View>
 
           {/* Add Another Card */}
-          <TouchableOpacity
-            style={styles.addAnotherCard}
-            activeOpacity={0.8}
-            onPress={handleAddAnother}
-          >
-            <Ionicons name="add-circle-outline" size={24} color="#0066FF" />
-            <Text style={styles.addAnotherTitle}>Add another</Text>
-            <Text style={styles.addAnotherSubtitle}>
-              Up to 3 images - JPG or PNG, up to 5 MB each.
+          {images.length < MAX_IMAGES ? (
+            <TouchableOpacity
+              style={styles.addAnotherCard}
+              activeOpacity={0.8}
+              onPress={handleAddImages}
+              disabled={loadingAction !== null}
+            >
+              <Ionicons name="add-circle-outline" size={24} color="#0066FF" />
+              <Text style={styles.addAnotherTitle}>
+                {images.length ? 'Add another' : 'Choose screenshots'}
+              </Text>
+              <Text style={styles.addAnotherSubtitle}>
+                Up to {MAX_IMAGES} images · JPG, PNG or WebP · 5 MB each
+              </Text>
+            </TouchableOpacity>
+          ) : null}
+
+          {reviewReady ? (
+            <>
+              <View style={styles.aiAlertBanner}>
+                <Ionicons
+                  name="warning-outline"
+                  size={18}
+                  color="#D97706"
+                  style={{ marginRight: 8, marginTop: 1 }}
+                />
+                <Text style={styles.aiAlertText}>
+                  <Text style={styles.aiAlertBold}>Check what we read. </Text>
+                  Review and correct the extracted text before saving it.
+                </Text>
+              </View>
+
+              <View style={styles.jobTextSection}>
+                <View style={styles.jobTextHeaderRow}>
+                  <Text style={styles.jobTextTitle}>Job text we read</Text>
+                  <Text style={styles.jobTextSublabel}>You can edit this</Text>
+                </View>
+
+                <View style={styles.jobTextCard}>
+                  <TextInput
+                    style={styles.jobTextInput}
+                    multiline
+                    value={extractedText}
+                    onChangeText={(value) => {
+                      setExtractedText(value);
+                      if (errorMessage) setErrorMessage('');
+                    }}
+                    maxLength={MAX_JOB_DESCRIPTION_LENGTH}
+                    placeholder="Extracted job text..."
+                    placeholderTextColor="#94A3B8"
+                    textAlignVertical="top"
+                  />
+                </View>
+                <Text style={styles.extractedCount}>
+                  {characterCount} / {MAX_JOB_DESCRIPTION_LENGTH} characters · at least {MIN_JOB_DESCRIPTION_LENGTH} required
+                </Text>
+              </View>
+            </>
+          ) : null}
+
+          {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
+          {!images.length ? (
+            <Text style={styles.emptyHint}>
+              {route?.params?.sourceUrl
+                ? `Link tried: ${route.params.sourceUrl}\nChoose screenshots of the job post to continue.`
+                : 'Choose screenshots of the job post to continue.'}
             </Text>
-          </TouchableOpacity>
-
-          {/* AI Banner */}
-          <View style={styles.aiAlertBanner}>
-            <Ionicons
-              name="warning-outline"
-              size={18}
-              color="#D97706"
-              style={{ marginRight: 8, marginTop: 1 }}
-            />
-            <Text style={styles.aiAlertText}>
-              <Text style={styles.aiAlertBold}>Check what we read. </Text>
-              We used AI to read your screenshots. Fix anything that looks wrong before you continue.
-            </Text>
-          </View>
-
-          {/* Job text we read section */}
-          <View style={styles.jobTextSection}>
-            <View style={styles.jobTextHeaderRow}>
-              <Text style={styles.jobTextTitle}>Job text we read</Text>
-              <Text style={styles.jobTextSublabel}>You can edit this</Text>
-            </View>
-
-            <View style={styles.jobTextCard}>
-              <TextInput
-                style={styles.jobTextInput}
-                multiline
-                value={extractedText}
-                onChangeText={setExtractedText}
-                placeholder="Extracted job text..."
-                placeholderTextColor="#94A3B8"
-                textAlignVertical="top"
-              />
-            </View>
-          </View>
+          ) : null}
         </ScrollView>
 
         {/* Bottom Sticky Action */}
@@ -185,9 +349,25 @@ export const AddJobScreenshotScreen = ({ navigation }: AddJobScreenshotScreenPro
           <TouchableOpacity
             style={styles.continueButton}
             activeOpacity={0.9}
-            onPress={() => navigation.navigate('AddCv')}
+            onPress={reviewReady ? saveJobDescription : readScreenshots}
+            disabled={
+              loadingAction !== null ||
+              (!reviewReady && images.length === 0) ||
+              (reviewReady && characterCount < MIN_JOB_DESCRIPTION_LENGTH)
+            }
           >
-            <Text style={styles.continueButtonText}>Continue</Text>
+            {loadingAction ? (
+              <View style={styles.buttonContent}>
+                <ActivityIndicator color="#FFFFFF" size="small" />
+                <Text style={styles.continueButtonText}>
+                  {loadingAction === 'ocr' ? 'Reading screenshots...' : 'Saving...'}
+                </Text>
+              </View>
+            ) : (
+              <Text style={styles.continueButtonText}>
+                {reviewReady ? 'Save and continue' : 'Read text from screenshots'}
+              </Text>
+            )}
           </TouchableOpacity>
         </View>
       </View>
@@ -305,6 +485,11 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     marginRight: 12,
   },
+  thumbnail: {
+    width: '100%',
+    height: '100%',
+    borderRadius: 8,
+  },
   fileDetails: {
     flex: 1,
   },
@@ -413,5 +598,27 @@ const styles = StyleSheet.create({
     color: '#FFFFFF',
     fontSize: 15,
     fontWeight: '700',
+  },
+  buttonContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
+  extractedCount: {
+    color: '#94A3B8',
+    fontSize: 11,
+    marginTop: 6,
+  },
+  errorText: {
+    color: '#DC2626',
+    fontSize: 12,
+    marginBottom: 12,
+  },
+  emptyHint: {
+    color: '#64748B',
+    fontSize: 12,
+    lineHeight: 18,
+    textAlign: 'center',
+    marginTop: 10,
   },
 });

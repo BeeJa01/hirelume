@@ -1,12 +1,9 @@
 const fs = require("fs");
 const path = require("path");
 const crypto = require("crypto");
+const { uploadDirectory } = require("../config");
 
-const privateCvDirectory = path.join(
-  process.cwd(),
-  "private",
-  "cvs"
-);
+const privateCvDirectory = path.resolve(process.cwd(), uploadDirectory);
 
 function ensureCvDirectory() {
   if (!fs.existsSync(privateCvDirectory)) {

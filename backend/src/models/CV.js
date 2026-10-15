@@ -9,6 +9,12 @@ const cvSchema = new mongoose.Schema(
       index: true,
     },
 
+    isActive: {
+      type: Boolean,
+      default: false,
+      index: true,
+    },
+
     originalName: {
       type: String,
       required: true,
@@ -60,6 +66,11 @@ const cvSchema = new mongoose.Schema(
   {
     timestamps: true,
   }
+);
+
+cvSchema.index(
+  { applicant: 1 },
+  { unique: true, partialFilterExpression: { isActive: true } },
 );
 
 module.exports = mongoose.model("CV", cvSchema);

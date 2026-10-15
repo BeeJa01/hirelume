@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
+  ActivityIndicator,
   View,
   Text,
   SafeAreaView,
@@ -8,31 +9,59 @@ import {
   TouchableOpacity,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { apiClient } from '@/services/apiClient';
+import type { ApiError, ResumeAnalysis } from '@/types';
 
 type AnalysingScreenProps = {
   navigation: any;
+  route: {
+    params: {
+      cvId: string;
+      jobDescriptionId: string;
+    };
+  };
 };
 
-export const AnalysingScreen = ({ navigation }: AnalysingScreenProps) => {
-  const [currentStep, setCurrentStep] = useState(3);
+export const AnalysingScreen = ({ navigation, route }: AnalysingScreenProps) => {
+  const [errorMessage, setErrorMessage] = useState('');
+  const [loading, setLoading] = useState(true);
+  const activeRequest = useRef(false);
 
   useEffect(() => {
-    // Automatically transition to the results page after simulation
-    const timer = setTimeout(() => {
-      navigation.replace('AnalysisResult');
-    }, 2800);
+    void createAnalysis();
+  }, []);
 
-    return () => clearTimeout(timer);
-  }, [navigation]);
+  const createAnalysis = async () => {
+    if (activeRequest.current) return;
+    activeRequest.current = true;
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const response = await apiClient.post<{ analysis: ResumeAnalysis }>('/analyses', {
+        cvId: route.params.cvId,
+        jobDescriptionId: route.params.jobDescriptionId,
+      }, { timeout: 90000 });
+      let questionsError: string | undefined;
+      try {
+        await apiClient.post(`/analyses/${response.analysis.id}/questions`, {}, { timeout: 90000 });
+      } catch (error) {
+        const apiError = error as ApiError;
+        questionsError = apiError.error?.message || 'Interview questions could not be generated. You can retry from the Questions tab.';
+      }
+      navigation.replace('AnalysisResult', { analysisId: response.analysis.id, questionsError });
+    } catch (error) {
+      const apiError = error as ApiError;
+      setErrorMessage(apiError.error?.message || 'The analysis could not be completed. Please try again.');
+      activeRequest.current = false;
+    } finally {
+      setLoading(false);
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
-      <TouchableOpacity
-        style={styles.container}
-        activeOpacity={1}
-        onPress={() => navigation.replace('AnalysisResult')}
-      >
+      <View style={styles.container}>
         <View style={styles.content}>
           {/* Sparkle Hero Icon */}
           <View style={styles.sparkleIconCircle}>
@@ -42,7 +71,7 @@ export const AnalysingScreen = ({ navigation }: AnalysingScreenProps) => {
           {/* Title & Subtitle */}
           <Text style={styles.title}>Analysing your fit</Text>
           <Text style={styles.subtitle}>
-            Business Development Officer · Greenfield Agro Ltd
+            Your CV is being compared with this job
           </Text>
 
           {/* Analysis Steps Card */}
@@ -97,10 +126,23 @@ export const AnalysingScreen = ({ navigation }: AnalysingScreenProps) => {
 
           {/* Subtext Notice */}
           <Text style={styles.noticeText}>
-            Most analyses finish within 30 seconds. If something goes wrong, your job text and CV stay filled in.
+            Most analyses finish within a minute. Your CV and job description stay available if you need to retry.
           </Text>
+          {loading ? (
+            <ActivityIndicator style={styles.loadingIndicator} color="#0066FF" />
+          ) : (
+            <View style={styles.errorContainer}>
+              <Text style={styles.errorText}>{errorMessage}</Text>
+              <TouchableOpacity style={styles.retryButton} onPress={() => void createAnalysis()}>
+                <Text style={styles.retryButtonText}>Try again</Text>
+              </TouchableOpacity>
+              <TouchableOpacity onPress={() => navigation.goBack()}>
+                <Text style={styles.backLinkText}>Back to your CV</Text>
+              </TouchableOpacity>
+            </View>
+          )}
         </View>
-      </TouchableOpacity>
+      </View>
     </SafeAreaView>
   );
 };
@@ -244,5 +286,36 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     lineHeight: 18,
     paddingHorizontal: 12,
+  },
+  loadingIndicator: {
+    marginTop: 20,
+  },
+  errorContainer: {
+    alignItems: 'center',
+    marginTop: 18,
+  },
+  errorText: {
+    color: '#DC2626',
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  retryButton: {
+    backgroundColor: '#0066FF',
+    paddingHorizontal: 22,
+    paddingVertical: 11,
+    borderRadius: 10,
+    marginBottom: 12,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 14,
+    fontWeight: '700',
+  },
+  backLinkText: {
+    color: '#0066FF',
+    fontSize: 13,
+    fontWeight: '600',
   },
 });

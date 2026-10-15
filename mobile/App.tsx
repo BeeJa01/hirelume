@@ -16,6 +16,13 @@ import { AddCvScreen } from './src/screens/AddCvScreen';
 import { AnalysingScreen } from './src/screens/AnalysingScreen';
 import { AnalysisResultScreen } from './src/screens/AnalysisResultScreen';
 import { MyAnalysesScreen } from './src/screens/MyAnalysesScreen';
+import { ApplicationsScreen } from './src/screens/ApplicationsScreen';
+import { AccountScreen } from './src/screens/AccountScreen';
+import { PrivacyNoticeScreen } from './src/screens/PrivacyNoticeScreen';
+import { InsideHirelumeScreen } from './src/screens/InsideHirelumeScreen';
+import { HelpContactScreen } from './src/screens/HelpContactScreen';
+import { HowItWorksScreen } from './src/screens/HowItWorksScreen';
+import { BuiltForNigeriaScreen } from './src/screens/BuiltForNigeriaScreen';
 
 export type RootStackParamList = {
   Splash: undefined;
@@ -23,13 +30,24 @@ export type RootStackParamList = {
   CreateAccount: undefined;
   Login: undefined;
   Home: undefined;
-  AddJobPasteText: undefined;
-  AddJobScreenshot: undefined;
-  AddJobLinkFallback: undefined;
-  AddCv: undefined;
-  Analysing: undefined;
-  AnalysisResult: { initialTab?: 'overview' | 'requirements' | 'questions' } | undefined;
+  AddJobPasteText: { sourceUrl?: string } | undefined;
+  AddJobScreenshot: { sourceUrl?: string } | undefined;
+  AddJobLinkFallback: { sourceUrl?: string } | undefined;
+  AddCv: { jobDescriptionId: string; rawText: string; source?: 'text' | 'image' | 'link' } | undefined;
+  Analysing: { cvId: string; jobDescriptionId: string };
+  AnalysisResult: {
+    analysisId: string;
+    initialTab?: 'overview' | 'requirements' | 'questions';
+    questionsError?: string;
+  };
   MyAnalyses: undefined;
+  Applications: undefined;
+  Account: undefined;
+  PrivacyNotice: undefined;
+  InsideHirelume: undefined;
+  HelpContact: undefined;
+  HowItWorks: undefined;
+  BuiltForNigeria: undefined;
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -74,6 +92,13 @@ function RootNavigator() {
           <Stack.Screen name="Analysing" component={AnalysingScreen} />
           <Stack.Screen name="AnalysisResult" component={AnalysisResultScreen} />
           <Stack.Screen name="MyAnalyses" component={MyAnalysesScreen} />
+          <Stack.Screen name="Applications" component={ApplicationsScreen} />
+          <Stack.Screen name="Account" component={AccountScreen} />
+          <Stack.Screen name="PrivacyNotice" component={PrivacyNoticeScreen} />
+          <Stack.Screen name="InsideHirelume" component={InsideHirelumeScreen} />
+          <Stack.Screen name="HelpContact" component={HelpContactScreen} />
+          <Stack.Screen name="HowItWorks" component={HowItWorksScreen} />
+          <Stack.Screen name="BuiltForNigeria" component={BuiltForNigeriaScreen} />
         </>
       ) : (
         <>

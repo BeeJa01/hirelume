@@ -5,7 +5,15 @@ const token = (bytes = 32) => randomBytes(bytes).toString('base64url');
 const asyncRoute = (handler) => (req, res, next) => Promise.resolve(handler(req, res, next)).catch(next);
 
 function publicUser(user) {
-  return { id: String(user._id ?? user.id), name: user.name, email: user.email, role: user.role };
+  return {
+    id: String(user._id ?? user.id),
+    name: user.name,
+    email: user.email,
+    role: user.role,
+    avatar_url: user.avatar_path
+      ? `/api/auth/me/avatar?v=${user.avatar_updated_at ? new Date(user.avatar_updated_at).getTime() : 0}`
+      : null,
+  };
 }
 
 function validate(schema, input) {

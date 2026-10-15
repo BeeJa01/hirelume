@@ -27,5 +27,3 @@ test('uploaded filenames are reduced to safe names', () => {
   assert.equal(safeFilename('../../my cv.pdf'), 'my_cv.pdf');
   assert.equal(safeFilename(''), 'cv');
 });
-
-test.todo('Parse text from valid PDF and DOCX CV files');

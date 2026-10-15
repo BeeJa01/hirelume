@@ -1,16 +1,56 @@
-import { Platform } from 'react-native';
+import { NativeModules, Platform } from 'react-native';
 
-// Base URL from environment variable, with platform-specific defaults
-// Android emulator uses 10.0.2.2 to access host machine localhost
-// iOS simulator & Web can use localhost:8000
+const API_PORT = 5000;
+
+function isTunnelHost(hostname: string) {
+  return (
+    hostname.endsWith('.exp.direct') ||
+    hostname.endsWith('.exp.host') ||
+    hostname.includes('ngrok') ||
+    hostname.endsWith('.expo.dev')
+  );
+}
+
+function hostnameFromUrl(value?: string | null): string | null {
+  if (!value) return null;
+  try {
+    const withScheme = value.includes('://') ? value : `http://${value}`;
+    const { hostname } = new URL(withScheme);
+    return hostname || null;
+  } catch {
+    return value.split('://').pop()?.split(':')[0] || null;
+  }
+}
+
+function metroHostname(): string | null {
+  const scriptURL = NativeModules.SourceCode?.scriptURL as string | undefined;
+  const fromMetro = hostnameFromUrl(scriptURL);
+  if (fromMetro && !isTunnelHost(fromMetro)) return fromMetro;
+
+  if (Platform.OS === 'web' && typeof window !== 'undefined') {
+    return window.location.hostname;
+  }
+
+  return null;
+}
+
 export const DEFAULT_API_URL = Platform.select({
-  android: 'http://10.0.2.2:8000/api',
-  ios: 'http://localhost:8000/api',
-  default: 'http://localhost:8000/api',
+  android: `http://10.0.2.2:${API_PORT}/api`,
+  ios: `http://localhost:${API_PORT}/api`,
+  default: `http://localhost:${API_PORT}/api`,
 });
 
-// The actual API URL used in apiClient.ts comes from EXPO_PUBLIC_API_URL env var
-// or falls back to DEFAULT_API_URL
+export function getApiUrl(): string {
+  const fromEnv = process.env.EXPO_PUBLIC_API_URL?.replace(/\/$/, '');
+  if (fromEnv) return fromEnv;
+
+  const host = metroHostname();
+  if (host && host !== 'localhost' && host !== '127.0.0.1') {
+    return `http://${host}:${API_PORT}/api`;
+  }
+
+  return DEFAULT_API_URL;
+}
 
 export const STORAGE_KEYS = {
   AUTH_TOKEN: '@hirelume_auth_token',

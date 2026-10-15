@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { apiClient } from '@/services/apiClient';
-import type { User, AuthResponse, RegisterCredentials, LoginCredentials, ApiError } from '@/types';
+import type { User, AuthResponse, RegisterCredentials, LoginCredentials } from '@/types';
 
 interface AuthContextType {
   user: User | null;
@@ -20,7 +20,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   // Restore session on app launch
   useEffect(() => {
-    restoreSession();
+    apiClient.setUnauthorizedHandler(() => setUser(null));
+    void restoreSession();
+    return () => apiClient.setUnauthorizedHandler(null);
   }, []);
 
   const restoreSession = async () => {
@@ -31,9 +33,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         const userData = await apiClient.get<User>('/auth/me');
         setUser(userData);
       }
-    } catch (error) {
-      // Token might be invalid, clear it
-      await apiClient.clearAuthTokens();
+    } catch {
+      // A 401 clears the token in the API client's response interceptor.
     } finally {
       setIsLoading(false);
     }
@@ -41,31 +42,21 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const signup = async (credentials: RegisterCredentials): Promise<AuthResponse> => {
     const response = await apiClient.post<AuthResponse>('/auth/register', credentials);
-    await apiClient.setTokens(response.access_token, response.refresh_token);
+    await apiClient.setAccessToken(response.access_token);
     setUser(response.user);
     return response;
   };
 
   const login = async (credentials: LoginCredentials): Promise<AuthResponse> => {
     const response = await apiClient.post<AuthResponse>('/auth/login', credentials);
-    await apiClient.setTokens(response.access_token, response.refresh_token);
+    await apiClient.setAccessToken(response.access_token);
     setUser(response.user);
     return response;
   };
 
   const logout = async () => {
-    try {
-      const refreshToken = await apiClient.getRefreshToken();
-      if (refreshToken) {
-        // Call logout endpoint to revoke refresh token
-        await apiClient.post('/auth/logout', { refresh_token: refreshToken });
-      }
-    } catch (error) {
-      // Ignore logout errors
-    } finally {
-      await apiClient.clearAuthTokens();
-      setUser(null);
-    }
+    await apiClient.clearAuthTokens();
+    setUser(null);
   };
 
   const refreshUser = async () => {

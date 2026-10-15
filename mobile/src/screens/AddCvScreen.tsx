@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   View,
   Text,
   TouchableOpacity,
@@ -9,25 +10,195 @@ import {
   StyleSheet,
   Platform,
   Alert,
+  Linking,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import * as DocumentPicker from 'expo-document-picker';
+import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+import { apiClient } from '@/services/apiClient';
+import type { ApiError, CvSummary } from '@/types';
 
 type AddCvScreenProps = {
   navigation: any;
+  route?: {
+    params?: {
+      jobDescriptionId: string;
+      rawText: string;
+      source?: 'text' | 'image' | 'link';
+    };
+  };
 };
 
-export const AddCvScreen = ({ navigation }: AddCvScreenProps) => {
-  const [cvName, setCvName] = useState('Tobi_Ogunleye_CV.pdf');
-  const [cvSize, setCvSize] = useState('1.2 MB');
+const MAX_CV_SIZE = 5 * 1024 * 1024;
 
-  const handleReplace = () => {
-    Alert.alert('Upload CV', 'Choose a PDF, Word document, or image from your files.', [
+export const AddCvScreen = ({ navigation, route }: AddCvScreenProps) => {
+  const [activeCv, setActiveCv] = useState<CvSummary | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [uploading, setUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState(0);
+  const [errorMessage, setErrorMessage] = useState('');
+  const savedJobText = route?.params?.rawText || '';
+  const jobDescriptionId = route?.params?.jobDescriptionId || '';
+  const jobWordCount = savedJobText.trim().split(/\s+/).filter(Boolean).length;
+
+  useEffect(() => {
+    let mounted = true;
+    apiClient.get<{ cv: CvSummary | null }>('/cvs/active')
+      .then((response) => {
+        if (mounted) setActiveCv(response.cv);
+      })
+      .catch((error: ApiError) => {
+        if (mounted) setErrorMessage(error.error?.message || 'Could not load your active CV.');
+      })
+      .finally(() => {
+        if (mounted) setLoading(false);
+      });
+    return () => { mounted = false; };
+  }, []);
+
+  const readableSize = (bytes: number) => (
+    bytes < 1024 * 1024 ? `${Math.max(1, Math.round(bytes / 1024))} KB` : `${(bytes / (1024 * 1024)).toFixed(1)} MB`
+  );
+
+  const friendlyError = (error: unknown) => {
+    const apiError = error as ApiError;
+    switch (apiError.error?.code) {
+      case 'FILE_TOO_LARGE':
+        return 'Your CV must be 5 MB or smaller.';
+      case 'UNSUPPORTED_FILE_TYPE':
+        return 'Use a PDF, DOCX, JPEG, PNG, or WebP CV.';
+      case 'CV_UNREADABLE':
+        return 'We could not read this file. Try a different document or clearer photo.';
+      case 'EMPTY_CV':
+        return 'No readable CV text was found. Try a clearer photo or text-based document.';
+      default:
+        return apiError.error?.message || 'Could not upload your CV. Check your connection and try again.';
+    }
+  };
+
+  const uploadCv = async (file: { uri: string; name: string; type: string; size?: number }) => {
+    if (file.size !== undefined && file.size > MAX_CV_SIZE) {
+      setErrorMessage('Your CV must be 5 MB or smaller.');
+      return;
+    }
+    const formData = new FormData();
+    formData.append('file', {
+      uri: file.uri,
+      name: file.name,
+      type: file.type,
+    } as unknown as Blob);
+    setUploading(true);
+    setUploadProgress(0);
+    setErrorMessage('');
+    try {
+      const response = await apiClient.upload<{ cv: CvSummary }>('/cvs/active', formData, {
+        timeout: 120000,
+        onUploadProgress: (progress) => {
+          if (progress.total) setUploadProgress(Math.round((progress.loaded / progress.total) * 100));
+        },
+      });
+      setActiveCv(response.cv);
+    } catch (error) {
+      setErrorMessage(friendlyError(error));
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  const pickDocument = async () => {
+    try {
+      const result = await DocumentPicker.getDocumentAsync({
+        type: [
+          'application/pdf',
+          'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+        ],
+        copyToCacheDirectory: true,
+      });
+      if (result.canceled) return;
+      const asset = result.assets[0];
+      await uploadCv({
+        uri: asset.uri,
+        name: asset.name,
+        type: asset.mimeType || (asset.name.toLowerCase().endsWith('.pdf')
+          ? 'application/pdf'
+          : 'application/vnd.openxmlformats-officedocument.wordprocessingml.document'),
+        size: asset.size,
+      });
+    } catch {
+      setErrorMessage('Could not open your files. Please try again.');
+    }
+  };
+
+  const pickPhoto = async () => {
+    try {
+      const currentPermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+      const permission = currentPermission.granted
+        ? currentPermission
+        : currentPermission.canAskAgain
+          ? await ImagePicker.requestMediaLibraryPermissionsAsync()
+          : currentPermission;
+      if (!permission.granted) {
+        setErrorMessage('Allow photo access to select a picture of your CV.');
+        if (!permission.canAskAgain) {
+          Alert.alert('Photo access is off', 'Allow photo access in Settings to upload a CV image.', [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open settings', onPress: () => void Linking.openSettings() },
+          ]);
+        }
+        return;
+      }
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: false,
+        quality: 1,
+      });
+      if (result.canceled) return;
+      const image = result.assets[0];
+      if (image.fileSize !== undefined && image.fileSize > MAX_CV_SIZE) {
+        setErrorMessage('Your CV image must be 5 MB or smaller.');
+        return;
+      }
+      const manipulator = ImageManipulator.manipulate(image.uri);
+      if (image.width > 1800) manipulator.resize({ width: 1800 });
+      const rendered = await manipulator.renderAsync();
+      const compressed = await rendered.saveAsync({
+        format: SaveFormat.JPEG,
+        compress: 0.78,
+      });
+      await uploadCv({
+        uri: compressed.uri,
+        name: `cv-photo-${Date.now()}.jpg`,
+        type: 'image/jpeg',
+        size: image.fileSize,
+      });
+    } catch {
+      setErrorMessage('Could not open your photo library. Please try again.');
+    }
+  };
+
+  const handleChooseCv = () => {
+    Alert.alert(activeCv ? 'Replace active CV' : 'Upload your CV', 'Choose where to get your CV.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: 'Choose PDF or DOCX', onPress: () => void pickDocument() },
+      { text: 'Choose a photo', onPress: () => void pickPhoto() },
+    ]);
+  };
+
+  const handleRemoveCv = () => {
+    Alert.alert('Remove active CV?', 'You will need to upload another CV before starting an analysis.', [
       { text: 'Cancel', style: 'cancel' },
       {
-        text: 'Choose file',
-        onPress: () => {
-          setCvName('Tobi_Ogunleye_Updated_CV.pdf');
-          setCvSize('1.4 MB');
+        text: 'Remove',
+        style: 'destructive',
+        onPress: async () => {
+          try {
+            await apiClient.delete('/cvs/active');
+            setActiveCv(null);
+            setErrorMessage('');
+          } catch (error) {
+            setErrorMessage(friendlyError(error));
+          }
         },
       },
     ]);
@@ -69,8 +240,14 @@ export const AddCvScreen = ({ navigation }: AddCvScreenProps) => {
               <Ionicons name="briefcase-outline" size={18} color="#0066FF" />
             </View>
             <View style={{ flex: 1 }}>
-              <Text style={styles.jobSummaryTitle}>Business Development Officer</Text>
-              <Text style={styles.jobSummaryMeta}>Greenfield Agro Ltd · 112 words</Text>
+              <Text style={styles.jobSummaryTitle}>
+                {savedJobText ? 'Job description saved' : 'No job description saved'}
+              </Text>
+              <Text style={styles.jobSummaryMeta}>
+                {savedJobText
+                  ? `${jobWordCount} words · ${route?.params?.source || 'job'} input`
+                  : 'Add a job description to continue'}
+              </Text>
             </View>
           </View>
 
@@ -78,33 +255,76 @@ export const AddCvScreen = ({ navigation }: AddCvScreenProps) => {
           <View style={styles.cvSection}>
             <Text style={styles.sectionHeaderTitle}>Your CV</Text>
 
-            <View style={styles.cvCard}>
-              <View style={styles.cvCardTop}>
-                <View style={styles.cvIconBox}>
-                  <Ionicons name="document-text-outline" size={22} color="#0066FF" />
-                </View>
-                <View style={{ flex: 1 }}>
-                  <Text style={styles.cvFileName}>{cvName}</Text>
-                  <Text style={styles.cvFileMeta}>{cvSize} · Added just now</Text>
-                  <View style={styles.readableBadge}>
-                    <Ionicons name="checkmark" size={12} color="#16A34A" style={{ marginRight: 3 }} />
-                    <Text style={styles.readableBadgeText}>Readable</Text>
+            {loading ? (
+              <View style={styles.emptyCvCard}>
+                <ActivityIndicator color="#0066FF" />
+                <Text style={styles.emptyCvText}>Checking your active CV...</Text>
+              </View>
+            ) : activeCv ? (
+              <View style={styles.cvCard}>
+                <View style={styles.cvCardTop}>
+                  <View style={styles.cvIconBox}>
+                    <Ionicons name="document-text-outline" size={22} color="#0066FF" />
+                  </View>
+                  <View style={{ flex: 1 }}>
+                    <Text style={styles.cvFileName} numberOfLines={1}>{activeCv.fileName}</Text>
+                    <Text style={styles.cvFileMeta}>
+                      {readableSize(activeCv.size)} · {activeCv.mimeType.split('/').pop()?.toUpperCase()}
+                    </Text>
+                    <View style={styles.readableBadge}>
+                      <Ionicons name="checkmark" size={12} color="#16A34A" style={{ marginRight: 3 }} />
+                      <Text style={styles.readableBadgeText}>Text extracted</Text>
+                    </View>
                   </View>
                 </View>
-              </View>
 
-              <TouchableOpacity
-                style={styles.replaceButton}
-                activeOpacity={0.8}
-                onPress={handleReplace}
-              >
-                <Text style={styles.replaceButtonText}>Replace</Text>
-              </TouchableOpacity>
-            </View>
+                <View style={styles.cvActionRow}>
+                  <TouchableOpacity
+                    style={[styles.replaceButton, styles.cvActionButton]}
+                    activeOpacity={0.8}
+                    onPress={handleChooseCv}
+                    disabled={uploading}
+                  >
+                    <Text style={styles.replaceButtonText}>Replace</Text>
+                  </TouchableOpacity>
+                  <TouchableOpacity
+                    style={[styles.replaceButton, styles.cvActionButton]}
+                    activeOpacity={0.8}
+                    onPress={handleRemoveCv}
+                    disabled={uploading}
+                  >
+                    <Text style={styles.removeButtonText}>Remove</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            ) : (
+              <View style={styles.emptyCvCard}>
+                <Ionicons name="document-text-outline" size={24} color="#94A3B8" />
+                <Text style={styles.emptyCvText}>No active CV uploaded</Text>
+                <TouchableOpacity
+                  style={styles.replaceButton}
+                  activeOpacity={0.8}
+                  onPress={handleChooseCv}
+                  disabled={uploading}
+                >
+                  <Text style={styles.replaceButtonText}>Choose a CV</Text>
+                </TouchableOpacity>
+              </View>
+            )}
+
+            {uploading ? (
+              <View style={styles.uploadProgressRow}>
+                <ActivityIndicator color="#0066FF" size="small" />
+                <Text style={styles.cvFileTypesHint}>
+                  Uploading and reading CV{uploadProgress ? ` · ${uploadProgress}%` : '...'}
+                </Text>
+              </View>
+            ) : null}
 
             <Text style={styles.cvFileTypesHint}>
-              PDF, image or Word file. Up to 5 MB. In English.
+              PDF, DOCX or photo. Up to 5 MB. Scanned PDFs may not be readable.
             </Text>
+            {errorMessage ? <Text style={styles.errorText}>{errorMessage}</Text> : null}
           </View>
 
           {/* What you will get Card */}
@@ -142,25 +362,29 @@ export const AddCvScreen = ({ navigation }: AddCvScreenProps) => {
             />
             <Text style={styles.privacyText}>
               <Text style={styles.privacyBold}>Your privacy. </Text>
-              We send only your CV content and the job text to the AI. Your email, phone and address are never sent.
+              We remove detected email addresses, phone numbers and street-address patterns from your CV before sending it to the AI.
             </Text>
           </View>
         </ScrollView>
 
         {/* Bottom CTA Area */}
         <View style={styles.bottomBar}>
-          <View style={styles.limitRow}>
-            <Ionicons name="time-outline" size={14} color="#64748B" style={{ marginRight: 4 }} />
-            <Text style={styles.limitText}>3 of 5 analyses left today</Text>
-          </View>
-
           <TouchableOpacity
-            style={styles.analyseButton}
+            style={[styles.analyseButton, (!activeCv || !jobDescriptionId || uploading) && styles.analyseButtonDisabled]}
             activeOpacity={0.9}
-            onPress={() => navigation.navigate('Analysing')}
+            disabled={!activeCv || !jobDescriptionId || uploading}
+            onPress={() => {
+              if (!activeCv || !jobDescriptionId) return;
+              navigation.navigate('Analysing', {
+                cvId: activeCv.id,
+                jobDescriptionId,
+              });
+            }}
           >
             <Ionicons name="sparkles" size={16} color="#FFFFFF" style={{ marginRight: 8 }} />
-            <Text style={styles.analyseButtonText}>Analyse my fit</Text>
+            <Text style={styles.analyseButtonText}>
+              {uploading ? 'Uploading CV...' : 'Analyse my fit'}
+            </Text>
           </TouchableOpacity>
         </View>
       </View>
@@ -292,6 +516,43 @@ const styles = StyleSheet.create({
     color: '#94A3B8',
     marginTop: 2,
   },
+  cvActionRow: {
+    flexDirection: 'row',
+    gap: 8,
+  },
+  cvActionButton: {
+    flex: 1,
+  },
+  removeButtonText: {
+    fontSize: 13,
+    fontWeight: '700',
+    color: '#DC2626',
+  },
+  emptyCvCard: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: '#E2E8F0',
+    borderRadius: 12,
+    padding: 16,
+    gap: 8,
+  },
+  emptyCvText: {
+    color: '#64748B',
+    fontSize: 13,
+  },
+  uploadProgressRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginTop: 8,
+  },
+  errorText: {
+    color: '#DC2626',
+    fontSize: 12,
+    lineHeight: 17,
+    marginTop: 8,
+  },
   readableBadge: {
     flexDirection: 'row',
     alignItems: 'center',
@@ -383,16 +644,6 @@ const styles = StyleSheet.create({
     borderTopWidth: 1,
     borderTopColor: '#F1F5F9',
   },
-  limitRow: {
-    flexDirection: 'row',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginBottom: 8,
-  },
-  limitText: {
-    fontSize: 12,
-    color: '#64748B',
-  },
   analyseButton: {
     backgroundColor: '#0066FF',
     height: 48,
@@ -400,6 +651,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'center',
+  },
+  analyseButtonDisabled: {
+    backgroundColor: '#94A3B8',
   },
   analyseButtonText: {
     color: '#FFFFFF',

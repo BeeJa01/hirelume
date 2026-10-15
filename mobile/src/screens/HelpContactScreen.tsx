@@ -1,5 +1,6 @@
 import React from 'react';
 import {
+  Alert,
   View,
   Text,
   TouchableOpacity,
@@ -18,18 +19,26 @@ type HelpContactScreenProps = {
 export const HelpContactScreen = ({ navigation }: HelpContactScreenProps) => {
   const faqs = [
     {
-      q: 'How does HireLume score my CV?',
-      a: 'We evaluate your CV against the job description using semantic matching across required skills, education, years of experience, and industry domain.',
+      q: 'How does Hirelume score my CV?',
+      a: 'The analysis compares evidence in your CV with the job description and returns a score, breakdown, strengths, gaps, and suggestions.',
     },
     {
       q: 'What does "Met, partly met, and not found" mean?',
-      a: '"Met" means clear proof was found on your CV. "Partly met" indicates transferable or adjacent skills. "Not found" means the requirement was absent, giving you a chance to update your CV before applying.',
+      a: 'The analysis describes how closely the evidence in your CV matches the job requirements. Review the listed evidence and gaps rather than treating the score as a hiring decision.',
     },
     {
-      q: 'How many free analyses do I get daily?',
-      a: 'Every user receives 5 full AI job fit analyses per day. The quota resets every night at 12:00 AM (midnight) West Africa Time.',
+      q: 'Does Hirelume submit job applications?',
+      a: 'No. Hirelume compares your CV with a job and helps you prepare. You apply directly through the employer or job-board website.',
     },
   ];
+
+  const openSupportEmail = async () => {
+    try {
+      await Linking.openURL('mailto:support@hirelume.com');
+    } catch {
+      Alert.alert('Could not open email', 'Set up an email app on your device, or contact support@hirelume.com directly.');
+    }
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -53,34 +62,19 @@ export const HelpContactScreen = ({ navigation }: HelpContactScreenProps) => {
         <Text style={styles.mainTitle}>We're here to help</Text>
         <Text style={styles.subtitle}>Get quick answers or reach out to our team directly.</Text>
 
-        {/* Support Channels */}
+        {/* Support contact */}
         <View style={styles.channelsContainer}>
           <TouchableOpacity
             style={styles.channelCard}
             activeOpacity={0.8}
-            onPress={() => Linking.openURL('https://wa.me/2348000000000')}
-          >
-            <View style={[styles.channelIcon, { backgroundColor: '#DCFCE7' }]}>
-              <Ionicons name="logo-whatsapp" size={22} color="#16A34A" />
-            </View>
-            <View style={styles.channelInfo}>
-              <Text style={styles.channelTitle}>WhatsApp Support</Text>
-              <Text style={styles.channelDesc}>Chat with our friendly support reps</Text>
-            </View>
-            <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
-          </TouchableOpacity>
-
-          <TouchableOpacity
-            style={styles.channelCard}
-            activeOpacity={0.8}
-            onPress={() => Linking.openURL('mailto:support@hirelume.com')}
+            onPress={() => void openSupportEmail()}
           >
             <View style={[styles.channelIcon, { backgroundColor: '#EFF6FF' }]}>
               <Ionicons name="mail-outline" size={22} color="#0066FF" />
             </View>
             <View style={styles.channelInfo}>
               <Text style={styles.channelTitle}>Email Support</Text>
-              <Text style={styles.channelDesc}>support@hirelume.com (reply within 4h)</Text>
+              <Text style={styles.channelDesc}>support@hirelume.com</Text>
             </View>
             <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
           </TouchableOpacity>

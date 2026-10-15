@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
+  ActivityIndicator,
   View,
   Text,
   TextInput,
@@ -11,6 +12,8 @@ import {
   Platform,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { apiClient } from '@/services/apiClient';
+import type { ApiError, ResumeAnalysis } from '@/types';
 
 type MyAnalysesScreenProps = {
   navigation: any;
@@ -19,46 +22,46 @@ type MyAnalysesScreenProps = {
 export const MyAnalysesScreen = ({ navigation }: MyAnalysesScreenProps) => {
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState<'All' | 'Strong' | 'Good' | 'Partial'>('All');
+  const [allAnalyses, setAllAnalyses] = useState<ResumeAnalysis[]>([]);
+  const [loading, setLoading] = useState(true);
+  const [errorMessage, setErrorMessage] = useState('');
 
-  const allAnalyses = [
-    {
-      id: '1',
-      title: 'Business Development Officer',
-      company: 'Greenfield Agro Ltd',
-      score: 67,
-      scoreLabel: 'Good',
-      scoreColor: '#0066FF',
-      scoreBg: '#EFF6FF',
-      date: '1 Oct 2026',
-    },
-    {
-      id: '2',
-      title: 'Sales Manager Trainee',
-      company: 'Brightpath Foods',
-      score: 78,
-      scoreLabel: 'Strong',
-      scoreColor: '#16A34A',
-      scoreBg: '#DCFCE7',
-      date: '29 Sep 2026',
-    },
-    {
-      id: '3',
-      title: 'Customer Success Associate',
-      company: 'Paylink Services',
-      score: 52,
-      scoreLabel: 'Partial',
-      scoreColor: '#D97706',
-      scoreBg: '#FEF3C7',
-      date: '27 Sep 2026',
-    },
-  ];
+  const loadAnalyses = async () => {
+    setLoading(true);
+    setErrorMessage('');
+    try {
+      const response = await apiClient.get<{ analyses: ResumeAnalysis[] }>('/analyses');
+      setAllAnalyses(response.analyses);
+    } catch (error) {
+      const apiError = error as ApiError;
+      setErrorMessage(apiError.error?.message || 'Could not load your analyses.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    void loadAnalyses();
+  }, []);
+
+  const scoreLabel = (matchLevel: ResumeAnalysis['matchLevel']) => (
+    matchLevel === 'strong' ? 'Strong' : matchLevel === 'good' ? 'Good' : 'Partial'
+  );
+  const scoreColor = (matchLevel: ResumeAnalysis['matchLevel']) => (
+    matchLevel === 'strong' ? '#16A34A' : matchLevel === 'good' ? '#0066FF' : '#D97706'
+  );
+  const scoreBg = (matchLevel: ResumeAnalysis['matchLevel']) => (
+    matchLevel === 'strong' ? '#DCFCE7' : matchLevel === 'good' ? '#EFF6FF' : '#FEF3C7'
+  );
 
   const filteredAnalyses = allAnalyses.filter((item) => {
+    const title = item.jobDescription?.title || 'Job match analysis';
+    const company = item.jobDescription?.company || '';
     const matchesSearch =
-      item.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      item.company.toLowerCase().includes(searchQuery.toLowerCase());
+      title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      company.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesFilter =
-      selectedFilter === 'All' || item.scoreLabel.toLowerCase() === selectedFilter.toLowerCase();
+      selectedFilter === 'All' || scoreLabel(item.matchLevel).toLowerCase() === selectedFilter.toLowerCase();
     return matchesSearch && matchesFilter;
   });
 
@@ -97,7 +100,7 @@ export const MyAnalysesScreen = ({ navigation }: MyAnalysesScreenProps) => {
               onPress={() => setSelectedFilter('All')}
             >
               <Text style={[styles.filterPillText, selectedFilter === 'All' && styles.filterPillTextActive]}>
-                All 3
+                All {allAnalyses.length}
               </Text>
             </TouchableOpacity>
 
@@ -132,22 +135,44 @@ export const MyAnalysesScreen = ({ navigation }: MyAnalysesScreenProps) => {
             </TouchableOpacity>
           </View>
 
+          {loading ? (
+            <View style={styles.emptyState}>
+              <ActivityIndicator color="#0066FF" />
+              <Text style={styles.emptyStateText}>Loading your analyses...</Text>
+            </View>
+          ) : errorMessage ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateError}>{errorMessage}</Text>
+              <TouchableOpacity style={styles.retryButton} onPress={() => void loadAnalyses()}>
+                <Text style={styles.retryButtonText}>Try again</Text>
+              </TouchableOpacity>
+            </View>
+          ) : filteredAnalyses.length === 0 ? (
+            <View style={styles.emptyState}>
+              <Text style={styles.emptyStateText}>
+                {allAnalyses.length ? 'No analyses match your search or filter.' : 'You have not analysed a job yet.'}
+              </Text>
+            </View>
+          ) : null}
+
           {/* Analyses Cards List */}
           <View style={styles.analysesList}>
             {filteredAnalyses.map((item) => (
               <View key={item.id} style={styles.analysisCard}>
                 <View style={styles.analysisCardTop}>
                   <View style={styles.jobInfoCol}>
-                    <Text style={styles.analysisJobTitle}>{item.title}</Text>
-                    <Text style={styles.analysisCompany}>{item.company}</Text>
+                    <Text style={styles.analysisJobTitle}>
+                      {item.jobDescription?.title || 'Job match analysis'}
+                    </Text>
+                    <Text style={styles.analysisCompany}>{item.jobDescription?.company || 'Company not provided'}</Text>
                   </View>
                   <View style={styles.scoreCol}>
-                    <Text style={[styles.scoreNumber, { color: item.scoreColor }]}>
+                    <Text style={[styles.scoreNumber, { color: scoreColor(item.matchLevel) }]}>
                       {item.score}
                     </Text>
-                    <View style={[styles.scoreBadge, { backgroundColor: item.scoreBg }]}>
-                      <Text style={[styles.scoreBadgeText, { color: item.scoreColor }]}>
-                        {item.scoreLabel}
+                    <View style={[styles.scoreBadge, { backgroundColor: scoreBg(item.matchLevel) }]}>
+                      <Text style={[styles.scoreBadgeText, { color: scoreColor(item.matchLevel) }]}>
+                        {scoreLabel(item.matchLevel)}
                       </Text>
                     </View>
                   </View>
@@ -156,11 +181,11 @@ export const MyAnalysesScreen = ({ navigation }: MyAnalysesScreenProps) => {
                 <View style={styles.divider} />
 
                 <View style={styles.analysisCardBottom}>
-                  <Text style={styles.analysisDate}>{item.date}</Text>
+                  <Text style={styles.analysisDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
                   <TouchableOpacity
                     style={styles.viewResultBtn}
                     activeOpacity={0.7}
-                    onPress={() => navigation.navigate('AnalysisResult')}
+                    onPress={() => navigation.navigate('AnalysisResult', { analysisId: item.id })}
                   >
                     <Text style={styles.viewResultText}>View result</Text>
                     <Ionicons name="chevron-forward" size={14} color="#0066FF" />
@@ -173,7 +198,7 @@ export const MyAnalysesScreen = ({ navigation }: MyAnalysesScreenProps) => {
           {/* Bottom Card (from Screenshot 3): Found another job? */}
           <View style={styles.startNewCard}>
             <Text style={styles.startNewTitle}>Found another job?</Text>
-            <Text style={styles.startNewSubtitle}>You have 3 of 5 analyses left today.</Text>
+            <Text style={styles.startNewSubtitle}>Compare your CV with another job opportunity.</Text>
             <TouchableOpacity
               style={styles.startNewButton}
               activeOpacity={0.9}
@@ -284,6 +309,33 @@ const styles = StyleSheet.create({
   },
   analysesList: {
     marginBottom: 16,
+  },
+  emptyState: {
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingVertical: 28,
+    gap: 12,
+  },
+  emptyStateText: {
+    color: '#64748B',
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  emptyStateError: {
+    color: '#DC2626',
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  retryButton: {
+    paddingHorizontal: 18,
+    paddingVertical: 9,
+    backgroundColor: '#0066FF',
+    borderRadius: 9,
+  },
+  retryButtonText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   analysisCard: {
     backgroundColor: '#FFFFFF',

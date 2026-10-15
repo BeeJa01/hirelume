@@ -35,38 +35,38 @@ export const PrivacyNoticeScreen = ({ navigation }: PrivacyNoticeScreenProps) =>
         showsVerticalScrollIndicator={false}
       >
         <View style={styles.badgeContainer}>
-          <Ionicons name="shield-checkmark" size={16} color="#0066FF" style={{ marginRight: 6 }} />
-          <Text style={styles.badgeText}>NDPA 2023 Compliant</Text>
+          <Ionicons name="information-circle-outline" size={16} color="#0066FF" style={{ marginRight: 6 }} />
+          <Text style={styles.badgeText}>How your data is used</Text>
         </View>
 
-        <Text style={styles.mainTitle}>How HireLume Protects & Uses Your Data</Text>
-        <Text style={styles.lastUpdated}>Last updated: October 2026</Text>
+        <Text style={styles.mainTitle}>How Hirelume uses your data</Text>
+        <Text style={styles.lastUpdated}>Product information</Text>
 
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeading}>1. Purpose-Bound CV Processing</Text>
+          <Text style={styles.sectionHeading}>1. CV and job description processing</Text>
           <Text style={styles.paragraph}>
-            When you upload your CV or paste job text, our AI algorithms evaluate your qualifications exclusively against the specific job description provided. We do not use your resume to train public AI models.
+            When you request an analysis, your CV text and the job description are sent from Hirelume's backend to its configured AI provider to generate your result. The backend attempts to remove detected email addresses, phone numbers, and street-address patterns from CV text first. Pattern matching may not find every personal detail.
           </Text>
         </View>
 
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeading}>2. Local Qualification Fairness</Text>
+          <Text style={styles.sectionHeading}>2. Account access</Text>
           <Text style={styles.paragraph}>
-            HireLume is engineered specifically for Nigerian jobseekers. Academic credentials including OND, HND, NCE, B.Sc., B.Tech, and NYSC discharge/exemption certificates are recognized natively and never penalized.
+            Saved job descriptions, CV records, and analysis results are associated with your signed-in account. The app requests your account's records when you open the relevant screens.
           </Text>
         </View>
 
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeading}>3. Storage & Encryption</Text>
+          <Text style={styles.sectionHeading}>3. File storage</Text>
           <Text style={styles.paragraph}>
-            All documents and analysis reports are encrypted both in transit (TLS 1.3) and at rest (AES-256). Your personal details are never shared with recruiters until you explicitly choose to apply.
+            Uploaded CV files are stored by the backend and are not returned as public file links. Do not upload information you do not want processed for your requested analysis.
           </Text>
         </View>
 
         <View style={styles.sectionCard}>
-          <Text style={styles.sectionHeading}>4. Right to Erasure (Data Deletion)</Text>
+          <Text style={styles.sectionHeading}>4. Data deletion requests</Text>
           <Text style={styles.paragraph}>
-            Under the Nigeria Data Protection Act (NDPA 2023), you hold complete ownership of your data. You may request total erasure of your CVs, scores, and account history at any time from your Account settings.
+            The app does not currently delete your account data automatically. From Account settings you can open an email draft to request deletion; sending the email and completing the request require follow-up.
           </Text>
         </View>
 

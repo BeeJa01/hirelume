@@ -26,6 +26,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState('');
   const [errors, setErrors] = useState<{ email?: string; password?: string }>({});
 
   const validate = () => {
@@ -45,6 +46,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
   const handleLogin = async () => {
     if (!validate()) return;
     setLoading(true);
+    setFormError('');
     try {
       await login({ email, password });
       // Navigation is handled by AuthContext
@@ -54,8 +56,13 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
       if (apiError?.error?.details) {
         const fieldErrors = getFieldErrors(apiError.error.details);
         setErrors(fieldErrors);
+      } else if (apiError?.error?.code === 'EMAIL_NOT_FOUND') {
+        setErrors({ email: apiError.error.message });
+      } else if (apiError?.error?.code === 'WRONG_PASSWORD') {
+        setErrors({ password: apiError.error.message });
+      } else {
+        setFormError(apiError?.error?.message || 'Something went wrong. Please try again.');
       }
-      Alert.alert('Login Failed', apiError?.error?.message || 'Something went wrong');
     }
   };
 
@@ -97,6 +104,7 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
+                  setFormError('');
                   if (errors.email)
                     setErrors((prev) => ({ ...prev, email: undefined }));
                 }}
@@ -111,12 +119,18 @@ export const LoginScreen = ({ navigation }: LoginScreenProps) => {
                 value={password}
                 onChangeText={(text) => {
                   setPassword(text);
+                  setFormError('');
                   if (errors.password)
                     setErrors((prev) => ({ ...prev, password: undefined }));
                 }}
                 secureTextEntry={true}
                 error={errors.password}
               />
+              {formError ? (
+                <Text accessibilityRole="alert" style={{ color: '#DC2626', fontSize: 13, marginTop: 8 }}>
+                  {formError}
+                </Text>
+              ) : null}
 
               {/* Forgot Password Link */}
               <TouchableOpacity

@@ -6,39 +6,136 @@ import {
   ScrollView,
   SafeAreaView,
   StatusBar,
-  Image,
   StyleSheet,
   Platform,
   Alert,
   Modal,
+  Linking,
+  ActivityIndicator,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
+import { useAuth } from '@/contexts/AuthContext';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
+import * as ImagePicker from 'expo-image-picker';
+import { ImageManipulator, SaveFormat } from 'expo-image-manipulator';
+import { apiClient } from '@/services/apiClient';
+import type { ApiError, User } from '@/types';
 
 type AccountScreenProps = {
   navigation: any;
 };
 
 export const AccountScreen = ({ navigation }: AccountScreenProps) => {
+  const { user, logout, refreshUser } = useAuth();
   const [deleteModalVisible, setDeleteModalVisible] = useState(false);
+  const [updatingAvatar, setUpdatingAvatar] = useState(false);
+
+  const pickProfileImage = async () => {
+    try {
+      const currentPermission = await ImagePicker.getMediaLibraryPermissionsAsync();
+      const permission = currentPermission.granted
+        ? currentPermission
+        : currentPermission.canAskAgain
+          ? await ImagePicker.requestMediaLibraryPermissionsAsync()
+          : currentPermission;
+      if (!permission.granted) {
+        if (!permission.canAskAgain) {
+          Alert.alert('Photo access is off', 'Allow photo access in Settings to choose a profile photo.', [
+            { text: 'Cancel', style: 'cancel' },
+            { text: 'Open settings', onPress: () => void Linking.openSettings() },
+          ]);
+        } else {
+          Alert.alert('Photo access needed', 'Allow photo-library access to choose a profile photo.');
+        }
+        return;
+      }
+
+      const result = await ImagePicker.launchImageLibraryAsync({
+        mediaTypes: ['images'],
+        allowsEditing: true,
+        aspect: [1, 1],
+        quality: 1,
+      });
+      if (result.canceled) return;
+
+      const photo = result.assets[0];
+      const manipulator = ImageManipulator.manipulate(photo.uri);
+      if (photo.width > 800) manipulator.resize({ width: 800 });
+      const rendered = await manipulator.renderAsync();
+      const compressed = await rendered.saveAsync({ format: SaveFormat.JPEG, compress: 0.8 });
+      const formData = new FormData();
+      formData.append('file', {
+        uri: compressed.uri,
+        name: `profile-${Date.now()}.jpg`,
+        type: 'image/jpeg',
+      } as unknown as Blob);
+
+      setUpdatingAvatar(true);
+      await apiClient.upload<{ user: User }>('/auth/me/avatar', formData, { timeout: 30000 });
+      await refreshUser();
+    } catch (error) {
+      const apiError = error as ApiError;
+      Alert.alert('Could not update profile photo', apiError.error?.message || 'Please try again.');
+    } finally {
+      setUpdatingAvatar(false);
+    }
+  };
+
+  const removeProfileImage = async () => {
+    setUpdatingAvatar(true);
+    try {
+      await apiClient.delete('/auth/me/avatar');
+      await refreshUser();
+    } catch (error) {
+      const apiError = error as ApiError;
+      Alert.alert('Could not remove profile photo', apiError.error?.message || 'Please try again.');
+    } finally {
+      setUpdatingAvatar(false);
+    }
+  };
+
+  const chooseProfileImageAction = () => {
+    if (updatingAvatar) return;
+    Alert.alert('Profile photo', 'Choose an option.', [
+      { text: 'Cancel', style: 'cancel' },
+      { text: user?.avatar_url ? 'Change photo' : 'Choose photo', onPress: () => void pickProfileImage() },
+      ...(user?.avatar_url ? [{
+        text: 'Remove photo',
+        style: 'destructive' as const,
+        onPress: () => void removeProfileImage(),
+      }] : []),
+    ]);
+  };
 
   const handleLogout = () => {
-    Alert.alert('Log Out', 'Are you sure you want to log out of HireLume?', [
+    Alert.alert('Log Out', 'Are you sure you want to log out of Hirelume?', [
       { text: 'Cancel', style: 'cancel' },
       {
         text: 'Log out',
         style: 'destructive',
-        onPress: () => navigation.reset({ index: 0, routes: [{ name: 'Welcome' }] }),
+        onPress: () => {
+          void logout().catch((error: ApiError) => {
+            Alert.alert('Could not log out', error.error?.message || 'Please try again.');
+          });
+        },
       },
     ]);
   };
 
-  const handleConfirmDelete = () => {
-    setDeleteModalVisible(false);
-    Alert.alert(
-      'Request Submitted',
-      'Your request to delete all CVs, personal information, and analysis logs has been submitted under the Nigeria Data Protection Act 2023. Data will be purged within 24 hours.',
-      [{ text: 'OK' }]
-    );
+  const handleConfirmDelete = async () => {
+    const subject = 'Request to delete my Hirelume account data';
+    const body = `Please help me request deletion of the Hirelume account and associated data for ${user?.email || 'my account'}.`;
+    const emailUrl = `mailto:privacy@hirelume.com?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
+    try {
+      if (!(await Linking.canOpenURL(emailUrl))) {
+        throw new Error('No email app is available on this device.');
+      }
+      await Linking.openURL(emailUrl);
+      setDeleteModalVisible(false);
+    } catch (error) {
+      const message = error instanceof Error ? error.message : 'Could not open your email app.';
+      Alert.alert('Could not start deletion request', message);
+    }
   };
 
   return (
@@ -56,16 +153,31 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
 
           {/* User Profile Card */}
           <View style={styles.profileCard}>
-            <Image
-              source={require('../../assets/avatar.png')}
-              style={styles.avatar}
-              defaultSource={require('../../assets/avatar.png')}
-            />
+            <TouchableOpacity
+              accessibilityRole="button"
+              accessibilityLabel="Change profile photo"
+              onPress={chooseProfileImageAction}
+              disabled={updatingAvatar}
+              style={styles.avatarButton}
+            >
+              {updatingAvatar ? (
+                <ActivityIndicator color="#0066FF" />
+              ) : (
+                <ProfileAvatar user={user} size={60} />
+              )}
+            </TouchableOpacity>
             <View style={styles.profileDetails}>
-              <Text style={styles.profileName}>Obinna Chukwuemeka</Text>
-              <Text style={styles.profileEmail}>tobi.ogunleye@email.com</Text>
+              <Text style={styles.profileName}>{user?.name || 'Hirelume user'}</Text>
+              <Text style={styles.profileEmail}>{user?.email || ''}</Text>
+              <TouchableOpacity onPress={chooseProfileImageAction} disabled={updatingAvatar}>
+                <Text style={styles.changePhotoText}>
+                  {user?.avatar_url ? 'Change profile photo' : 'Add profile photo'}
+                </Text>
+              </TouchableOpacity>
               <View style={styles.roleBadge}>
-                <Text style={styles.roleBadgeText}>Job seeker</Text>
+                <Text style={styles.roleBadgeText}>
+                  {user?.role === 'recruiter' ? 'Recruiter' : 'Job seeker'}
+                </Text>
               </View>
             </View>
           </View>
@@ -119,7 +231,7 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
               </View>
               <View style={styles.menuTextContainer}>
                 <Text style={styles.menuTitle}>Ask for my data to be deleted</Text>
-                <Text style={styles.menuSubtitle}>Your CV and results are removed on request</Text>
+                <Text style={styles.menuSubtitle}>Open an email to request deletion</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
             </TouchableOpacity>
@@ -137,20 +249,10 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
               </View>
               <View style={styles.menuTextContainer}>
                 <Text style={styles.menuTitle}>Help and contact</Text>
-                <Text style={styles.menuSubtitle}>Guides, FAQs and WhatsApp support</Text>
+                <Text style={styles.menuSubtitle}>Guides and email support</Text>
               </View>
               <Ionicons name="chevron-forward" size={18} color="#CBD5E1" />
             </TouchableOpacity>
-          </View>
-
-          {/* Daily limit notice */}
-          <View style={styles.limitCard}>
-            <View style={styles.limitIconContainer}>
-              <Ionicons name="time-outline" size={20} color="#0066FF" />
-            </View>
-            <Text style={styles.limitText}>
-              You can run <Text style={styles.limitBold}>5 analyses a day</Text>. The limit resets at midnight.
-            </Text>
           </View>
 
           {/* Log Out Button */}
@@ -214,13 +316,8 @@ export const AccountScreen = ({ navigation }: AccountScreenProps) => {
             </View>
             <Text style={styles.modalTitle}>Delete all your data?</Text>
             <Text style={styles.modalDescription}>
-              In accordance with the Nigeria Data Protection Act (NDPA 2023), requesting deletion will permanently erase:
+              Hirelume does not currently offer in-app account deletion. This opens an email to the privacy team so you can request deletion. No data is deleted automatically from this screen.
             </Text>
-            <View style={styles.modalBulletList}>
-              <Text style={styles.modalBulletItem}>• All uploaded CV files and extracted text</Text>
-              <Text style={styles.modalBulletItem}>• All match scores and analysis logs</Text>
-              <Text style={styles.modalBulletItem}>• Your account credentials and profile information</Text>
-            </View>
             <View style={styles.modalActionsRow}>
               <TouchableOpacity
                 style={styles.modalCancelBtn}
@@ -280,14 +377,19 @@ const styles = StyleSheet.create({
     shadowRadius: 6,
     elevation: 1,
   },
-  avatar: {
+  avatarButton: {
     width: 60,
     height: 60,
     borderRadius: 30,
     marginRight: 14,
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#F1F5F9',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  changePhotoText: {
+    fontSize: 12,
+    color: '#0066FF',
+    fontWeight: '600',
+    marginBottom: 6,
   },
   profileDetails: {
     flex: 1,
@@ -356,35 +458,6 @@ const styles = StyleSheet.create({
     height: 1,
     backgroundColor: '#F1F5F9',
     marginHorizontal: 16,
-  },
-  limitCard: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    backgroundColor: '#FFFFFF',
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    borderRadius: 14,
-    padding: 14,
-    marginBottom: 16,
-  },
-  limitIconContainer: {
-    width: 32,
-    height: 32,
-    borderRadius: 16,
-    backgroundColor: '#EFF6FF',
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginRight: 10,
-  },
-  limitText: {
-    flex: 1,
-    fontSize: 12.5,
-    color: '#475569',
-    lineHeight: 18,
-  },
-  limitBold: {
-    fontWeight: '700',
-    color: '#0F172A',
   },
   logoutButton: {
     flexDirection: 'row',
@@ -461,15 +534,6 @@ const styles = StyleSheet.create({
     color: '#475569',
     lineHeight: 18,
     marginBottom: 10,
-  },
-  modalBulletList: {
-    marginBottom: 20,
-  },
-  modalBulletItem: {
-    fontSize: 12.5,
-    color: '#64748B',
-    lineHeight: 18,
-    marginBottom: 4,
   },
   modalActionsRow: {
     flexDirection: 'row',

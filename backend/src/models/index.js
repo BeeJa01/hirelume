@@ -4,4 +4,6 @@ module.exports = {
   Application: require('./Application'),
   CV: require('./CV'),
   AnalysisResult: require('./AnalysisResult'),
+  JobDescription: require('./JobDescription'),
+  ResumeAnalysis: require('./ResumeAnalysis'),
 };

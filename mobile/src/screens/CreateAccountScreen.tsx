@@ -8,7 +8,6 @@ import {
   ScrollView,
   StatusBar,
   SafeAreaView,
-  Alert,
 } from 'react-native';
 import { styles } from '@/style';
 import { SpecialInput } from '@/components/SpecialInput';
@@ -28,6 +27,7 @@ export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) =>
   const [password, setPassword] = useState('');
   const [agreePrivacy, setAgreePrivacy] = useState(true);
   const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState('');
   const [errors, setErrors] = useState<{
     fullName?: string;
     email?: string;
@@ -67,6 +67,7 @@ export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) =>
   const handleCreateAccount = async () => {
     if (!validate()) return;
     setLoading(true);
+    setFormError('');
     try {
       // Privacy agreement is UI-only, not sent to backend
       await signup({
@@ -82,8 +83,11 @@ export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) =>
       if (apiError?.error?.details) {
         const fieldErrors = getFieldErrors(apiError.error.details);
         setErrors(fieldErrors);
+      } else if (apiError?.error?.code === 'EMAIL_ALREADY_EXISTS') {
+        setErrors({ email: apiError.error.message });
+      } else {
+        setFormError(apiError?.error?.message || 'Something went wrong. Please try again.');
       }
-      Alert.alert('Sign Up Failed', apiError?.error?.message || 'Something went wrong');
     }
   };
 
@@ -130,6 +134,7 @@ export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) =>
                 value={fullName}
                 onChangeText={(text) => {
                   setFullName(text);
+                  setFormError('');
                   if (errors.fullName)
                     setErrors((prev) => ({ ...prev, fullName: undefined }));
                 }}
@@ -143,6 +148,7 @@ export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) =>
                 value={email}
                 onChangeText={(text) => {
                   setEmail(text);
+                  setFormError('');
                   if (errors.email)
                     setErrors((prev) => ({ ...prev, email: undefined }));
                 }}
@@ -157,6 +163,7 @@ export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) =>
                 value={password}
                 onChangeText={(text) => {
                   setPassword(text);
+                  setFormError('');
                   if (errors.password)
                     setErrors((prev) => ({ ...prev, password: undefined }));
                 }}
@@ -164,6 +171,11 @@ export const CreateAccountScreen = ({ navigation }: CreateAccountScreenProps) =>
                 helperText="At least 8 characters."
                 error={errors.password}
               />
+              {formError ? (
+                <Text accessibilityRole="alert" style={{ color: '#DC2626', fontSize: 13, marginTop: 8 }}>
+                  {formError}
+                </Text>
+              ) : null}
 
               {/* Privacy Notice Checkbox */}
               <TouchableOpacity

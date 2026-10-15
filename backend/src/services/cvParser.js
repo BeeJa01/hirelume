@@ -2,18 +2,18 @@ const fs = require("fs/promises");
 const path = require("path");
 const pdfParse = require("pdf-parse");
 const mammoth = require("mammoth");
+const { createWorker } = require("tesseract.js");
+const englishData = require("@tesseract.js-data/eng");
 
-const parsePdf = async (filePath) => {
-  const buffer = await fs.readFile(filePath);
-
+const parsePdf = async (input) => {
+  const buffer = Buffer.isBuffer(input) ? input : await fs.readFile(input);
   const data = await pdfParse(buffer);
-
   return data.text;
 };
 
-const parseDocx = async (filePath) => {
+const parseDocx = async (input) => {
   const result = await mammoth.extractRawText({
-    path: filePath,
+    ...(Buffer.isBuffer(input) ? { buffer: input } : { path: input }),
   });
 
   return result.value;
@@ -27,16 +27,16 @@ const cleanExtractedText = (text) => {
     .trim();
 };
 
-const parseCV = async (filePath, mimeType) => {
+const parseCV = async (input, mimeType) => {
   let extractedText;
 
   if (mimeType === "application/pdf") {
-    extractedText = await parsePdf(filePath);
+    extractedText = await parsePdf(input);
   } else if (
     mimeType ===
     "application/vnd.openxmlformats-officedocument.wordprocessingml.document"
   ) {
-    extractedText = await parseDocx(filePath);
+    extractedText = await parseDocx(input);
   } else if (
     mimeType === "application/msword"
   ) {
@@ -50,6 +50,21 @@ const parseCV = async (filePath, mimeType) => {
   return cleanExtractedText(extractedText);
 };
 
+const parseImageCv = async (input) => {
+  const worker = await createWorker(englishData.code, 1, {
+    langPath: englishData.langPath,
+    gzip: englishData.gzip,
+    cacheMethod: "none",
+  });
+  try {
+    const result = await worker.recognize(input);
+    return cleanExtractedText(String(result.data.text || ""));
+  } finally {
+    await worker.terminate();
+  }
+};
+
 module.exports = {
   parseCV,
+  parseImageCv,
 };

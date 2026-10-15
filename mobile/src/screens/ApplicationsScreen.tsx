@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import {
   View,
   Text,
@@ -16,36 +16,6 @@ type ApplicationsScreenProps = {
 };
 
 export const ApplicationsScreen = ({ navigation }: ApplicationsScreenProps) => {
-  const [filter, setFilter] = useState<'All' | 'Shortlisted' | 'Applied'>('All');
-
-  const applications = [
-    {
-      id: '1',
-      title: 'Business Development Officer',
-      company: 'Greenfield Agro Ltd',
-      status: 'Shortlisted',
-      statusColor: '#16A34A',
-      statusBg: '#DCFCE7',
-      matchScore: 67,
-      appliedDate: '2 Oct 2026',
-    },
-    {
-      id: '2',
-      title: 'Sales Manager Trainee',
-      company: 'Brightpath Foods',
-      status: 'Applied',
-      statusColor: '#0066FF',
-      statusBg: '#EFF6FF',
-      matchScore: 78,
-      appliedDate: '30 Sep 2026',
-    },
-  ];
-
-  const filtered = applications.filter((app) => {
-    if (filter === 'All') return true;
-    return app.status.toLowerCase() === filter.toLowerCase();
-  });
-
   return (
     <SafeAreaView style={styles.safeArea}>
       <StatusBar barStyle="dark-content" backgroundColor="#FFFFFF" />
@@ -57,73 +27,25 @@ export const ApplicationsScreen = ({ navigation }: ApplicationsScreenProps) => {
           {/* Header */}
           <View style={styles.header}>
             <Text style={styles.title}>Applications</Text>
-            <Text style={styles.subtitle}>Track your submitted job applications</Text>
+            <Text style={styles.subtitle}>Hirelume does not submit or track job applications yet</Text>
           </View>
 
-          {/* Filter Pills */}
-          <View style={styles.filterPillsRow}>
+          <View style={styles.emptyCard}>
+            <View style={styles.emptyIcon}>
+              <Ionicons name="briefcase-outline" size={24} color="#0066FF" />
+            </View>
+            <Text style={styles.emptyTitle}>No applications to show</Text>
+            <Text style={styles.emptyText}>
+              Hirelume currently helps you compare your CV with a job. It does not submit applications or track applications you make on other sites.
+            </Text>
             <TouchableOpacity
-              style={[styles.filterPill, filter === 'All' && styles.filterPillActive]}
+              style={styles.startAnalysisButton}
               activeOpacity={0.8}
-              onPress={() => setFilter('All')}
+              onPress={() => navigation.navigate('AddJobPasteText')}
             >
-              <Text style={[styles.filterPillText, filter === 'All' && styles.filterPillTextActive]}>
-                All (2)
-              </Text>
+              <Text style={styles.startAnalysisText}>Start a job analysis</Text>
+              <Ionicons name="chevron-forward" size={16} color="#FFFFFF" />
             </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.filterPill, filter === 'Shortlisted' && styles.filterPillActive]}
-              activeOpacity={0.8}
-              onPress={() => setFilter('Shortlisted')}
-            >
-              <Text style={[styles.filterPillText, filter === 'Shortlisted' && styles.filterPillTextActive]}>
-                Shortlisted
-              </Text>
-            </TouchableOpacity>
-
-            <TouchableOpacity
-              style={[styles.filterPill, filter === 'Applied' && styles.filterPillActive]}
-              activeOpacity={0.8}
-              onPress={() => setFilter('Applied')}
-            >
-              <Text style={[styles.filterPillText, filter === 'Applied' && styles.filterPillTextActive]}>
-                Applied
-              </Text>
-            </TouchableOpacity>
-          </View>
-
-          {/* List */}
-          <View style={styles.list}>
-            {filtered.map((item) => (
-              <View key={item.id} style={styles.card}>
-                <View style={styles.cardTop}>
-                  <View style={styles.jobCol}>
-                    <Text style={styles.jobTitle}>{item.title}</Text>
-                    <Text style={styles.company}>{item.company}</Text>
-                  </View>
-                  <View style={[styles.statusBadge, { backgroundColor: item.statusBg }]}>
-                    <Text style={[styles.statusText, { color: item.statusColor }]}>
-                      {item.status}
-                    </Text>
-                  </View>
-                </View>
-
-                <View style={styles.divider} />
-
-                <View style={styles.cardBottom}>
-                  <Text style={styles.dateText}>Applied: {item.appliedDate}</Text>
-                  <TouchableOpacity
-                    style={styles.viewResultBtn}
-                    activeOpacity={0.7}
-                    onPress={() => navigation.navigate('AnalysisResult')}
-                  >
-                    <Text style={styles.viewResultText}>View match report</Text>
-                    <Ionicons name="chevron-forward" size={14} color="#0066FF" />
-                  </TouchableOpacity>
-                </View>
-              </View>
-            ))}
           </View>
         </ScrollView>
 
@@ -194,94 +116,51 @@ const styles = StyleSheet.create({
     color: '#64748B',
     marginTop: 4,
   },
-  filterPillsRow: {
-    flexDirection: 'row',
-    gap: 8,
-    marginBottom: 16,
-  },
-  filterPill: {
-    paddingHorizontal: 12,
-    paddingVertical: 6,
-    borderRadius: 16,
-    borderWidth: 1,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#FFFFFF',
-  },
-  filterPillActive: {
-    backgroundColor: '#0F172A',
-    borderColor: '#0F172A',
-  },
-  filterPillText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#64748B',
-  },
-  filterPillTextActive: {
-    color: '#FFFFFF',
-    fontWeight: '700',
-  },
-  list: {
-    marginBottom: 16,
-  },
-  card: {
+  emptyCard: {
+    alignItems: 'center',
     backgroundColor: '#FFFFFF',
     borderWidth: 1,
     borderColor: '#E2E8F0',
     borderRadius: 12,
-    padding: 14,
-    marginBottom: 12,
+    padding: 24,
+    marginTop: 18,
   },
-  cardTop: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'flex-start',
+  emptyIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    backgroundColor: '#EFF6FF',
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginBottom: 14,
   },
-  jobCol: {
-    flex: 1,
-    paddingRight: 12,
-  },
-  jobTitle: {
-    fontSize: 14.5,
-    fontWeight: '700',
+  emptyTitle: {
     color: '#0F172A',
-  },
-  company: {
-    fontSize: 12,
-    color: '#64748B',
-    marginTop: 3,
-  },
-  statusBadge: {
-    paddingHorizontal: 8,
-    paddingVertical: 4,
-    borderRadius: 6,
-  },
-  statusText: {
-    fontSize: 11,
+    fontSize: 16,
     fontWeight: '700',
+    marginBottom: 8,
   },
-  divider: {
-    height: 1,
-    backgroundColor: '#F1F5F9',
-    marginVertical: 12,
+  emptyText: {
+    color: '#64748B',
+    fontSize: 13,
+    lineHeight: 19,
+    textAlign: 'center',
+    marginBottom: 18,
   },
-  cardBottom: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
-  },
-  dateText: {
-    fontSize: 12,
-    color: '#94A3B8',
-  },
-  viewResultBtn: {
+  startAnalysisButton: {
+    minHeight: 42,
+    backgroundColor: '#0066FF',
+    borderRadius: 10,
+    paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 2,
+    justifyContent: 'center',
+    gap: 8,
   },
-  viewResultText: {
-    fontSize: 12,
-    fontWeight: '600',
-    color: '#0066FF',
+  startAnalysisText: {
+    color: '#FFFFFF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   bottomNavContainer: {
     flexDirection: 'row',

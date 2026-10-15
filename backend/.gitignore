@@ -1,4 +1,5 @@
 .env
+.mongo-data/
 node_modules/
 coverage/
 npm-debug.log*
@@ -8,6 +9,8 @@ yarn-error.log*
 # Uploaded applicant files are private runtime data.
 private/cvs/**
 !private/cvs/.gitkeep
+private/avatars/**
+!private/avatars/.gitkeep
 
 # Editor and operating-system files.
 .vscode/

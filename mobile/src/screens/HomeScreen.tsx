@@ -1,57 +1,61 @@
-import React from 'react';
+import React, { useCallback, useState } from 'react';
 import {
+  ActivityIndicator,
   View,
   Text,
   TouchableOpacity,
   ScrollView,
   SafeAreaView,
   StatusBar,
-  Image,
   StyleSheet,
   Platform,
-  Alert,
 } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { useAuth } from '@/contexts/AuthContext';
+import { ProfileAvatar } from '@/components/ProfileAvatar';
+import { useFocusEffect } from '@react-navigation/native';
+import { apiClient } from '@/services/apiClient';
+import type { ApiError, ResumeAnalysis } from '@/types';
 
 type HomeScreenProps = {
   navigation: any;
 };
 
 export const HomeScreen = ({ navigation }: HomeScreenProps) => {
-  const { user, logout } = useAuth();
-  const recentAnalyses = [
-    {
-      id: '1',
-      title: 'Business Development Officer',
-      company: 'Greenfield Agro Ltd',
-      score: 67,
-      scoreLabel: 'Good',
-      scoreColor: '#0066FF',
-      scoreBg: '#EFF6FF',
-      date: '1 Oct 2026',
-    },
-    {
-      id: '2',
-      title: 'Sales Manager Trainee',
-      company: 'Brightpath Foods',
-      score: 78,
-      scoreLabel: 'Strong',
-      scoreColor: '#16A34A',
-      scoreBg: '#DCFCE7',
-      date: '29 Sep 2026',
-    },
-    {
-      id: '3',
-      title: 'Customer Success Associate',
-      company: 'Paylink Services',
-      score: 52,
-      scoreLabel: 'Partial',
-      scoreColor: '#D97706',
-      scoreBg: '#FEF3C7',
-      date: '27 Sep 2026',
-    },
-  ];
+  const { user } = useAuth();
+  const [recentAnalyses, setRecentAnalyses] = useState<ResumeAnalysis[]>([]);
+  const [todayCount, setTodayCount] = useState<number | null>(null);
+  const [loadingAnalyses, setLoadingAnalyses] = useState(true);
+  const [analysisError, setAnalysisError] = useState('');
+
+  const loadAnalyses = useCallback(async () => {
+    setLoadingAnalyses(true);
+    setAnalysisError('');
+    try {
+      const response = await apiClient.get<{ analyses: ResumeAnalysis[] }>('/analyses');
+      const today = new Date().toDateString();
+      setTodayCount(response.analyses.filter(
+        (analysis) => new Date(analysis.createdAt).toDateString() === today,
+      ).length);
+      setRecentAnalyses(response.analyses.slice(0, 3));
+    } catch (error) {
+      const apiError = error as ApiError;
+      setTodayCount(null);
+      setAnalysisError(apiError.error?.message || 'Could not load your recent analyses.');
+    } finally {
+      setLoadingAnalyses(false);
+    }
+  }, []);
+
+  useFocusEffect(useCallback(() => {
+    void loadAnalyses();
+  }, [loadAnalyses]));
+
+  const scoreStyle = (matchLevel: ResumeAnalysis['matchLevel']) => {
+    if (matchLevel === 'strong') return { label: 'Strong', color: '#16A34A', background: '#DCFCE7' };
+    if (matchLevel === 'good') return { label: 'Good', color: '#0066FF', background: '#EFF6FF' };
+    return { label: 'Partial', color: '#D97706', background: '#FEF3C7' };
+  };
 
   return (
     <SafeAreaView style={styles.safeArea}>
@@ -72,28 +76,9 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
             <TouchableOpacity
               style={styles.avatarButton}
               activeOpacity={0.8}
-              onPress={() => {
-                Alert.alert(
-                  'Account',
-                  'What would you like to do?',
-                  [
-                    { text: 'Cancel', style: 'cancel' },
-                    {
-                      text: 'Log out',
-                      style: 'destructive',
-                      onPress: async () => {
-                        await logout();
-                      },
-                    },
-                  ]
-                );
-              }}
+              onPress={() => navigation.navigate('Account')}
             >
-              <Image
-                source={require('../../assets/avatar.png')}
-                style={styles.avatarImage}
-                defaultSource={require('../../assets/avatar.png')}
-              />
+              <ProfileAvatar user={user} size={44} />
             </TouchableOpacity>
           </View>
 
@@ -123,21 +108,14 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
             <View style={styles.todayHeaderRow}>
               <Text style={styles.todayTitle}>Today's analyses</Text>
               <View style={styles.todayBadge}>
-                <Text style={styles.todayBadgeText}>3 of 5 left</Text>
+                <Text style={styles.todayBadgeText}>
+                  {todayCount === null ? '—' : `${todayCount} completed`}
+                </Text>
               </View>
             </View>
 
-            {/* Segmented 5-part progress bar */}
-            <View style={styles.segmentedProgressBar}>
-              <View style={[styles.progressSegment, styles.segmentFilled]} />
-              <View style={[styles.progressSegment, styles.segmentFilled]} />
-              <View style={[styles.progressSegment, styles.segmentFilled]} />
-              <View style={[styles.progressSegment, styles.segmentUnfilled]} />
-              <View style={[styles.progressSegment, styles.segmentUnfilled]} />
-            </View>
-
             <Text style={styles.todayCaption}>
-              The daily limit resets at midnight.
+              Completed analyses saved to your account today.
             </Text>
           </View>
 
@@ -150,30 +128,34 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
               </TouchableOpacity>
             </View>
 
-            {recentAnalyses.map((item) => (
-              <View key={item.id} style={styles.analysisCard}>
+            {loadingAnalyses ? (
+              <ActivityIndicator color="#0066FF" style={styles.analysisState} />
+            ) : analysisError ? (
+              <View style={styles.analysisState}>
+                <Text style={styles.analysisStateError}>{analysisError}</Text>
+                <TouchableOpacity onPress={() => void loadAnalyses()}>
+                  <Text style={styles.retryText}>Try again</Text>
+                </TouchableOpacity>
+              </View>
+            ) : recentAnalyses.length === 0 ? (
+              <View style={styles.analysisState}>
+                <Text style={styles.analysisStateText}>Your completed analyses will appear here.</Text>
+              </View>
+            ) : recentAnalyses.map((item) => {
+              const score = scoreStyle(item.matchLevel);
+              return <View key={item.id} style={styles.analysisCard}>
                 <View style={styles.analysisCardTop}>
                   <View style={styles.jobInfoCol}>
-                    <Text style={styles.analysisJobTitle}>{item.title}</Text>
-                    <Text style={styles.analysisCompany}>{item.company}</Text>
+                    <Text style={styles.analysisJobTitle}>{item.jobDescription?.title || 'Job match analysis'}</Text>
+                    <Text style={styles.analysisCompany}>{item.jobDescription?.company || 'Company not provided'}</Text>
                   </View>
                   <View style={styles.scoreCol}>
-                    <Text style={[styles.scoreNumber, { color: item.scoreColor }]}>
+                    <Text style={[styles.scoreNumber, { color: score.color }]}>
                       {item.score}
                     </Text>
-                    <View
-                      style={[
-                        styles.scoreBadge,
-                        { backgroundColor: item.scoreBg },
-                      ]}
-                    >
-                      <Text
-                        style={[
-                          styles.scoreBadgeText,
-                          { color: item.scoreColor },
-                        ]}
-                      >
-                        {item.scoreLabel}
+                    <View style={[styles.scoreBadge, { backgroundColor: score.background }]}>
+                      <Text style={[styles.scoreBadgeText, { color: score.color }]}>
+                        {score.label}
                       </Text>
                     </View>
                   </View>
@@ -182,18 +164,18 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
                 <View style={styles.divider} />
 
                 <View style={styles.analysisCardBottom}>
-                  <Text style={styles.analysisDate}>{item.date}</Text>
+                  <Text style={styles.analysisDate}>{new Date(item.createdAt).toLocaleDateString()}</Text>
                   <TouchableOpacity
                     style={styles.viewResultBtn}
                     activeOpacity={0.7}
-                    onPress={() => navigation.navigate('AnalysisResult')}
+                    onPress={() => navigation.navigate('AnalysisResult', { analysisId: item.id })}
                   >
                     <Text style={styles.viewResultText}>View result</Text>
                     <Ionicons name="chevron-forward" size={14} color="#0066FF" />
                   </TouchableOpacity>
                 </View>
-              </View>
-            ))}
+              </View>;
+            })}
           </View>
         </ScrollView>
 
@@ -213,12 +195,12 @@ export const HomeScreen = ({ navigation }: HomeScreenProps) => {
             <Text style={styles.navTabLabel}>Analyses</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.navTab} activeOpacity={0.8} onPress={() => {}}>
+          <TouchableOpacity style={styles.navTab} activeOpacity={0.8} onPress={() => navigation.navigate('Applications')}>
             <Ionicons name="briefcase-outline" size={20} color="#94A3B8" />
             <Text style={styles.navTabLabel}>Applications</Text>
           </TouchableOpacity>
 
-          <TouchableOpacity style={styles.navTab} activeOpacity={0.8} onPress={() => {}}>
+          <TouchableOpacity style={styles.navTab} activeOpacity={0.8} onPress={() => navigation.navigate('Account')}>
             <Ionicons name="person-outline" size={20} color="#94A3B8" />
             <Text style={styles.navTabLabel}>Account</Text>
           </TouchableOpacity>
@@ -265,17 +247,7 @@ const styles = StyleSheet.create({
     marginTop: 4,
   },
   avatarButton: {
-    width: 44,
-    height: 44,
-    borderRadius: 22,
-    overflow: 'hidden',
-    borderWidth: 1.5,
-    borderColor: '#E2E8F0',
-    backgroundColor: '#F1F5F9',
-  },
-  avatarImage: {
-    width: '100%',
-    height: '100%',
+    borderRadius: 24,
   },
   heroCard: {
     backgroundColor: '#0A192F',
@@ -353,22 +325,6 @@ const styles = StyleSheet.create({
     fontWeight: '700',
     color: '#1D4ED8',
   },
-  segmentedProgressBar: {
-    flexDirection: 'row',
-    gap: 6,
-    marginBottom: 8,
-  },
-  progressSegment: {
-    flex: 1,
-    height: 4,
-    borderRadius: 2,
-  },
-  segmentFilled: {
-    backgroundColor: '#0066FF',
-  },
-  segmentUnfilled: {
-    backgroundColor: '#E2E8F0',
-  },
   todayCaption: {
     fontSize: 11.5,
     color: '#94A3B8',
@@ -400,6 +356,26 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     padding: 14,
     marginBottom: 12,
+  },
+  analysisState: {
+    alignItems: 'center',
+    paddingVertical: 18,
+  },
+  analysisStateText: {
+    color: '#64748B',
+    fontSize: 13,
+    textAlign: 'center',
+  },
+  analysisStateError: {
+    color: '#DC2626',
+    fontSize: 13,
+    textAlign: 'center',
+    marginBottom: 8,
+  },
+  retryText: {
+    color: '#0066FF',
+    fontSize: 13,
+    fontWeight: '700',
   },
   analysisCardTop: {
     flexDirection: 'row',

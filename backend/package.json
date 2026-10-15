@@ -6,7 +6,7 @@
   "scripts": {
     "start": "node src/server.js",
     "dev": "node --watch src/server.js",
-    "test": "node --test tests/application.test.js tests/cv.test.js tests/blindMode.test.js"
+    "test": "node --test tests/application.test.js tests/auth.test.js tests/avatar.test.js tests/jobDescription.test.js tests/jobDescriptionLink.test.js tests/resumeFlow.test.js tests/cv.test.js tests/blindMode.test.js"
   },
   "engines": {
     "node": ">=20"
@@ -20,15 +20,21 @@
   },
   "homepage": "https://github.com/BeeJa01/hirelume#readme",
   "dependencies": {
+    "@tesseract.js-data/eng": "^1.0.0",
     "bcryptjs": "^3.0.3",
+    "cheerio": "^1.2.0",
     "cors": "^2.8.6",
     "dotenv": "^18.0.5",
     "express": "^5.2.1",
+    "express-rate-limit": "^8.7.1",
+    "ipaddr.js": "^2.5.0",
     "jsonwebtoken": "^9.0.3",
     "mammoth": "^1.13.0",
+    "mongodb-memory-server": "^11.3.0",
     "mongoose": "^9.10.3",
     "multer": "^2.4.0",
-    "pdf-parse": "^2.4.5",
+    "pdf-parse": "^1.1.1",
+    "tesseract.js": "^7.0.0",
     "zod": "^4.6.5"
   },
   "devDependencies": {

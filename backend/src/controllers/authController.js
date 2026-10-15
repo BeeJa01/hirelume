@@ -31,7 +31,12 @@ const register = asyncRoute(async (req, res) => {
     const user = await User.create({ ...input, email: input.email.toLowerCase(), password_hash: await bcrypt.hash(input.password, 12) });
     res.json(authResponse(user));
   } catch (error) {
-    if (error.code === 11000) return res.status(409).json({ detail: 'Account already exists' });
+    if (error.code === 11000) {
+      return res.status(409).json({
+        success: false,
+        error: { code: 'EMAIL_ALREADY_EXISTS', message: 'An account with this email already exists.' },
+      });
+    }
     throw error;
   }
 });
@@ -39,8 +44,17 @@ const register = asyncRoute(async (req, res) => {
 const login = asyncRoute(async (req, res) => {
   const input = validate(loginSchema, req.body);
   const user = await User.findOne({ email: input.email.toLowerCase() });
-  if (!user || !(await bcrypt.compare(input.password, user.password_hash))) {
-    return res.status(401).json({ detail: 'Unable to sign in with those details' });
+  if (!user) {
+    return res.status(404).json({
+      success: false,
+      error: { code: 'EMAIL_NOT_FOUND', message: 'No account was found for this email.' },
+    });
+  }
+  if (!(await bcrypt.compare(input.password, user.password_hash))) {
+    return res.status(401).json({
+      success: false,
+      error: { code: 'WRONG_PASSWORD', message: 'The password is incorrect.' },
+    });
   }
   res.json(authResponse(user));
 });
