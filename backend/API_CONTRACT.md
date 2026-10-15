@@ -193,3 +193,5 @@ Returns the draft/status to its owning job seeker. A completed response also inc
 ## Flow 1 analysis
 
 Set `ANALYSIS_PROVIDER=gemini` with `GEMINI_API_KEY`, or `ANALYSIS_PROVIDER=groq` with `GROQ_API_KEY`. Each submitted CV is parsed, optionally identity-redacted, scored in the background, and retried up to `ANALYSIS_MAX_ATTEMPTS`. Pending Flow 1 and confirmed Flow 2 work is recovered when the server starts. With provider `none`, submissions remain pending.
+
+PATCH /api/shortlist/:applicationId/shortlist
