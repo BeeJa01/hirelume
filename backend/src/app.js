@@ -7,6 +7,7 @@ const jobRoutes = require('./routes/jobRoutes');
 const applicationRoutes = require('./routes/applicationRoutes');
 const cvRoutes = require('./routes/cvRoutes');
 const analysisRoutes = require('./routes/analysisRoutes');
+const shortlistRoutes = require("./routes/shortlistRoutes");
 
 const app = express();
 app.disable('x-powered-by');
@@ -23,6 +24,7 @@ app.use('/api/jobs', jobRoutes);
 app.use('/api/applications', applicationRoutes);
 app.use('/api/cvs', cvRoutes);
 app.use('/api/analysis', analysisRoutes);
+app.use("/api/shortlist", shortlistRoutes);
 app.use(notFound);
 app.use(errorHandler);
 
