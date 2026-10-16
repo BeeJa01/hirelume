@@ -1,7 +1,12 @@
 const mongoose = require('mongoose');
 
 const analysisResultSchema = new mongoose.Schema({
-  application_id: { type: mongoose.Schema.Types.ObjectId, ref: 'Application', required: true, unique: true, index: true },
+  application_id: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: 'Application',
+  required: true,
+  unique: true
+},
   score: { type: Number, required: true },
   match_level: { type: String, required: true },
   reason: { type: String, required: true },
