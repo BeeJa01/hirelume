@@ -1,0 +1,352 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Help | HireLume</title>
+
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+      --font-display: "Poppins", ui-sans-serif, system-ui, sans-serif;
+      --color-brand: #2563eb;
+      --color-brand-dark: #1d4ed8;
+      --color-line: #e2e8f0;
+    }
+    @layer components {
+      .btn-primary { @apply inline-flex items-center justify-center gap-2 rounded-lg bg-brand px-4 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand; }
+      .card { @apply rounded-xl border border-line bg-white; }
+      .faq summary { @apply flex cursor-pointer list-none items-center justify-between gap-4 px-5 py-4 text-sm font-semibold hover:bg-[#f8fafc]; }
+      .faq summary::-webkit-details-marker { display: none; }
+      .faq .ans { @apply space-y-2 px-5 pb-5 text-sm leading-relaxed text-gray-600; }
+    }
+  </style>
+  <style>
+    .icon { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+  </style>
+</head>
+
+<body class="bg-[#f8fafc] font-sans text-black antialiased">
+
+  <svg width="0" height="0" class="absolute" aria-hidden="true">
+    <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></symbol>
+    <symbol id="i-plus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8v8" /></symbol>
+    <symbol id="i-plus" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14" /></symbol>
+    <symbol id="i-users" viewBox="0 0 24 24"><circle cx="9" cy="8" r="3.5" /><path d="M2 21v-1a6 6 0 0 1 6-6h2a6 6 0 0 1 6 6v1M16 4.5a3.5 3.5 0 0 1 0 7M22 21v-1a6 6 0 0 0-4-5.6" /></symbol>
+    <symbol id="i-help" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M9.1 9a3 3 0 0 1 5.8 1c0 2-3 3-3 3M12 17h.01" /></symbol>
+    <symbol id="i-spark" viewBox="0 0 24 24"><path d="M12 3l1.8 4.6L18.5 9l-4.7 1.4L12 15l-1.8-4.6L5.5 9l4.7-1.4L12 3zM18 15l.9 2.1L21 18l-2.1.9L18 21l-.9-2.1L15 18l2.1-.9L18 15z" /></symbol>
+    <symbol id="i-file" viewBox="0 0 24 24"><path d="M14 3H7a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V8l-5-5zM14 3v5h5M9 13h6M9 17h4" /></symbol>
+    <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7" /><path d="m20 20-3.5-3.5" /></symbol>
+    <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></symbol>
+    <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+    <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+    <symbol id="i-mail" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2" /><path d="m3 7 9 6 9-6" /></symbol>
+  </svg>
+
+  <div class="lg:flex lg:min-h-screen">
+
+    <!-- Sidebar (desktop, signed-in users). Links are filled in by the script for each role. -->
+    <aside id="sidebar" class="hidden w-64 shrink-0 flex-col border-r border-line bg-white lg:sticky lg:top-0 lg:flex lg:h-screen">
+      <a href="landingpage.html" class="px-6 py-6" aria-label="HireLume home">
+        <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+      </a>
+      <p id="role-label" class="px-6 text-xs font-bold uppercase tracking-wide text-gray-500"></p>
+      <nav id="side-nav" aria-label="Dashboard" class="mt-3 space-y-1 px-4"></nav>
+      <div class="mt-auto flex items-center gap-3 border-t border-line p-4">
+        <span class="grid size-9 shrink-0 place-items-center rounded-full bg-gray-200 text-xs font-semibold" data-user="initials"></span>
+        <div class="min-w-0 flex-1">
+          <p class="truncate text-sm font-semibold" data-user="name"></p>
+          <p class="truncate text-xs text-gray-500" data-user="email"></p>
+        </div>
+        <a href="/logout" aria-label="Log out" class="text-gray-500 hover:text-black"><svg class="icon size-5" aria-hidden="true"><use href="#i-logout" /></svg></a>
+      </div>
+    </aside>
+
+    <div class="min-w-0 flex-1">
+
+      <!-- Top bar -->
+      <header class="relative border-b border-line bg-white">
+        <div class="flex h-16 items-center justify-between px-5 sm:px-8">
+          <a href="landingpage.html" id="top-logo" class="lg:hidden" aria-label="HireLume home">
+            <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+          </a>
+          <p id="top-title" class="font-display hidden text-sm font-semibold lg:block">Help</p>
+
+          <div class="flex items-center gap-3">
+            <!-- Signed-in -->
+            <a id="top-create" href="create-job.html" class="btn-primary hidden"><svg class="icon size-4" aria-hidden="true"><use href="#i-plus" /></svg>Create job</a>
+            <span id="top-user" class="hidden items-center gap-2">
+              <span class="grid size-9 place-items-center rounded-full bg-gray-200 text-xs font-semibold" data-user="initials"></span>
+              <span class="hidden text-sm font-semibold lg:inline" data-user="first"></span>
+            </span>
+            <button id="menu-btn" type="button" class="hidden size-10 place-items-center rounded-lg border border-line lg:hidden" aria-label="Open menu" aria-expanded="false" aria-controls="nav-menu">
+              <svg class="icon size-5" aria-hidden="true"><use href="#i-menu" /></svg>
+            </button>
+            <!-- Signed-out -->
+            <a id="top-login" href="login.html" class="hidden text-sm font-semibold text-gray-600 hover:text-black">Log in</a>
+            <a id="top-signup" href="signup.html" class="btn-primary hidden">Create an account</a>
+          </div>
+        </div>
+
+        <nav id="nav-menu" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-line bg-white px-5 py-4 text-sm text-gray-500 sm:px-8 lg:hidden!"></nav>
+      </header>
+
+      <main class="mx-auto max-w-3xl px-5 py-8 sm:px-8 lg:py-10">
+
+        <!-- Breadcrumb: goes back to the person's home page -->
+        <nav aria-label="Breadcrumb" class="mb-4 flex items-center gap-2 text-sm text-gray-500">
+          <a id="crumb-home" href="landingpage.html" class="hover:text-black">Home</a>
+          <span aria-hidden="true">&rsaquo;</span>
+          <span class="font-medium text-black">Help</span>
+        </nav>
+
+        <!-- Heading + search -->
+        <h1 class="font-display text-2xl font-bold lg:text-3xl">How can we help?</h1>
+        <p class="mt-1 text-sm text-gray-500">Quick answers about jobs, applicants, analyses and your account.</p>
+
+        <div class="relative mt-5">
+          <svg class="icon pointer-events-none absolute left-3.5 top-1/2 size-4 -translate-y-1/2 text-gray-500" aria-hidden="true"><use href="#i-search" /></svg>
+          <label for="help-search" class="sr-only">Search help</label>
+          <input id="help-search" type="search" placeholder="Search for an answer"
+                 class="w-full rounded-xl border border-line bg-white py-3 pl-10 pr-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:text-sm" />
+        </div>
+
+        <!-- Topic tabs -->
+        <div id="tabs" class="mt-4 flex flex-wrap items-center gap-2 text-sm">
+          <button type="button" data-tab="all">All</button>
+          <button type="button" data-tab="recruiter">Recruiters</button>
+          <button type="button" data-tab="job_seeker">Job seekers</button>
+          <button type="button" data-tab="account">Account</button>
+        </div>
+
+        <!-- Getting started -->
+        <section data-group="recruiter" class="group-block mt-8" aria-labelledby="gs-r">
+          <h2 id="gs-r" class="font-display text-lg font-semibold">Getting started as a recruiter</h2>
+          <ol class="mt-3 grid gap-3 sm:grid-cols-3">
+            <li class="card p-4"><span class="grid size-7 place-items-center rounded-full bg-blue-50 text-xs font-bold text-brand">1</span><p class="font-display mt-3 text-sm font-semibold">Create a job</p><p class="mt-1 text-xs text-gray-500">Add the title, a short description and your requirements.</p></li>
+            <li class="card p-4"><span class="grid size-7 place-items-center rounded-full bg-blue-50 text-xs font-bold text-brand">2</span><p class="font-display mt-3 text-sm font-semibold">Share one link</p><p class="mt-1 text-xs text-gray-500">Post it anywhere. Applicants apply on their phones, no account needed.</p></li>
+            <li class="card p-4"><span class="grid size-7 place-items-center rounded-full bg-blue-50 text-xs font-bold text-brand">3</span><p class="font-display mt-3 text-sm font-semibold">Review ranked applicants</p><p class="mt-1 text-xs text-gray-500">Each score comes with a reason. You make the decision.</p></li>
+          </ol>
+        </section>
+
+        <section data-group="job_seeker" class="group-block mt-8" aria-labelledby="gs-j">
+          <h2 id="gs-j" class="font-display text-lg font-semibold">Getting started as a job seeker</h2>
+          <ol class="mt-3 grid gap-3 sm:grid-cols-3">
+            <li class="card p-4"><span class="grid size-7 place-items-center rounded-full bg-blue-50 text-xs font-bold text-brand">1</span><p class="font-display mt-3 text-sm font-semibold">Add the job and your CV</p><p class="mt-1 text-xs text-gray-500">Paste the job text, upload a screenshot or paste a link.</p></li>
+            <li class="card p-4"><span class="grid size-7 place-items-center rounded-full bg-blue-50 text-xs font-bold text-brand">2</span><p class="font-display mt-3 text-sm font-semibold">See your match</p><p class="mt-1 text-xs text-gray-500">Get a score, the reasons behind it, gaps and CV tips.</p></li>
+            <li class="card p-4"><span class="grid size-7 place-items-center rounded-full bg-blue-50 text-xs font-bold text-brand">3</span><p class="font-display mt-3 text-sm font-semibold">Prepare for the interview</p><p class="mt-1 text-xs text-gray-500">Practise with questions based on the job and your CV.</p></li>
+          </ol>
+        </section>
+
+        <!-- Recruiters -->
+        <section data-group="recruiter" class="group-block mt-8" aria-labelledby="h-r">
+          <h2 id="h-r" class="font-display text-lg font-semibold">For recruiters</h2>
+          <div class="card faq mt-3 divide-y divide-line overflow-hidden">
+            <details class="group">
+              <summary>How do I create a job and share it?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>Go to <a class="font-semibold text-brand" href="create-job.html">Create job</a>, add a title, a description and your requirements, then choose <b>Save job and get link</b>. You can copy the link, or share it straight to WhatsApp, LinkedIn or X.</p><p>Applicants don't need an account to apply.</p></div>
+            </details>
+            <details class="group">
+              <summary>How are applicants scored?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>Every CV is compared with the requirements you listed. Required skills count double, and each requirement shows whether it was met, with evidence from the CV. The score always comes with a reason.</p><p>Scores usually appear within a minute of an application. A score shows as "Analysis pending" until then.</p></div>
+            </details>
+            <details class="group">
+              <summary>Can the AI get it wrong?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>Yes. HireLume ranks and explains, but nobody is hidden or removed from your list, and only you can shortlist or reject. Always check the CV before you decide.</p></div>
+            </details>
+            <details class="group">
+              <summary>How do I shortlist or reject an applicant?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>Open <a class="font-semibold text-brand" href="applicants.html">Applicants</a>, choose a job, then click an applicant. Use the <b>Shortlist</b>, <b>Reject</b> or <b>Undecided</b> buttons at the top of their page. Use the tabs on the list to filter by status.</p></div>
+            </details>
+            <details class="group">
+              <summary>Why can't I edit my requirements?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>Requirements lock after the first application so that earlier scores stay fair. You can still edit the title and description at any time. If you need different requirements, create a new job.</p></div>
+            </details>
+            <details class="group">
+              <summary>How do I close or reopen a job?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>On <a class="font-semibold text-brand" href="jobs.html">Jobs</a>, open the <b>&middot;&middot;&middot;</b> menu on the job and choose <b>Close Job</b>. You can also use the <b>Close job</b> button on the job's applicants page.</p><p>Once closed, the job link shows "This job is closed" and nobody can apply. Your applicants and their rankings are kept. To open it again, use the same menu and choose <b>Reopen job</b>.</p></div>
+            </details>
+            <details class="group">
+              <summary>What is Blind Mode?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>When Blind Mode is on, a CV opens as an anonymised text version instead of the original file, so you can review it without personal details.</p></div>
+            </details>
+            <details class="group">
+              <summary>What do applicants see after they apply?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>If you turned on <b>Let applicants see feedback</b> when creating the job, they can see guidance on their own CV: strengths, gaps and tips. They never see their rank, how others compare, or your decision.</p></div>
+            </details>
+          </div>
+        </section>
+
+        <!-- Job seekers -->
+        <section data-group="job_seeker" class="group-block mt-8" aria-labelledby="h-j">
+          <h2 id="h-j" class="font-display text-lg font-semibold">For job seekers</h2>
+          <div class="card faq mt-3 divide-y divide-line overflow-hidden">
+            <details class="group">
+              <summary>How do I check my fit for a job?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>Go to <a class="font-semibold text-brand" href="job-seeker-home.html">New analysis</a>. Add the job by pasting the text, uploading a screenshot or pasting a link, then add your CV and choose <b>Analyse my fit</b>. For the best match, paste the full job post.</p></div>
+            </details>
+            <details class="group">
+              <summary>What do I get from an analysis?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>A match score with the reason behind it, whether each requirement is met, partly met or not found, your gaps, CV tips and next steps, plus 8 to 10 interview questions. Past results are saved in <a class="font-semibold text-brand" href="my-analyses.html">My analyses</a>.</p></div>
+            </details>
+            <details class="group">
+              <summary>Which CV files can I upload?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>For an analysis you can upload a PDF, an image or a Word file, up to 5 MB, written in English. When you apply to a job, the CV must be a PDF or Word file up to 5 MB. If a file can't be read, make sure it's a real PDF or Word document and not a renamed file.</p></div>
+            </details>
+            <details class="group">
+              <summary>Why does it say I've used all my analyses?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>There is a daily limit on analyses. It resets at midnight, so you can try again tomorrow.</p></div>
+            </details>
+            <details class="group">
+              <summary>Is my information safe?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>For an analysis, only your CV content and the job text are sent to the AI. Your email, phone number and address are never sent.</p></div>
+            </details>
+            <details class="group">
+              <summary>I applied to a job. How do I see my result?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>You can apply without an account. To see your result later, create an account or log in using the <b>same email address you applied with</b>.</p></div>
+            </details>
+            <details class="group">
+              <summary>Will the recruiter see how I compare with others?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>The recruiter reviews applications and makes the decision. You won't see how other applicants compare, and the AI guidance you get can be wrong, so treat it as a guide.</p></div>
+            </details>
+          </div>
+        </section>
+
+        <!-- Account -->
+        <section data-group="account" class="group-block mt-8" aria-labelledby="h-a">
+          <h2 id="h-a" class="font-display text-lg font-semibold">Account</h2>
+          <div class="card faq mt-3 divide-y divide-line overflow-hidden">
+            <details class="group">
+              <summary>I forgot my password<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>On the <a class="font-semibold text-brand" href="login.html">log in</a> page, choose <b>Forgot password?</b>, enter your email and we'll send you a reset link. The link works once and expires after about an hour. After you set a new password, log in with it.</p></div>
+            </details>
+            <details class="group">
+              <summary>The reset email hasn't arrived<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>It can take a minute. Check your spam folder, and make sure you used the email you signed up with. If the link says it has expired, request a new one from the <a class="font-semibold text-brand" href="forgot-password.html">forgot password</a> page.</p></div>
+            </details>
+            <details class="group">
+              <summary>Can I change my account type later?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>No. You choose recruiter or job seeker when you sign up and it can't be changed later. If you need the other type, create a new account with a different email.</p></div>
+            </details>
+            <details class="group">
+              <summary>How do I log out?<svg class="icon size-4 shrink-0 text-gray-500 transition-transform group-open:rotate-180" aria-hidden="true"><use href="#i-chevron" /></svg></summary>
+              <div class="ans"><p>Use the log out icon next to your name at the bottom of the sidebar, or choose <b>Log out</b> in the menu on your phone.</p></div>
+            </details>
+          </div>
+        </section>
+
+        <p id="no-results" class="mt-10 hidden rounded-xl border border-dashed border-line bg-white p-6 text-center text-sm text-gray-500">No answers match your search. Try different words.</p>
+
+        <!-- Contact (only shown when SUPPORT_EMAIL is set in the script below) -->
+        <section id="contact" class="card mt-10 hidden items-center gap-4 p-5">
+          <span class="grid size-10 shrink-0 place-items-center rounded-lg bg-blue-50 text-brand"><svg class="icon size-5" aria-hidden="true"><use href="#i-mail" /></svg></span>
+          <div class="min-w-0 flex-1">
+            <p class="font-display text-sm font-semibold">Still need help?</p>
+            <p class="text-xs text-gray-500">Send us a message and we'll get back to you.</p>
+          </div>
+          <a id="contact-link" href="#" class="btn-primary whitespace-nowrap">Email support</a>
+        </section>
+      </main>
+    </div>
+  </div>
+
+  <script src="api.js"></script>
+  <script>
+    // Put your support address here to show the "Still need help?" card (leave empty to hide it).
+    const SUPPORT_EMAIL = "";
+
+    // ---- Who is looking? Signed-in users get their own sidebar; visitors get a simple top bar ----
+    const role = session.token && session.user ? session.user.role : null;
+    const NAV = {
+      recruiter: { label: "Recruiter", items: [["jobs.html", "briefcase", "Jobs"], ["create-job.html", "plus-circle", "Create job"], ["applicants.html", "users", "Applicants"], ["help.html", "help", "Help"]] },
+      job_seeker: { label: "Job seeker", items: [["job-seeker-home.html", "spark", "New analysis"], ["my-analyses.html", "file", "My analyses"], ["help.html", "help", "Help"]] }
+    };
+    const ico = (n) => '<svg class="icon size-5" aria-hidden="true"><use href="#i-' + n + '"/></svg>';
+
+    if (role && NAV[role]) {
+      const cfg = NAV[role];
+      document.getElementById("role-label").textContent = cfg.label;
+      document.getElementById("side-nav").innerHTML = cfg.items.map(function (it) {
+        const here = it[0] === "help.html";
+        return '<a href="' + it[0] + '"' + (here ? ' aria-current="page"' : '') + ' class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm ' +
+          (here ? "border border-brand/30 bg-blue-50 font-semibold text-brand" : "text-gray-500 hover:bg-[#f8fafc] hover:text-black") + '">' + ico(it[1]) + it[2] + '</a>';
+      }).join("");
+      document.getElementById("nav-menu").innerHTML = cfg.items.map(function (it) {
+        return '<a href="' + it[0] + '" class="' + (it[0] === "help.html" ? "font-semibold text-brand" : "hover:text-black") + '">' + it[2] + '</a>';
+      }).join("") + '<a href="/logout" class="hover:text-black">Log out</a>';
+      document.getElementById("top-user").classList.remove("hidden"); document.getElementById("top-user").classList.add("flex");
+      const mb = document.getElementById("menu-btn"); mb.classList.remove("hidden"); mb.classList.add("grid");
+      if (role === "recruiter") { const c = document.getElementById("top-create"); c.classList.remove("hidden"); c.classList.add("hidden", "lg:inline-flex"); }
+      document.getElementById("top-logo").setAttribute("href", role === "recruiter" ? "jobs.html" : "job-seeker-home.html");
+      const crumb = document.getElementById("crumb-home");
+      crumb.setAttribute("href", role === "recruiter" ? "jobs.html" : "job-seeker-home.html");
+      crumb.textContent = role === "recruiter" ? "Jobs" : "New analysis";
+    } else {
+      document.getElementById("sidebar").remove();
+      document.getElementById("top-logo").classList.remove("lg:hidden");
+      document.getElementById("top-title").remove();
+      document.getElementById("top-login").classList.remove("hidden");
+      document.getElementById("top-signup").classList.remove("hidden"); document.getElementById("top-signup").classList.add("inline-flex");
+    }
+
+    // ---- Tabs + search ----
+    const blocks = Array.from(document.querySelectorAll(".group-block"));
+    const search = document.getElementById("help-search");
+    const tabBtns = Array.from(document.querySelectorAll("[data-tab]"));
+    let tab = role === "recruiter" ? "recruiter" : role === "job_seeker" ? "job_seeker" : "all";
+
+    function paintTabs() {
+      tabBtns.forEach(function (b) {
+        const on = b.dataset.tab === tab;
+        b.className = "rounded-lg px-3.5 py-1.5 " + (on ? "bg-black font-semibold text-white" : "border border-line bg-white font-medium text-gray-600 hover:bg-gray-50");
+        b.setAttribute("aria-pressed", String(on));
+      });
+    }
+    function apply() {
+      const term = search.value.trim().toLowerCase();
+      let shown = 0;
+      blocks.forEach(function (sec) {
+        const inTab = tab === "all" || sec.dataset.group === tab;
+        const items = Array.from(sec.querySelectorAll("details"));
+        if (!items.length) { // "getting started" blocks: hidden while searching
+          const vis = inTab && !term; sec.classList.toggle("hidden", !vis); return;
+        }
+        let any = 0;
+        items.forEach(function (d) {
+          const hit = !term || d.textContent.toLowerCase().includes(term);
+          d.classList.toggle("hidden", !hit);
+          if (term && hit) d.open = true;
+          if (hit) any++;
+        });
+        const vis = inTab && any > 0;
+        sec.classList.toggle("hidden", !vis);
+        if (vis) shown += any;
+      });
+      document.getElementById("no-results").classList.toggle("hidden", shown > 0);
+    }
+    tabBtns.forEach(function (b) { b.addEventListener("click", function () { tab = b.dataset.tab; paintTabs(); apply(); }); });
+    search.addEventListener("input", apply);
+    paintTabs(); apply();
+
+    // ---- Contact card ----
+    if (SUPPORT_EMAIL) {
+      const c = document.getElementById("contact"); c.classList.remove("hidden"); c.classList.add("flex");
+      document.getElementById("contact-link").href = "mailto:" + SUPPORT_EMAIL + "?subject=" + encodeURIComponent("HireLume help");
+    }
+
+    // ---- Mobile menu ----
+    const menuBtn = document.getElementById("menu-btn"), menu = document.getElementById("nav-menu");
+    menuBtn.addEventListener("click", function () {
+      const open = menu.classList.toggle("hidden") === false;
+      menu.classList.toggle("flex", open);
+      menuBtn.setAttribute("aria-expanded", String(open));
+      menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    });
+  </script>
+</body>
+</html>
