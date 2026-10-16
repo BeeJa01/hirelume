@@ -34,27 +34,67 @@
 <h1 class="mt-5 font-display text-2xl font-bold sm:text-3xl">Application received</h1>
 <p id="msg" class="mx-auto mt-2 max-w-md text-sm leading-relaxed text-mute"></p>
 <div class="mt-5 flex flex-wrap items-center justify-center gap-2 text-xs font-semibold"><span class="inline-flex items-center gap-1.5 rounded-full bg-slate-100 px-3 py-1.5 text-slate-700"><svg class="icon size-3.5" aria-hidden="true"><use href="#i-lock"/></svg> CV locked</span><span id="chipTitle" class="rounded-full bg-soft px-3 py-1.5 text-brand">Your application</span></div>
-<p id="status" role="status" class="mt-6 flex items-center justify-center gap-2 text-xs text-mute"><span class="size-3.5 animate-spin rounded-full border-2 border-line border-t-brand motion-reduce:animate-none"></span><span id="statusText">Our AI is reading your CV...</span></p></section></main></div></div><script src="api.js"></script><script>var STEPS=[["Read the job","See what the role needs"],["Your details","Name, email and phone"],["Upload your CV","PDF or Word"],["Consent and submit","Review and send"]];
+<p id="status" role="status" class="mt-6 flex items-center justify-center gap-2 text-xs text-mute"><span class="size-3.5 animate-spin rounded-full border-2 border-line border-t-brand motion-reduce:animate-none"></span><span id="statusText">Our AI is reading your CV...</span></p></section></main>
+<div id="aiFailModal" role="dialog" aria-modal="true" aria-labelledby="aiFailTitle" aria-describedby="aiFailText" class="fixed inset-0 z-50 hidden place-items-center bg-slate-900/55 p-5">
+<div class="w-full max-w-md rounded-3xl bg-white p-7 text-center shadow-2xl"><span class="mx-auto grid size-12 place-items-center rounded-2xl bg-soft text-brand"><svg class="icon size-6" aria-hidden="true"><use href="#i-spark"/></svg></span>
+<h2 id="aiFailTitle" class="mt-4 font-display text-xl font-bold">Your application is safe</h2>
+<div id="aiFailText" class="mt-2 space-y-2 text-sm leading-relaxed text-mute"><p>We couldn’t complete the AI review, but your application was submitted successfully and the recruiter can still review it.</p><p>Create a job seeker account to keep this application linked to you and use HireLume’s job-fit tools.</p></div>
+<a id="failureSignup" href="#" class="mt-5 flex h-12 w-full items-center justify-center rounded-xl bg-brand font-semibold text-white hover:bg-blue-700">Create a job seeker account</a>
+<button id="failureDismiss" type="button" class="mt-2 flex h-11 w-full items-center justify-center rounded-xl text-sm font-semibold hover:bg-slate-50">Not now</button>
+</div></div></div></div><script src="api.js"></script><script>var STEPS=[["Read the job","See what the role needs"],["Your details","Name, email and phone"],["Upload your CV","PDF or Word"],["Consent and submit","Review and send"]];
 function renderSteps(st){document.getElementById("steps").innerHTML=STEPS.map(function(s,i){var d=st[i],c=d==="done"?"bg-ok text-white":d==="cur"?"bg-brand text-white":"bg-slate-100 text-mute";
 return '<li class="flex items-start gap-3"><span class="grid size-8 shrink-0 place-items-center rounded-full text-xs font-semibold '+c+'">'+(d==="done"?'<svg class="icon size-4"><use href="#i-tick"/></svg>':i+1)+'</span><span class="leading-tight"><span class="block text-sm font-medium'+(d==="todo"?" text-mute":"")+'">'+s[0]+'</span><span class="text-xs text-mute">'+s[1]+'</span></span></li>';}).join("");
 var cur=st.indexOf("cur"),m=document.getElementById("stepNow");if(m)m.textContent="Step "+(cur<0?4:cur+1)+" of 4";}
 var $ = function (id) { return document.getElementById(id); };
 var app = {}; try { app = JSON.parse(sessionStorage.getItem("hlApp")) || {}; } catch (e) {}
-var first = (app.name || "").split(" ")[0], company = "";
+var first = (app.name || "").split(" ")[0], company = "", jobTitle = "";
 renderSteps(["done", "done", "done", "done"]);
 function setMsg() { $("msg").textContent = "Thank you" + (first ? ", " + first : "") + ". " + (company || "The recruiter") + " will review your application and make the decision."; }
 setMsg();
 document.querySelectorAll('a[href="public-job-page.html"]').forEach(function (a) { a.href = applyFlow.link("public-job-page.html"); });
 var jt = applyFlow.jobToken(), rt = applyFlow.resultToken();
 if (jt) applyFlow.getJob(jt).then(function (j) {
-  company = j.company;
+  company = j.company; jobTitle = j.title;
   if (j.title) { $("chipTitle").textContent = j.title; $("crumbTitle").textContent = j.title; }
   if (j.company) $("crumbCo").textContent = "Jobs at " + j.company;
+  updateFailureAction();
   setMsg();
 }).catch(function () {});
 function stopSpinner() { document.querySelector("#status span").classList.add("hidden"); }
-// Flowchart: "AI analysis successful?" No -> stay here, analysis retries in the background
-function showWaiting() { stopSpinner(); $("statusText").textContent = "We could not read your CV just yet. We will keep trying in the background. You do not need to do anything."; }
+function signupHref() {
+  var p = new URLSearchParams();
+  if (rt) p.set("result", rt);
+  if (jt) p.set("t", jt);
+  if (app.name) p.set("name", app.name);
+  if (app.email) p.set("email", app.email);
+  if (jobTitle) p.set("jobTitle", jobTitle);
+  if (company) p.set("company", company);
+  return applyFlow.page("signup-applicant.html") + "?" + p.toString();
+}
+var loggedIn = !!(session.token && session.user && session.user.role === "job_seeker"), failureModalShown = false;
+function updateFailureAction() {
+  $("failureSignup").href = loggedIn ? applyFlow.page("job-seeker-home.html") : signupHref();
+  $("failureSignup").textContent = loggedIn ? "Go to my job seeker dashboard" : "Create a job seeker account";
+}
+function showFailureModal() {
+  if (failureModalShown) return;
+  failureModalShown = true;
+  stopSpinner();
+  $("statusText").textContent = "The AI review could not be completed. Your application was still submitted successfully.";
+  updateFailureAction();
+  $("aiFailModal").classList.remove("hidden");
+  $("aiFailModal").classList.add("grid");
+  document.body.classList.add("overflow-hidden");
+  $("failureSignup").focus();
+}
+function closeFailureModal() {
+  $("aiFailModal").classList.add("hidden");
+  $("aiFailModal").classList.remove("grid");
+  document.body.classList.remove("overflow-hidden");
+}
+$("failureDismiss").addEventListener("click", closeFailureModal);
+$("aiFailModal").addEventListener("click", function (e) { if (e.target === this) closeFailureModal(); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("aiFailModal").classList.contains("hidden")) closeFailureModal(); });
 var stop = null;
 if (!rt) { stopSpinner(); $("statusText").textContent = "Your application was received. We could not find your reference on this page, so there is no result to show here."; }
 else {
@@ -64,9 +104,14 @@ else {
       if (stop) stop();
       // Yes + recruiter allows feedback -> AI offer; Yes + no feedback -> interview questions only
       location.href = applyFlow.link(r.feedbackEnabled ? "application-received-ai-offer.html" : "interview-questions-application.html", true);
-    } else if (r.state === "failed") { showWaiting(); }
+    } else if (r.state === "failed") { if (stop) stop(); showFailureModal(); }
   });
-  setTimeout(function () { if (!document.querySelector("#status span").classList.contains("hidden")) showWaiting(); }, 60000);
+  setTimeout(function () {
+    if (!document.querySelector("#status span").classList.contains("hidden")) {
+      stopSpinner();
+      $("statusText").textContent = "The AI review is taking longer than expected. Your application was submitted, and you do not need to wait on this page.";
+    }
+  }, 60000);
 }
 </script></body></html>
 

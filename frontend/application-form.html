@@ -39,11 +39,18 @@
 <div class="mt-3 flex items-center gap-3 rounded-xl border border-dashed border-line p-4"><span class="text-brand"><svg class="icon size-7" aria-hidden="true"><use href="#i-doc"/></svg></span><div class="min-w-0 flex-1"><p id="cvName" class="truncate text-sm font-semibold">No file chosen</p><p id="cvMeta" class="text-xs text-mute">PDF or Word</p></div><span id="cvBadge" class="hidden rounded-full px-2.5 py-0.5 text-xs font-semibold"></span><button id="cvBtn" type="button" class="text-sm font-semibold text-brand hover:underline">Choose file</button></div>
 <p class="mt-2 text-xs text-mute">PDF or DOCX file. Up to 5 MB. In English.</p>
 <h2 class="mt-8 font-display text-lg font-semibold">Consent</h2>
-<label class="mt-3 flex items-start gap-3 text-sm text-slate-600"><input id="consent" type="checkbox" class="mt-1 size-4 accent-blue-600" /><span id="consentText">I agree that Hirelume and Sunrise Logistics Ltd may use my details and CV to review my application. An AI service will read my CV. My data is kept for 90 days after this job closes, and I can ask for it to be deleted. <a href="#" class="font-medium text-brand">Read the privacy notice</a>.</span></label>
+<label class="mt-3 flex items-start gap-3 text-sm text-slate-600"><input id="consent" type="checkbox" class="mt-1 size-4 accent-blue-600" /><span id="consentText">I agree that Hirelume and the recruiter may use my details and CV to review my application. An AI service will read my CV. My data is kept for 90 days after this job closes, and I can ask for it to be deleted. <a href="#" data-privacy-trigger class="font-medium text-brand hover:underline">Read the privacy notice</a>.</span></label>
 <ul id="errs" role="alert" class="mt-5 hidden list-disc space-y-1 rounded-lg bg-red-50 p-3 pl-7 text-sm text-red-700"></ul>
 <div class="mt-6 flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between"><p class="flex items-center gap-2 text-xs text-mute"><svg class="icon size-4" aria-hidden="true"><use href="#i-lock"/></svg> Your CV is locked after you submit it.</p><button id="submit" type="submit" class="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand px-6 font-semibold text-white hover:bg-blue-700 disabled:opacity-60">Submit application <svg class="icon size-5" aria-hidden="true"><use href="#i-arrow"/></svg></button></div></form>
 <aside class="space-y-5"><div class="rounded-2xl border border-line bg-white p-5"><div class="flex items-center gap-3"><span class="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-brand"><svg class="icon size-7" aria-hidden="true"><use href="#i-case"/></svg></span><div><p id="asideTitle" class="font-display font-semibold">Job</p><p id="asideCo" class="text-xs text-mute"></p></div></div><p id="asideCount" class="mt-3 text-sm text-mute"></p></div>
-<div class="flex gap-3 rounded-2xl border border-green-200 bg-green-50 p-5 text-sm text-slate-700"><span class="text-ok"><svg class="icon size-5" aria-hidden="true"><use href="#i-shield"/></svg></span><p><strong>Your data stays safe.</strong> We only collect your name, email, phone and CV. We do not send your email, phone or address to the AI.</p></div></aside></main></div></div><script src="api.js"></script><script>var STEPS=[["Read the job","See what the role needs"],["Your details","Name, email and phone"],["Upload your CV","PDF or Word"],["Consent and submit","Review and send"]];
+<div class="flex gap-3 rounded-2xl border border-green-200 bg-green-50 p-5 text-sm text-slate-700"><span class="text-ok"><svg class="icon size-5" aria-hidden="true"><use href="#i-shield"/></svg></span><p><strong>Your data stays safe.</strong> We only collect your name, email, phone and CV. We do not send your email, phone or address to the AI.</p></div></aside></main></div></div>
+<div id="privacyModal" class="fixed inset-0 z-50 hidden items-center justify-center bg-slate-950/50 p-4" role="dialog" aria-modal="true" aria-labelledby="privacyTitle" aria-describedby="privacyBody">
+<div class="w-full max-w-lg rounded-2xl bg-white p-6 shadow-xl sm:p-7">
+<div class="flex items-start gap-3"><span class="grid size-10 shrink-0 place-items-center rounded-full bg-soft text-brand"><svg class="icon size-5" aria-hidden="true"><use href="#i-shield"/></svg></span><div><h2 id="privacyTitle" class="font-display text-xl font-semibold">Privacy notice</h2><p class="mt-1 text-sm text-mute">Please review how your application data will be used.</p></div></div>
+<div id="privacyBody" class="mt-5 space-y-3 text-sm leading-6 text-slate-600"><p id="privacyConsentText"></p><p>We collect your name, email, phone number and CV for this application. The recruiter can use these details to review your application.</p><p>An AI service may read your CV and the job information, but your email, phone number and address are not sent to the AI. Your application data is kept for 90 days after the job closes, and you can ask for it to be deleted.</p></div>
+<div class="mt-6 grid gap-3 sm:grid-cols-2"><button id="privacyDecline" type="button" class="h-11 rounded-lg border border-line px-4 text-sm font-semibold text-slate-700 hover:bg-slate-50">No, I don’t</button><button id="privacyAccept" type="button" class="h-11 rounded-lg bg-brand px-4 text-sm font-semibold text-white hover:bg-blue-700">Yes, I consent</button></div>
+</div></div>
+<script src="api.js"></script><script>var STEPS=[["Read the job","See what the role needs"],["Your details","Name, email and phone"],["Upload your CV","PDF or Word"],["Consent and submit","Review and send"]];
 function renderSteps(st){document.getElementById("steps").innerHTML=STEPS.map(function(s,i){var d=st[i],c=d==="done"?"bg-ok text-white":d==="cur"?"bg-brand text-white":"bg-slate-100 text-mute";
 return '<li class="flex items-start gap-3"><span class="grid size-8 shrink-0 place-items-center rounded-full text-xs font-semibold '+c+'">'+(d==="done"?'<svg class="icon size-4"><use href="#i-tick"/></svg>':i+1)+'</span><span class="leading-tight"><span class="block text-sm font-medium'+(d==="todo"?" text-mute":"")+'">'+s[0]+'</span><span class="text-xs text-mute">'+s[1]+'</span></span></li>';}).join("");
 var cur=st.indexOf("cur"),m=document.getElementById("stepNow");if(m)m.textContent="Step "+(cur<0?4:cur+1)+" of 4";}
@@ -66,6 +73,34 @@ function refresh() {
 ["name", "phone", "email", "consent"].forEach(function (id) { $(id).addEventListener("input", refresh); });
 $("cv").addEventListener("change", refresh);
 $("cvBtn").addEventListener("click", function () { if (!locked) $("cv").click(); });
+var privacyTrigger = null;
+function consentCopy() {
+  return "I agree that Hirelume and " + (JOB && JOB.company ? JOB.company : "the recruiter") + " may use my details and CV to review my application. An AI service will read my CV. My data is kept for 90 days after this job closes, and I can ask for it to be deleted.";
+}
+function openPrivacy(trigger) {
+  privacyTrigger = trigger;
+  $("privacyConsentText").textContent = consentCopy();
+  $("privacyModal").classList.remove("hidden");
+  $("privacyModal").classList.add("flex");
+  document.body.classList.add("overflow-hidden");
+  $("privacyAccept").focus();
+}
+function closePrivacy() {
+  $("privacyModal").classList.add("hidden");
+  $("privacyModal").classList.remove("flex");
+  document.body.classList.remove("overflow-hidden");
+  if (privacyTrigger) privacyTrigger.focus();
+}
+$("consentText").addEventListener("click", function (e) {
+  var trigger = e.target.closest("[data-privacy-trigger]");
+  if (!trigger) return;
+  e.preventDefault();
+  openPrivacy(trigger);
+});
+$("privacyAccept").addEventListener("click", function () { $("consent").checked = true; refresh(); closePrivacy(); });
+$("privacyDecline").addEventListener("click", function () { $("consent").checked = false; refresh(); closePrivacy(); });
+$("privacyModal").addEventListener("click", function (e) { if (e.target === this) closePrivacy(); });
+document.addEventListener("keydown", function (e) { if (e.key === "Escape" && !$("privacyModal").classList.contains("hidden")) closePrivacy(); });
 $("form").addEventListener("submit", async function (e) {
   e.preventDefault(); var errs = [];
   if (!detailsOk()) errs.push("Enter your full name, a valid email and a phone number with at least 10 digits.");
@@ -119,8 +154,7 @@ async function loadJob() {
   $("asideTitle").textContent = title; $("asideCo").textContent = JOB.company;
   $("asideCount").textContent = JOB.reqs.length ? "You are compared with " + JOB.requiredCount + " Required and " + JOB.niceCount + " Nice-to-have requirements." : "";
   var ct = $("consentText");
-  if (JOB.consentText) ct.innerHTML = esc(JOB.consentText) + ' <a href="#" class="font-medium text-brand">Read the privacy notice</a>.';
-  else ct.innerHTML = ct.innerHTML.replace("Sunrise Logistics Ltd", esc(JOB.company || "the recruiter"));
+  ct.innerHTML = esc(consentCopy()) + ' <a href="#" data-privacy-trigger class="font-medium text-brand hover:underline">Read the privacy notice</a>.';
   if (JOB.closed) block("This job is no longer accepting applications.");
 }
 refresh();

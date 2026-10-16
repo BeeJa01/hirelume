@@ -143,6 +143,7 @@ test('public consent, paging, account linking, feedback privacy, ratings, and de
   const job = await createJob(recruiterToken);
   const publicJob = await request(app).get(`/api/public/jobs/${job.public_token}`);
   assert.equal(publicJob.body.consent.version, 'v1');
+  assert.equal(publicJob.body.company, 'Test User');
   const submitted = await request(app)
     .post(`/api/public/jobs/${job.public_token}/applications`)
     .field('name', 'Candidate').field('email', 'candidate@example.com').field('phone', '555-0100')

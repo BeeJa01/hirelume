@@ -21,12 +21,13 @@ const allowedExtensions = new Set(['.pdf', '.docx']);
 const contentTypes = { '.pdf': 'application/pdf', '.docx': 'application/vnd.openxmlformats-officedocument.wordprocessingml.document' };
 
 const getPublicJob = asyncRoute(async (req, res) => {
-  const job = await Job.findOne({ public_token: req.params.token }).lean();
+  const job = await Job.findOne({ public_token: req.params.token }).populate('recruiter_id', 'name').lean();
   if (!job) return res.status(404).json({ detail: 'JOB_NOT_FOUND' });
   res.json({
     status: job.status,
     id: String(job._id),
     title: job.title,
+    company: job.recruiter_id?.name || '',
     description: job.description,
     requirements: job.requirements.map(({ text, requirement_type }) => ({ text, type: requirement_type })),
     consent: { version: consentVersion, text: consentText },
