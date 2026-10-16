@@ -26,6 +26,10 @@ module.exports = {
   groqModel: groqModelAliases[configuredGroqModel] || configuredGroqModel,
   publicRateLimit: Number(process.env.PUBLIC_RATE_LIMIT || 60),
   publicRateWindowMinutes: Number(process.env.PUBLIC_RATE_WINDOW_MINUTES || 15),
-  corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173,https://hirelume-kappa.vercel.app')
-    .split(',').map((origin) => origin.trim()).filter(Boolean),
+ 
+corsOrigins: (process.env.CORS_ORIGIN || 'http://localhost:5173,http://127.0.0.1:5173,http://localhost:5500,http://127.0.0.1:5500,https://hirelume-kappa.vercel.app')
+  .split(',')
+  .map((origin) => origin.trim())
+  .filter(Boolean),
+
 };

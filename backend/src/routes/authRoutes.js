@@ -20,7 +20,7 @@ router.post('/logout', logout);
 router.get('/me', authenticate, currentUser);
 
 // Forgot-password and password-reset endpoints
-router.post('/forgot-password', rateLimit({ limit: 5 }), forgotPassword);
-router.post('/reset-password', rateLimit({ limit: 5 }), resetPassword);
+router.post('/forgot-password', rateLimit({ limit: 20 }), forgotPassword);
+router.post('/reset-password', rateLimit({ limit: 20 }), resetPassword);
 
 module.exports = router;
