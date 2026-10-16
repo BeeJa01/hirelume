@@ -8,16 +8,11 @@ const {
 const allowedMimeTypes = [
   "application/pdf",
   "application/vnd.openxmlformats-officedocument.wordprocessingml.document",
-  "image/jpeg",
-  "image/png",
 ];
 
 const allowedExtensions = [
   ".pdf",
   ".docx",
-  ".jpg",
-  ".jpeg",
-  ".png",
 ];
 
 const storage = multer.diskStorage({

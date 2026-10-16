@@ -12,6 +12,7 @@ const jobRoutes = require("./routes/jobRoutes");
 const applicationRoutes = require("./routes/applicationRoutes");
 const publicApplicationRoutes = require("./routes/publicApplicationRoutes");
 const cvRoutes = require("./routes/cvRoutes");
+const resultsRoutes = require("./routes/resultsRoutes");
 
 const app = express();
 
@@ -51,7 +52,7 @@ app.use("/api/jobs", jobRoutes);
  * Final endpoint:
  * POST /public/jobs/:token/applications
  */
-app.use("/public", publicApplicationRoutes);
+app.use("/api/public", publicApplicationRoutes);
 
 /**
  * Authenticated application routes.
@@ -62,6 +63,7 @@ app.use("/api/applications", applicationRoutes);
  * CV management routes.
  */
 app.use("/api/cvs", cvRoutes);
+app.use("/api/results", resultsRoutes);
 
 /**
  * Handle unknown routes.

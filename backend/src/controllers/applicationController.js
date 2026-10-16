@@ -4,6 +4,7 @@ const crypto = require("crypto");
 const Application = require("../models/Application");
 const CV = require("../models/CV");
 const Job = require("../models/Job");
+const { queueAnalysis } = require("../services/analysis");
 
 /**
  * Create a public job application.
@@ -29,7 +30,10 @@ const Job = require("../models/Job");
 const createPublicApplication = async (req, res) => {
   try {
     const { token } = req.params;
-    const { fullName, email, phone, consent } = req.body;
+    const fullName = req.body.fullName ?? req.body.name;
+    const { email, phone, consent } = req.body;
+    const consentVersion =
+      req.body.consent_version ?? req.body.consentVersion ?? "v1";
 
     // Make sure all required applicant information was provided.
     if (!fullName || !email || !phone) {
@@ -130,7 +134,7 @@ const createPublicApplication = async (req, res) => {
 
       // Keep the consent version explicit so the team can update the
       // privacy wording later without losing which version was accepted.
-      consentVersion: "1.0",
+      consentVersion,
 
       status: "submitted",
       analysisStatus: "pending",
@@ -138,10 +142,13 @@ const createPublicApplication = async (req, res) => {
       privateResultToken: crypto.randomBytes(32).toString("hex"),
     });
 
-    // Connect the CV back to its application.
-    cv.application = application._id;
-    await cv.save();
 
+// Connect the CV back to its application.
+  cv.application = application._id;
+  await cv.save();
+
+// Start AI analysis in the background. Do not delay the applicant's response.
+  queueAnalysis(application._id);
     return res.status(201).json({
       message: "Application submitted successfully",
 
@@ -152,6 +159,9 @@ const createPublicApplication = async (req, res) => {
       resultToken: application.privateResultToken,
 
       analysisStatus: application.analysisStatus,
+      application_id: String(application._id),
+      result_token: application.privateResultToken,
+      analysis_status: application.analysisStatus,
     });
   } catch (error) {
     console.error("Public application creation error:", error);
