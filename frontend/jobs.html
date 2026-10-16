@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your jobs | HireLume</title>
-
+<title>Your jobs | HireLume</title>
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/nymcjtq4/image/upload/c_fill,w_64,h_64,f_png/v1792099497/photo_2_2026-10-15_22-21-27_v5dczh.jpg">
  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
@@ -44,6 +44,9 @@
     <symbol id="i-dots" viewBox="0 0 24 24"><circle cx="5" cy="12" r="1" /><circle cx="12" cy="12" r="1" /><circle cx="19" cy="12" r="1" /></symbol>
     <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></symbol>
+    <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="m15 9-6 6M9 9l6 6" /></symbol>
+    <symbol id="i-undo" viewBox="0 0 24 24"><path d="M3 7v6h6" /><path d="M21 17a9 9 0 0 0-15-6.7L3 13" /></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
   </svg>
 
@@ -63,7 +66,7 @@
         <a href="/create-job.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
           <svg class="icon size-5" aria-hidden="true"><use href="#i-plus-circle" /></svg>Create job
         </a>
-        <a href="/applicants.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+        <a href="applicants.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
           <svg class="icon size-5" aria-hidden="true"><use href="#i-users" /></svg>Applicants
         </a>
         <a href="/help.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
@@ -108,7 +111,7 @@
         <nav id="nav-menu" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-line bg-white px-5 py-4 text-sm text-gray-500 sm:px-8 lg:hidden!">
           <a href="/jobs" class="font-semibold text-brand">Jobs</a>
           <a href="/create-job.html" class="hover:text-black">Create job</a>
-          <a href="/applicants.html" class="hover:text-black">Applicants</a>
+          <a href="applicants.html" class="hover:text-black">Applicants</a>
           <a href="/help" class="hover:text-black">Help</a>
           <a href="/logout" class="hover:text-black">Log out</a>
         </nav>
@@ -151,6 +154,32 @@
     </div>
   </div>
 
+  <!-- Row action menu (one shared menu, positioned under the clicked button) -->
+  <div id="row-menu" role="menu" class="fixed z-40 hidden w-48 rounded-xl border border-line bg-white p-1 shadow-lg"></div>
+
+  <!-- Close job confirmation -->
+  <div id="close-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="cm-title">
+    <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <button type="button" id="cm-x" aria-label="Close dialog" class="absolute right-4 top-4 grid size-8 place-items-center rounded-lg text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+        <svg class="icon size-5" aria-hidden="true"><use href="#i-x" /></svg>
+      </button>
+      <h2 id="cm-title" class="font-display pr-8 text-lg font-bold"></h2>
+      <p class="mt-2 text-sm text-gray-500">Candidates won't be able to apply anymore. Everything you've collected so far stays put.</p>
+      <ul class="mt-4 space-y-2 rounded-xl bg-[#f8fafc] p-4 text-sm">
+        <li class="flex items-start gap-2"><svg class="icon mt-0.5 size-4 shrink-0 text-teal-600" aria-hidden="true"><use href="#i-check" /></svg><span>The job link shows "This job is closed"</span></li>
+        <li class="flex items-start gap-2"><svg class="icon mt-0.5 size-4 shrink-0 text-teal-600" aria-hidden="true"><use href="#i-check" /></svg><span id="cm-kept"></span></li>
+      </ul>
+      <p id="cm-error" role="alert" class="mt-3 hidden text-sm text-red-600"></p>
+      <div class="mt-6 flex items-center justify-end gap-3">
+        <button type="button" id="cm-cancel" class="rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-[#f8fafc]">Cancel</button>
+        <button type="button" id="cm-confirm" class="btn-primary">Close Job</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Small confirmation message -->
+  <div id="toast" role="status" class="fixed bottom-6 left-1/2 z-50 hidden -translate-x-1/2 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white shadow-lg"></div>
+
  <script src="api.js"></script>
 <script>
   requireAuth("recruiter");
@@ -169,7 +198,9 @@
   function copyBtn(id) {
     return '<button type="button" data-copy="' + id + '" class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 text-xs font-semibold hover:bg-[#f8fafc]">' + ico("copy", "size-4") + '<span>Copy link</span></button>';
   }
-  const moreBtn = '<button type="button" aria-label="More actions" class="grid size-8 place-items-center rounded-lg text-gray-500 hover:bg-[#f8fafc]">' + ico("dots") + '</button>';
+  function moreBtn(id) {
+    return '<button type="button" data-more="' + id + '" aria-label="More actions" aria-haspopup="menu" aria-expanded="false" class="grid size-8 place-items-center rounded-lg text-gray-500 hover:bg-[#f8fafc] aria-expanded:bg-blue-100 aria-expanded:text-brand">' + ico("dots") + '</button>';
+  }
   const empty = '<li class="p-6 text-center text-sm text-gray-500">No jobs found.</li>';
 
   // Stats
@@ -199,7 +230,7 @@
       '<p>' + j.applicants + '</p>' +
       '<p class="flex items-center gap-2"><span class="font-semibold">' + (j.score == null ? "-" : j.score) + '</span>' + (j.tag ? badge(j.tag, tagCls[j.tag]) : "") + '</p>' +
       '<p class="text-gray-500">' + j.created + '</p>' +
-      '<div class="flex items-center justify-end gap-2">' + copyBtn(j.token) + moreBtn + '</div>' +
+      '<div class="flex items-center justify-end gap-2">' + copyBtn(j.token) + moreBtn(j.id) + '</div>' +
       '</li>';
   }
 
@@ -207,7 +238,7 @@
     return '<li class="card p-4">' +
       '<div class="flex items-start justify-between gap-2"><div>' +
       '<p class="flex flex-wrap items-center gap-2"><a href="applicants.html?job=' + j.id + '" class="font-display font-semibold hover:text-brand">' + esc(j.title) + '</a>' + badge(j.status, statusCls[j.status]) + '</p>' +
-      '<p class="mt-0.5 text-xs text-gray-500">' + (j.location || (j.blind ? "Blind mode on" : "")) + '</p></div>' + moreBtn + '</div>' +
+      '<p class="mt-0.5 text-xs text-gray-500">' + (j.location || (j.blind ? "Blind mode on" : "")) + '</p></div>' + moreBtn(j.id) + '</div>' +
       '<div class="mt-4 flex items-center justify-between text-sm">' +
       '<p><span class="font-semibold">' + j.applicants + '</span> <span class="text-gray-500">applicants</span></p>' +
       '<p class="flex items-center gap-2"><span class="text-xs text-gray-500">Top match</span><span class="font-semibold">' + (j.score == null ? "-" : j.score) + '</span>' + (j.tag ? badge(j.tag, tagCls[j.tag]) : "") + '</p></div>' +
@@ -253,6 +284,81 @@
     setTimeout(function () { label.textContent = "Copy link"; }, 1500);
   });
 
+  // ---- Three-dot menu ----
+  const rowMenu = document.getElementById("row-menu");
+  let menuFor = null, menuBtnEl = null;
+  const jobById = function (id) { return jobs.find(function (j) { return j.id === id; }); };
+
+  function closeRowMenu() {
+    rowMenu.classList.add("hidden"); menuFor = null;
+    if (menuBtnEl) { menuBtnEl.setAttribute("aria-expanded", "false"); menuBtnEl = null; }
+  }
+  function openRowMenu(btn, id) {
+    const j = jobById(id); if (!j) return;
+    const item = "flex w-full items-center gap-2.5 rounded-lg px-3 py-2.5 text-left text-sm font-medium ";
+    rowMenu.innerHTML =
+      '<a role="menuitem" href="applicants.html?job=' + encodeURIComponent(j.id) + '" class="' + item + 'hover:bg-[#f8fafc]">' + ico("users", "size-4 text-gray-500") + 'View applicants</a>' +
+      (j.status === "Open"
+        ? '<button type="button" role="menuitem" data-close="' + j.id + '" class="' + item + 'text-red-600 hover:bg-red-50">' + ico("x-circle", "size-4") + 'Close Job</button>'
+        : '<button type="button" role="menuitem" data-reopen="' + j.id + '" class="' + item + 'hover:bg-[#f8fafc]">' + ico("undo", "size-4 text-gray-500") + 'Reopen job</button>');
+    const r = btn.getBoundingClientRect(), w = 192;
+    rowMenu.style.left = Math.max(8, Math.min(window.innerWidth - w - 8, r.right - w)) + "px";
+    rowMenu.classList.remove("hidden");
+    // flip above the button if there is no room below
+    const h = rowMenu.offsetHeight;
+    rowMenu.style.top = (r.bottom + 4 + h > window.innerHeight ? Math.max(8, r.top - h - 4) : r.bottom + 4) + "px";
+    btn.setAttribute("aria-expanded", "true"); menuBtnEl = btn; menuFor = id;
+  }
+  document.addEventListener("click", function (e) {
+    const more = e.target.closest("[data-more]");
+    if (more) { const same = menuFor === more.dataset.more; closeRowMenu(); if (!same) openRowMenu(more, more.dataset.more); return; }
+    if (!e.target.closest("#row-menu")) closeRowMenu();
+  });
+  window.addEventListener("resize", closeRowMenu);
+  window.addEventListener("scroll", closeRowMenu, true);
+
+  // ---- Close job confirmation ----
+  const modal = document.getElementById("close-modal"), cmConfirm = document.getElementById("cm-confirm"), cmError = document.getElementById("cm-error");
+  let closing = null;
+  function openCloseModal(id) {
+    const j = jobById(id); if (!j) return;
+    closing = j; closeRowMenu();
+    document.getElementById("cm-title").textContent = "Close " + j.title + "?";
+    document.getElementById("cm-kept").textContent = j.applicants === 0 ? "Nothing is deleted. Your job and its settings are kept" : "The " + j.applicants + " applicant" + (j.applicants === 1 ? "" : "s") + " and their rankings are kept";
+    cmError.classList.add("hidden"); cmConfirm.disabled = false; cmConfirm.textContent = "Close Job";
+    modal.classList.remove("hidden"); modal.classList.add("flex");
+    document.getElementById("cm-cancel").focus();
+  }
+  function hideCloseModal() { modal.classList.add("hidden"); modal.classList.remove("flex"); closing = null; }
+  function toast(msg) {
+    const t = document.getElementById("toast"); t.textContent = msg; t.classList.remove("hidden");
+    clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.add("hidden"); }, 2500);
+  }
+  async function setStatus(j, action) {
+    await api(ENDPOINTS.jobs + "/" + j.id + "/" + action, { method: "POST" });
+    j.status = action === "close" ? "Closed" : "Open";
+    renderStats(); render();
+  }
+  cmConfirm.addEventListener("click", async function () {
+    if (!closing) return;
+    const j = closing;
+    cmConfirm.disabled = true; cmConfirm.textContent = "Closing...";
+    try { await setStatus(j, "close"); hideCloseModal(); toast(j.title + " is now closed"); }
+    catch (err) { cmError.textContent = err.message; cmError.classList.remove("hidden"); cmConfirm.disabled = false; cmConfirm.textContent = "Close Job"; }
+  });
+  document.getElementById("cm-cancel").addEventListener("click", hideCloseModal);
+  document.getElementById("cm-x").addEventListener("click", hideCloseModal);
+  modal.addEventListener("click", function (e) { if (e.target === modal) hideCloseModal(); });
+  document.addEventListener("keydown", function (e) { if (e.key === "Escape") { hideCloseModal(); closeRowMenu(); } });
+  document.addEventListener("click", async function (e) {
+    const c = e.target.closest("[data-close]"), r = e.target.closest("[data-reopen]");
+    if (c) openCloseModal(c.dataset.close);
+    if (r) {
+      const j = jobById(r.dataset.reopen); closeRowMenu(); if (!j) return;
+      try { await setStatus(j, "reopen"); toast(j.title + " is open again"); } catch (err) { toast(err.message); }
+    }
+  });
+
   // Mobile menu
   const menuBtn = document.getElementById("menu-btn");
   const menu = document.getElementById("nav-menu");
@@ -265,3 +371,4 @@
 </script>
 </body>
 </html>
+
