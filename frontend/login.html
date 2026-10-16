@@ -4,7 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Log in | HireLume</title>
-
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/nymcjtq4/image/upload/c_fill,w_64,h_64,f_png/v1792099497/photo_2_2026-10-15_22-21-27_v5dczh.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
@@ -40,7 +40,7 @@
   <!-- Top bar (phone and tablet only) -->
   <header class="relative border-b border-line bg-white lg:hidden">
     <nav aria-label="Main" class="flex h-16 items-center justify-between px-5 sm:px-10">
-      <a href="index.html" aria-label="HireLume home">
+      <a href="landingpage.html" aria-label="HireLume home">
         <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
       </a>
 
@@ -49,11 +49,11 @@
       </button>
 
       <div id="nav-menu" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-line bg-white px-5 py-4 text-sm text-gray-500 sm:px-10">
-        <a href="index.html" class="hover:text-black">Home</a>
-        <a href="index.html#how-it-works" class="hover:text-black">How it works</a>
-        <a href="index.html#recruiters" class="hover:text-black">For recruiters</a>
-        <a href="index.html#job-seekers" class="hover:text-black">For job seekers</a>
-        <a href="index.html#promises" class="hover:text-black">Our promises</a>
+        <a href="landingpage.html" class="hover:text-black">Home</a>
+        <a href="landingpage.html#how-it-works" class="hover:text-black">How it works</a>
+        <a href="landingpage.html#recruiters" class="hover:text-black">For recruiters</a>
+        <a href="landingpage.html#job-seekers" class="hover:text-black">For job seekers</a>
+        <a href="landingpage.html#promises" class="hover:text-black">Our promises</a>
         <a href="signup.html" class="font-semibold text-brand">Sign up</a>
       </div>
     </nav>
@@ -63,7 +63,7 @@
 
     <!-- Info panel: heading and benefits on top on phones, on the left on desktop -->
     <aside class="auth-bg flex flex-col px-5 pb-4 pt-8 sm:px-10 lg:p-12">
-      <a href="index.html" aria-label="HireLume home" class="hidden lg:block">
+      <a href="landingpage.html" aria-label="HireLume home" class="hidden lg:block">
         <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-8 w-auto" width="130" height="32" />
       </a>
 
@@ -111,7 +111,10 @@
             </div>
 
             <div>
-              <label for="password" class="text-sm font-medium">Password</label>
+              <div class="flex items-center justify-between">
+                <label for="password" class="text-sm font-medium">Password</label>
+                <a id="forgot-link" href="forgot-password.html" class="text-sm font-semibold text-brand hover:text-brand-dark">Forgot password?</a>
+              </div>
               <div class="relative mt-1.5">
                 <input id="password" name="password" type="password" autocomplete="current-password" required
                        class="w-full rounded-lg border border-line bg-white py-3 pl-3.5 pr-11 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:py-2.5 sm:text-sm" />
@@ -123,6 +126,7 @@
             </div>
           </div>
 
+          <p id="form-notice" role="status" class="mt-4 hidden rounded-lg border border-green-200 bg-green-50 px-3.5 py-3 text-sm font-medium text-green-700">Password updated. Log in with your new password.</p>
           <p id="form-error" role="alert" class="mt-4 hidden text-sm text-red-600"></p>
           <button type="submit"
                   class="mt-6 w-full rounded-lg bg-brand py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-dark focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand">
@@ -158,6 +162,12 @@
       toggle.setAttribute("aria-pressed", String(show));
       toggle.setAttribute("aria-label", show ? "Hide password" : "Show password");
     });
+
+    // Coming back from the reset page: show the success note. Keep ?next= when going to "Forgot password?"
+    const qs = new URLSearchParams(location.search);
+    if (qs.get("reset") === "1") document.getElementById("form-notice").classList.remove("hidden");
+    const nextParam = applyFlow.safeNext();
+    if (nextParam) document.getElementById("forgot-link").href = "forgot-password.html?next=" + encodeURIComponent(nextParam);
 
     // Real login
     document.getElementById("login-form").addEventListener("submit", (e) => {
