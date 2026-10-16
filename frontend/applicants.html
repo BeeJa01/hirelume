@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Your jobs | HireLume</title>
 
-<link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
 
@@ -30,7 +30,7 @@
 
 <body class="bg-[#f8fafc] font-sans text-black antialiased">
 
-  <!-- Icon sprite (use with <svg class="icon size-5"><use href="#i-name"/></svg>) -->
+  <!-- Icon sprite -->
   <svg width="0" height="0" class="absolute" aria-hidden="true">
     <symbol id="i-briefcase" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2" /><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16" /></symbol>
     <symbol id="i-plus-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M8 12h8M12 8v8" /></symbol>
@@ -45,6 +45,8 @@
     <symbol id="i-logout" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></symbol>
     <symbol id="i-chevron" viewBox="0 0 24 24"><path d="m6 9 6 6 6-6" /></symbol>
     <symbol id="i-menu" viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h16" /></symbol>
+    <symbol id="i-info" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10" /><path d="M12 16v-4M12 8h.01" /></symbol>
+    <symbol id="i-x" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12" /></symbol>
   </svg>
 
   <div class="lg:flex lg:min-h-screen">
@@ -71,13 +73,15 @@
         </a>
       </nav>
 
-      <div class="mt-auto flex items-center gap-3 border-t border-line p-4">
-        <span class="grid size-9 shrink-0 place-items-center rounded-full bg-gray-200 text-xs font-semibold" data-user="initials"></span>
-        <div class="min-w-0 flex-1">
-          <p class="truncate text-sm font-semibold" data-user="name"></p>
-          <p class="truncate text-xs text-gray-500" data-user="email"></p>
+      <div class="mt-auto border-t border-line p-4">
+        <div class="flex items-center gap-3">
+          <span class="grid size-9 shrink-0 place-items-center rounded-full bg-gray-200 text-xs font-semibold" data-user="initials"></span>
+          <div class="min-w-0 flex-1">
+            <p class="truncate text-sm font-semibold" data-user="name"></p>
+            <p class="truncate text-xs text-gray-500" data-user="email"></p>
+          </div>
+          <a href="/logout" aria-label="Log out" class="text-gray-500 hover:text-black"><svg class="icon size-5" aria-hidden="true"><use href="#i-logout" /></svg></a>
         </div>
-        <a href="/logout" aria-label="Log out" class="text-gray-500 hover:text-black"><svg class="icon size-5" aria-hidden="true"><use href="#i-logout" /></svg></a>
       </div>
     </aside>
 
@@ -115,55 +119,251 @@
       </header>
 
       <main class="px-5 py-6 sm:px-8 lg:py-8">
-        <a href="jobs.html" class="text-sm text-gray-500 hover:text-black">&larr; All jobs</a>
-        <h1 id="job-title" class="font-display mt-2 text-2xl font-bold lg:text-3xl">Applicants</h1>
-        <p id="job-sub" class="mt-1 text-sm text-gray-500"></p>
-        <div class="mt-4 flex gap-2 text-sm">
-          <button type="button" data-sort="score" class="rounded-lg border border-line bg-white px-3 py-1.5 font-semibold">Best match</button>
-          <button type="button" data-sort="date" class="rounded-lg border border-line bg-white px-3 py-1.5 font-semibold">Newest</button>
+        <!-- Breadcrumb -->
+        <div class="flex items-center gap-2 text-sm text-gray-500">
+          <a href="jobs.html" class="hover:text-black">Jobs</a>
+          <span>&rsaquo;</span>
+          <span id="breadcrumb-title" class="hover:text-black">...</span>
+          <span>&rsaquo;</span>
+          <span class="font-medium text-black">Applicants</span>
         </div>
-        <ul id="rows" class="mt-4 space-y-3"></ul>
+
+        <!-- Job Header & Actions -->
+        <div class="mt-3 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div>
+            <div class="flex items-center gap-3">
+              <h1 id="job-title" class="font-display text-2xl font-bold lg:text-3xl">Applicants</h1>
+              <span id="job-status" class="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 border border-emerald-200">Open</span>
+            </div>
+            <p id="job-sub" class="mt-1 text-sm text-gray-500">Loading details...</p>
+          </div>
+          <div class="flex items-center gap-2">
+            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
+              <svg class="icon size-4 text-gray-500" aria-hidden="true"><use href="#i-copy"/></svg> Copy link
+            </button>
+            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
+              <svg class="icon size-4 text-red-500" aria-hidden="true"><use href="#i-x"/></svg> Close job
+            </button>
+          </div>
+        </div>
+
+        <!-- AI Info Banner -->
+        <div class="mt-5 flex items-center justify-between rounded-xl border border-blue-100 bg-blue-50/50 p-4 text-sm text-gray-700">
+          <div class="flex items-center gap-3">
+            <span class="grid size-8 shrink-0 place-items-center rounded-full bg-blue-100 text-brand">
+              <svg class="icon size-4" aria-hidden="true"><use href="#i-info"/></svg>
+            </span>
+            <p><strong class="font-semibold text-black">The AI can be wrong. You decide.</strong> Hirelume ranks and explains. Nobody is hidden or removed from this list, and only you can shortlist or reject.</p>
+          </div>
+        </div>
+
+        <!-- Filter Tabs & Sorting -->
+        <div class="mt-6 flex flex-col justify-between gap-4 sm:flex-row sm:items-center">
+          <div id="filter-tabs" class="flex flex-wrap items-center gap-2 text-sm">
+            <button type="button" data-filter="all" class="filter-tab rounded-lg bg-black px-3.5 py-1.5 font-semibold text-white">All <span id="count-all"></span></button>
+            <button type="button" data-filter="shortlisted" class="filter-tab rounded-lg border border-line bg-white px-3.5 py-1.5 font-medium text-gray-600 hover:bg-gray-50">Shortlisted <span id="count-shortlisted"></span></button>
+            <button type="button" data-filter="undecided" class="filter-tab rounded-lg border border-line bg-white px-3.5 py-1.5 font-medium text-gray-600 hover:bg-gray-50">Undecided <span id="count-undecided"></span></button>
+            <button type="button" data-filter="rejected" class="filter-tab rounded-lg border border-line bg-white px-3.5 py-1.5 font-medium text-gray-600 hover:bg-gray-50">Rejected <span id="count-rejected"></span></button>
+          </div>
+          <div class="flex items-center gap-2 text-sm">
+            <span class="text-xs font-medium text-gray-500">Sort:</span>
+            <button type="button" data-sort="score" class="sort-btn inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 font-semibold text-gray-700">
+              Score <svg class="icon size-3.5 text-gray-500" aria-hidden="true"><use href="#i-chevron"/></svg>
+            </button>
+            <button type="button" data-sort="date" class="sort-btn inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3 py-1.5 font-medium text-gray-600 hover:bg-gray-50">
+              Newest
+            </button>
+          </div>
+        </div>
+
+        <!-- Applicants Table Card -->
+        <div class="card mt-4 overflow-hidden">
+          <div class="overflow-x-auto">
+            <table class="w-full border-collapse text-left">
+              <thead>
+                <tr class="border-b border-line bg-gray-50/75 text-xs font-semibold text-gray-500">
+                  <th class="w-12 px-4 py-3">#</th>
+                  <th class="px-4 py-3">Applicant</th>
+                  <th class="w-28 px-4 py-3">Score</th>
+                  <th class="px-4 py-3">Why this score</th>
+                  <th class="w-24 px-4 py-3">Applied</th>
+                  <th class="w-28 px-4 py-3">Status</th>
+                  <th class="w-10 px-4 py-3"></th>
+                </tr>
+              </thead>
+              <tbody id="rows" class="divide-y divide-line text-sm">
+                <tr>
+                  <td colspan="7" class="p-6 text-center text-sm text-gray-500">Loading applicants...</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Table Footer Pagination/Count -->
+          <div class="flex items-center justify-between border-t border-line bg-white px-4 py-3 text-xs text-gray-500">
+            <p id="showing-count">Showing 0 applicants</p>
+          </div>
+        </div>
       </main>
     </div>
   </div>
 
- <script src="api.js"></script>
-<script>
-  requireAuth("recruiter");
-  const jobId = new URLSearchParams(location.search).get("job"), rows = document.getElementById("rows");
-  let sort = "score";
-  async function load() {
-    document.querySelectorAll("[data-sort]").forEach(function (b) { b.classList.toggle("border-brand", b.dataset.sort === sort); });
-    try {
-      const out = await Promise.all([api(ENDPOINTS.jobs + "/" + jobId), api(ENDPOINTS.jobs + "/" + jobId + "/applications?sort=" + sort)]);
-      document.getElementById("job-title").textContent = out[0].title;
-      document.getElementById("job-sub").textContent = out[1].total + " applicant" + (out[1].total === 1 ? "" : "s");
-      rows.innerHTML = out[1].applicants.map(function (a) {
-        const right = a.score != null
-          ? '<span class="font-semibold">' + a.score + '</span><span class="rounded-full bg-blue-50 px-2.5 py-0.5 text-xs font-semibold text-brand">' + levelOf(a.score) + '</span>'
-          : '<span class="text-xs text-gray-500">Analysing...</span>';
-        return '<li><a href="applicant-detail.html?job=' + jobId + '&id=' + a.id + '" class="card block p-4 hover:border-brand/40">' +
-          '<div class="flex items-center justify-between gap-3"><p class="font-display font-semibold">' + esc(a.name) + '</p><p class="flex items-center gap-2">' + right + '</p></div>' +
-          '<p class="mt-2 text-sm text-gray-500">' + esc(a.reason) + '</p>' +
-          '<p class="mt-2 text-xs text-gray-500">' + esc(a.status) + ' - ' + fmtDate(a.applied_at) + '</p></a></li>';
-      }).join("") || '<li class="p-6 text-center text-sm text-gray-500">No applicants yet.</li>';
-    } catch (e) { rows.innerHTML = '<li class="p-6 text-center text-sm text-red-600">' + esc(e.message) + '</li>'; }
-  }
-  document.querySelectorAll("[data-sort]").forEach(function (b) { b.addEventListener("click", function () { sort = b.dataset.sort; load(); }); });
-  if (jobId) load();
-  else api(ENDPOINTS.jobs).then(function (list) {
-    location.replace(list.length ? "applicants.html?job=" + list[0].id : "jobs.html");
-  }).catch(function () { location.replace("jobs.html"); });
-  // Mobile menu
-  const menuBtn = document.getElementById("menu-btn");
-  const menu = document.getElementById("nav-menu");
-  menuBtn.addEventListener("click", function () {
-    const open = menu.classList.toggle("hidden") === false;
-    menu.classList.toggle("flex", open);
-    menuBtn.setAttribute("aria-expanded", String(open));
-    menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
-  });
-</script>
+  <script src="api.js"></script>
+  <script>
+    requireAuth("recruiter");
+    const jobId = new URLSearchParams(location.search).get("job");
+    const rows = document.getElementById("rows");
+    let sort = "score";
+    let activeFilter = "all";
+    let allApplicants = [];
+
+    function getInitials(name) {
+      if (!name) return "??";
+      const parts = name.trim().split(" ");
+      return parts.length > 1 ? (parts[0][0] + parts[parts.length - 1][0]).toUpperCase() : parts[0][0].toUpperCase();
+    }
+
+    function getBadgeStyle(level) {
+      const l = (level || "").toLowerCase();
+      if (l === "strong") return "bg-emerald-50 text-emerald-600 border-emerald-200";
+      if (l === "good") return "bg-blue-50 text-brand border-blue-200";
+      if (l === "partial") return "bg-amber-50 text-amber-600 border-amber-200";
+      if (l === "low") return "bg-red-50 text-red-600 border-red-200";
+      return "bg-gray-50 text-gray-600 border-gray-200";
+    }
+
+    function getStatusBadgeStyle(status) {
+      const s = (status || "").toLowerCase();
+      if (s === "shortlisted") return "bg-emerald-50 text-emerald-600 border-emerald-200";
+      if (s === "rejected") return "bg-red-50 text-red-600 border-red-200";
+      return "bg-blue-50 text-brand border-blue-200";
+    }
+
+    function renderTable() {
+      const filtered = allApplicants.filter(a => {
+        if (activeFilter === "all") return true;
+        return (a.status || "undecided").toLowerCase() === activeFilter;
+      });
+
+      document.getElementById("showing-count").textContent = `Showing ${filtered.length} of ${allApplicants.length} applicants`;
+
+      if (!filtered.length) {
+        rows.innerHTML = '<tr><td colspan="7" class="p-6 text-center text-sm text-gray-500">No applicants found.</td></tr>';
+        return;
+      }
+
+      rows.innerHTML = filtered.map((a, index) => {
+        const scoreBadge = a.score != null
+          ? `<span class="font-bold">${a.score}</span><span class="rounded-full border px-2 py-0.5 text-xs font-semibold ${getBadgeStyle(typeof levelOf === 'function' ? levelOf(a.score) : '')}">${typeof levelOf === 'function' ? levelOf(a.score) : ''}</span>`
+          : `<span class="flex items-center gap-1.5 text-xs font-medium text-gray-500"><span class="size-2 rounded-full bg-amber-500 animate-pulse"></span> Analysis pending</span>`;
+
+        const avatar = a.avatar 
+          ? `<img src="${esc(a.avatar)}" alt="${esc(a.name)}" class="size-full object-cover">`
+          : getInitials(a.name);
+
+        return `
+          <tr onclick="location.href='applicant-detail.html?job=${jobId}&id=${a.id}'" class="hover:bg-gray-50/50 transition-colors cursor-pointer">
+            <td class="py-3.5 px-4 text-gray-500 font-medium">${index + 1}</td>
+            <td class="py-3.5 px-4">
+              <div class="flex items-center gap-3">
+                <div class="size-8 rounded-full bg-blue-100 flex items-center justify-center font-bold text-brand text-xs overflow-hidden shrink-0">
+                  ${avatar}
+                </div>
+                <div class="min-w-0">
+                  <p class="font-semibold text-black truncate">${esc(a.name)}</p>
+                  <p class="text-xs text-gray-500 truncate">${esc(a.email || '')}</p>
+                </div>
+              </div>
+            </td>
+            <td class="py-3.5 px-4">
+              <div class="flex items-center gap-2">${scoreBadge}</div>
+            </td>
+            <td class="py-3.5 px-4 text-gray-600 text-xs leading-relaxed max-w-md">${esc(a.reason || '')}</td>
+            <td class="py-3.5 px-4 text-gray-500 text-xs whitespace-nowrap">${typeof fmtDate === 'function' ? fmtDate(a.applied_at) : (a.applied_at || '')}</td>
+            <td class="py-3.5 px-4">
+              <span class="inline-block rounded-full border px-2.5 py-0.5 text-xs font-semibold ${getStatusBadgeStyle(a.status)}">${esc(a.status || 'Undecided')}</span>
+            </td>
+            <td class="py-3.5 px-4 text-gray-400 text-right">&rsaquo;</td>
+          </tr>
+        `;
+      }).join("");
+    }
+
+    async function load() {
+      try {
+        const out = await Promise.all([
+          api(ENDPOINTS.jobs + "/" + jobId),
+          api(ENDPOINTS.jobs + "/" + jobId + "/applications?sort=" + sort)
+        ]);
+
+        const job = out[0];
+        const apps = out[1];
+
+        // Update Job Title & Subtitle dynamically
+        document.getElementById("job-title").textContent = job.title;
+        document.getElementById("breadcrumb-title").textContent = job.title;
+        document.getElementById("job-sub").textContent = `${job.company || ''} ${job.location ? '- ' + job.location : ''} - ${apps.total} applicant${apps.total === 1 ? '' : 's'}`;
+        if (job.status) {
+          document.getElementById("job-status").textContent = job.status;
+        }
+
+        allApplicants = apps.applicants || [];
+
+        // Dynamic tab counts
+        const shortlistedCount = allApplicants.filter(a => (a.status || "").toLowerCase() === "shortlisted").length;
+        const rejectedCount = allApplicants.filter(a => (a.status || "").toLowerCase() === "rejected").length;
+        const undecidedCount = allApplicants.length - shortlistedCount - rejectedCount;
+
+        document.getElementById("count-all").textContent = allApplicants.length;
+        document.getElementById("count-shortlisted").textContent = shortlistedCount;
+        document.getElementById("count-undecided").textContent = undecidedCount;
+        document.getElementById("count-rejected").textContent = rejectedCount;
+
+        renderTable();
+
+      } catch (e) {
+        rows.innerHTML = `<tr><td colspan="7" class="p-6 text-center text-sm text-red-600">${esc(e.message)}</td></tr>`;
+      }
+    }
+
+    // Sort Handler
+    document.querySelectorAll("[data-sort]").forEach(b => {
+      b.addEventListener("click", function () {
+        sort = b.dataset.sort;
+        document.querySelectorAll("[data-sort]").forEach(btn => {
+          btn.classList.toggle("font-semibold", btn.dataset.sort === sort);
+          btn.classList.toggle("font-medium", btn.dataset.sort !== sort);
+        });
+        load();
+      });
+    });
+
+    // Filter Handler
+    document.querySelectorAll("[data-filter]").forEach(b => {
+      b.addEventListener("click", function () {
+        activeFilter = b.dataset.filter;
+        document.querySelectorAll("[data-filter]").forEach(btn => {
+          const isActive = btn.dataset.filter === activeFilter;
+          btn.className = `filter-tab rounded-lg px-3.5 py-1.5 ${isActive ? 'bg-black font-semibold text-white' : 'border border-line bg-white font-medium text-gray-600 hover:bg-gray-50'}`;
+        });
+        renderTable();
+      });
+    });
+
+    if (jobId) load();
+    else api(ENDPOINTS.jobs).then(function (list) {
+      location.replace(list.length ? "applicants.html?job=" + list[0].id : "jobs.html");
+    }).catch(function () { location.replace("jobs.html"); });
+
+    // Mobile menu toggle
+    const menuBtn = document.getElementById("menu-btn");
+    const menu = document.getElementById("nav-menu");
+    menuBtn.addEventListener("click", function () {
+      const open = menu.classList.toggle("hidden") === false;
+      menu.classList.toggle("flex", open);
+      menuBtn.setAttribute("aria-expanded", String(open));
+      menuBtn.setAttribute("aria-label", open ? "Close menu" : "Open menu");
+    });
+  </script>
 </body>
 </html>
-
