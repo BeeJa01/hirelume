@@ -39,7 +39,7 @@
 <div class="mt-3 flex items-center gap-3 rounded-xl border border-dashed border-line p-4"><span class="text-brand"><svg class="icon size-7" aria-hidden="true"><use href="#i-doc"/></svg></span><div class="min-w-0 flex-1"><p id="cvName" class="truncate text-sm font-semibold">No file chosen</p><p id="cvMeta" class="text-xs text-mute">PDF or Word</p></div><span id="cvBadge" class="hidden rounded-full px-2.5 py-0.5 text-xs font-semibold"></span><button id="cvBtn" type="button" class="text-sm font-semibold text-brand hover:underline">Choose file</button></div>
 <p class="mt-2 text-xs text-mute">PDF or DOCX file. Up to 5 MB. In English.</p>
 <h2 class="mt-8 font-display text-lg font-semibold">Consent</h2>
-<label class="mt-3 flex items-start gap-3 text-sm text-slate-600"><input id="consent" type="checkbox" class="mt-1 size-4 accent-blue-600" /><span id="consentText">I agree that Hirelume and Sunrise Logistics Ltd may use my details and CV to review my application. An AI service will read my CV. My data is kept for 90 days after this job closes, and I can ask for it to be deleted. <a href="#" data-privacy-trigger class="font-medium text-brand hover:underline">Read the privacy notice</a>.</span></label>
+<label class="mt-3 flex items-start gap-3 text-sm text-slate-600"><input id="consent" type="checkbox" class="mt-1 size-4 accent-blue-600" /><span id="consentText">I agree that Hirelume and the recruiter may use my details and CV to review my application. An AI service will read my CV. My data is kept for 90 days after this job closes, and I can ask for it to be deleted. <a href="#" data-privacy-trigger class="font-medium text-brand hover:underline">Read the privacy notice</a>.</span></label>
 <ul id="errs" role="alert" class="mt-5 hidden list-disc space-y-1 rounded-lg bg-red-50 p-3 pl-7 text-sm text-red-700"></ul>
 <div class="mt-6 flex flex-col-reverse items-stretch gap-3 sm:flex-row sm:items-center sm:justify-between"><p class="flex items-center gap-2 text-xs text-mute"><svg class="icon size-4" aria-hidden="true"><use href="#i-lock"/></svg> Your CV is locked after you submit it.</p><button id="submit" type="submit" class="flex h-12 items-center justify-center gap-2 rounded-xl bg-brand px-6 font-semibold text-white hover:bg-blue-700 disabled:opacity-60">Submit application <svg class="icon size-5" aria-hidden="true"><use href="#i-arrow"/></svg></button></div></form>
 <aside class="space-y-5"><div class="rounded-2xl border border-line bg-white p-5"><div class="flex items-center gap-3"><span class="grid size-11 shrink-0 place-items-center rounded-xl bg-slate-100 text-brand"><svg class="icon size-7" aria-hidden="true"><use href="#i-case"/></svg></span><div><p id="asideTitle" class="font-display font-semibold">Job</p><p id="asideCo" class="text-xs text-mute"></p></div></div><p id="asideCount" class="mt-3 text-sm text-mute"></p></div>
@@ -74,9 +74,12 @@ function refresh() {
 $("cv").addEventListener("change", refresh);
 $("cvBtn").addEventListener("click", function () { if (!locked) $("cv").click(); });
 var privacyTrigger = null;
+function consentCopy() {
+  return "I agree that Hirelume and " + (JOB && JOB.company ? JOB.company : "the recruiter") + " may use my details and CV to review my application. An AI service will read my CV. My data is kept for 90 days after this job closes, and I can ask for it to be deleted.";
+}
 function openPrivacy(trigger) {
   privacyTrigger = trigger;
-  $("privacyConsentText").textContent = JOB && JOB.consentText ? JOB.consentText : "HireLume and the recruiter may use your details and CV to review your application.";
+  $("privacyConsentText").textContent = consentCopy();
   $("privacyModal").classList.remove("hidden");
   $("privacyModal").classList.add("flex");
   document.body.classList.add("overflow-hidden");
@@ -151,8 +154,7 @@ async function loadJob() {
   $("asideTitle").textContent = title; $("asideCo").textContent = JOB.company;
   $("asideCount").textContent = JOB.reqs.length ? "You are compared with " + JOB.requiredCount + " Required and " + JOB.niceCount + " Nice-to-have requirements." : "";
   var ct = $("consentText");
-  if (JOB.consentText) ct.innerHTML = esc(JOB.consentText) + ' <a href="#" data-privacy-trigger class="font-medium text-brand hover:underline">Read the privacy notice</a>.';
-  else ct.innerHTML = ct.innerHTML.replace("Sunrise Logistics Ltd", esc(JOB.company || "the recruiter"));
+  ct.innerHTML = esc(consentCopy()) + ' <a href="#" data-privacy-trigger class="font-medium text-brand hover:underline">Read the privacy notice</a>.';
   if (JOB.closed) block("This job is no longer accepting applications.");
 }
 refresh();
