@@ -1,16 +1,13 @@
 
-const express = require("express");
+const express = require('express');
 const router = express.Router();
 
-const {
-  shortlistApplication,
-} = require("../controllers/shortlistController");
-
-const auth = require("../middleware/auth");
+const { shortlistApplication } = require('../controllers/shortlistController');
+const { authenticate } = require('../middleware/auth');
 
 router.patch(
-  "/:applicationId/shortlist",
-  auth,
+  '/:applicationId/shortlist',
+  authenticate,
   shortlistApplication
 );
 

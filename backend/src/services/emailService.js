@@ -11,6 +11,7 @@ const transporter = nodemailer.createTransport({
   },
 });
 
+// Existing shortlist email
 const sendShortlistEmail = async ({
   email,
   applicantName,
@@ -31,4 +32,25 @@ The Hirelume Team`,
   });
 };
 
-module.exports = { sendShortlistEmail };
+// New forgot-password email
+const sendPasswordResetEmail = async ({ email, resetUrl }) => {
+  return transporter.sendMail({
+    from: process.env.EMAIL_FROM,
+    to: email,
+    subject: "Reset your Hirelume password",
+    text: `We received a request to reset your Hirelume password.
+
+Use the link below to choose a new password. This link expires in 15 minutes.
+
+${resetUrl}
+
+If you did not request a password reset, you can ignore this email.
+
+The Hirelume Team`,
+  });
+};
+
+module.exports = {
+  sendShortlistEmail,
+  sendPasswordResetEmail,
+};
