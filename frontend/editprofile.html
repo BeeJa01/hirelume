@@ -1,0 +1,452 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Profile · HireLume</title>
+  <link rel="icon" type="image/png" href="https://res.cloudinary.com/nymcjtq4/image/upload/c_fill,w_64,h_64,f_png/v1792099497/photo_2_2026-10-15_22-21-27_v5dczh.jpg">
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet" />
+
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <style type="text/tailwindcss">
+    @theme {
+      --font-sans: "Poppins", system-ui, -apple-system, "Segoe UI", sans-serif;
+      --color-page: #F5F7FB;
+      --color-ink: #0B1426;
+      --color-ink2: #2B3447;
+      --color-mute: #667085;
+      --color-mute2: #475467;
+      --color-line: #E4E8F0;
+      --color-line2: #D0D5DD;
+      --color-chip: #EEF1F6;
+      --color-brand: #0070F8;
+      --color-brand-dark: #0059C7;
+      --color-brand-soft: #E8F1FE;
+      --color-ok: #0E7A55;
+      --color-ok-soft: #E3F5EE;
+      --color-danger: #C0332B;
+      --color-warn-bg: #FDEBE6;
+      --color-warn-line: #F6CFC4;
+      --color-warn-ink: #7A2E1F;
+      --breakpoint-sm: 561px;
+      --breakpoint-app: 861px;
+      --breakpoint-wide: 1101px;
+    }
+    @layer components {
+      .ico { @apply size-5 shrink-0 fill-none stroke-current stroke-[1.6]; }
+      .card { @apply rounded-[14px] border border-line bg-white p-5; }
+      .btn { @apply inline-flex h-10 items-center justify-center gap-2 rounded-[10px] px-5 text-[13px] font-semibold transition-colors focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand; }
+      .input-field { @apply w-full rounded-[10px] border border-line bg-white px-3.5 py-2.5 text-sm text-ink outline-none focus:border-brand focus:ring-1 focus:ring-brand; }
+    }
+  </style>
+</head>
+
+<body class="bg-page font-sans text-sm text-ink antialiased [&_svg]:[stroke-linecap:round] [&_svg]:[stroke-linejoin:round]">
+<div class="grid min-h-screen app:grid-cols-[260px_1fr]">
+
+  <!-- Sidebar (desktop only) -->
+  <aside class="hidden flex-col border-r border-line bg-white px-4 py-5 app:sticky app:top-0 app:flex app:h-screen">
+    <a href="index.html" aria-label="HireLume home" class="px-1">
+      <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+    </a>
+    
+    <!-- Role label header in sidebar -->
+    <p id="sidebar-role-label" class="mx-1 mb-2.5 mt-[34px] text-[11px] font-medium tracking-wider text-mute">RECRUITER</p>
+    
+    <!-- Recruiter Navigation -->
+    <nav id="nav-recruiter" aria-label="Main Recruiter" class="flex flex-col gap-1.5">
+      <a href="jobs.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" /></svg>Jobs
+      </a>
+      <a href="create-job.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 8v8M8 12h8" /></svg>Create job
+      </a>
+      <a href="applicants.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="9" cy="8" r="3.5" /><path d="M2.5 20c0-3.6 2.9-6.5 6.5-6.5s6.5 2.9 6.5 6.5M16 4.6a3.5 3.5 0 0 1 0 6.8M18 14c2 .8 3.5 2.9 3.5 6" /></svg>Applicants
+      </a>
+      <a href="help.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5M12 17h.01" /></svg>Help
+      </a>
+    </nav>
+
+    <!-- Job Seeker Navigation (Hidden by default, shown when seeker role is active) -->
+    <nav id="nav-seeker" aria-label="Main Seeker" class="flex flex-col gap-1.5 hidden">
+      <a href="new-analysis.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="m12 3-1.9 5.8a2 2 0 0 1-1.3 1.3L3 12l5.8 1.9a2 2 0 0 1 1.3 1.3L12 21l1.9-5.8a2 2 0 0 1 1.3-1.3L21 12l-5.8-1.9a2 2 0 0 1-1.3-1.3Z"/></svg>New analysis
+      </a>
+      <a href="my-analyses.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><path d="M14 2v6h6M16 13H8M16 17H8M10 9H8"/></svg>My analyses
+      </a>
+      <a href="my-applications.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="7" width="18" height="13" rx="2" /><path d="M8 7V5a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2M3 13h18" /></svg>My applications
+      </a>
+      <a href="help.html" class="flex h-11 items-center gap-3 rounded-[10px] border border-transparent px-3.5 text-sm text-ink2 transition-colors hover:bg-chip">
+        <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5M12 17h.01" /></svg>Help
+      </a>
+    </nav>
+
+    <div class="mt-auto flex items-center gap-2.5 border-t border-line pt-4">
+      <img id="sidebar-avatar" src="" alt="" class="size-8 shrink-0 rounded-full object-cover bg-gray-200">
+      <div class="min-w-0 leading-tight"><b id="sidebar-name" class="block text-[13px] font-semibold truncate"></b><span id="sidebar-sub" class="text-xs text-mute truncate block"></span></div>
+      <a href="login.html" aria-label="Log out" class="ml-auto rounded-lg p-1.5 text-mute2 hover:bg-chip"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></svg></a>
+    </div>
+  </aside>
+
+  <div class="min-w-0">
+
+    <!-- Phone top bar -->
+    <header class="relative border-b border-line bg-white app:hidden">
+      <div class="flex h-16 items-center justify-between px-4">
+        <a href="index.html" aria-label="HireLume home">
+          <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
+        </a>
+        <div class="flex items-center gap-2.5">
+          <img id="phone-topbar-avatar" src="" alt="" class="size-9 rounded-full object-cover">
+          <button type="button" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" class="grid size-10 place-items-center rounded-[10px] border border-line hover:bg-chip">
+            <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
+          </button>
+        </div>
+      </div>
+      <nav id="mobileNav" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-1 border-b border-line bg-white px-4 py-3 text-sm data-[open]:flex">
+        <a href="jobs.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Jobs</a>
+        <a href="create-job.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Create job</a>
+        <a href="applicants.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Applicants</a>
+        <a href="login.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Log out</a>
+      </nav>
+    </header>
+
+    <!-- Desktop top bar -->
+    <header class="hidden h-[60px] items-center justify-between border-b border-line bg-white px-8 app:flex">
+      <span class="text-[13px] text-mute font-medium">Profile</span>
+      
+      <!-- Role Switcher for previewing both Recruiter & Job Seeker UIs -->
+      <div class="flex items-center gap-1 bg-chip p-1 rounded-[10px] text-xs font-semibold">
+        <button type="button" onclick="switchRole('recruiter')" id="btn-switch-recruiter" class="px-3 py-1.5 rounded-lg transition-all">Recruiter View</button>
+        <button type="button" onclick="switchRole('seeker')" id="btn-switch-seeker" class="px-3 py-1.5 rounded-lg transition-all">Job Seeker View</button>
+      </div>
+
+      <div class="flex items-center gap-3.5">
+        <a href="help.html" aria-label="Help" class="grid size-9 place-items-center rounded-lg border border-line bg-white text-mute2 hover:bg-chip"><svg class="ico size-[18px]" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5M12 17h.01" /></svg></a>
+        <div class="h-7 w-px bg-line"></div>
+        <button type="button" class="flex items-center gap-2.5 rounded-lg px-1.5 py-1 text-[13px] font-medium hover:bg-chip">
+          <img id="desktop-topbar-avatar" src="" alt="" class="size-7 rounded-full object-cover">
+          <span id="desktop-topbar-name"></span>
+          <svg class="ico size-3.5 text-mute2" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
+        </button>
+      </div>
+    </header>
+
+    <main class="mx-auto max-w-[1100px] px-4 pb-12 pt-6 app:px-8 app:pb-16 app:pt-8">
+
+      <!-- Page Header & Action Buttons -->
+      <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between mb-6">
+        <div>
+          <h1 class="text-2xl font-bold tracking-tight text-ink app:text-3xl">Profile</h1>
+          <p class="mt-0.5 text-xs text-mute">Manage your details and account.</p>
+        </div>
+        <div class="flex items-center gap-3">
+          <button type="button" onclick="resetForm()" class="btn border border-line2 bg-white text-ink2 hover:bg-chip">Cancel</button>
+          <button type="button" onclick="saveProfile()" class="btn bg-brand text-white hover:bg-brand-dark">Save changes</button>
+        </div>
+      </div>
+
+      <!-- Success Toast Notification -->
+      <div id="toast" role="status" class="pointer-events-none fixed bottom-6 left-1/2 z-[60] -translate-x-1/2 translate-y-5 rounded-[10px] bg-ink px-[18px] py-[11px] text-[13px] text-white opacity-0 transition data-[show]:translate-y-0 data-[show]:opacity-100"></div>
+
+      <!-- Main Two-Column Profile Grid Layout -->
+      <div class="grid grid-cols-1 gap-6 lg:grid-cols-[1fr_360px]">
+
+        <!-- Left Column (Personal Details & Conditional Company Card) -->
+        <div class="flex flex-col gap-6">
+
+          <!-- Personal details card -->
+          <section class="card space-y-5">
+            <h2 class="text-base font-semibold text-ink">Personal details</h2>
+
+            <!-- Avatar upload row -->
+            <div class="flex items-center gap-4">
+              <img id="profile-avatar" src="" alt="" class="size-16 rounded-full object-cover border border-line bg-chip">
+              <div class="min-w-0">
+                <p id="profile-name-header" class="font-semibold text-ink"></p>
+                <p class="text-xs text-mute">JPG or PNG, up to 2 MB.</p>
+                <div class="mt-2 flex items-center gap-3 text-xs font-semibold">
+                  <label class="cursor-pointer text-brand hover:underline inline-flex items-center gap-1">
+                    <svg class="ico size-3.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Change photo
+                    <input type="file" id="avatarInput" accept="image/png, image/jpeg" class="hidden" onchange="previewPhoto(event)">
+                  </label>
+                  <button type="button" onclick="removePhoto()" class="text-danger hover:underline">Remove</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Form fields grid -->
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-1">
+              <div>
+                <label class="mb-1 block text-xs font-semibold text-ink2">Full name</label>
+                <input type="text" id="input-name" class="input-field" />
+              </div>
+              <div>
+                <label class="mb-1 block text-xs font-semibold text-ink2">Phone number</label>
+                <input type="text" id="input-phone" class="input-field" />
+              </div>
+              <div>
+                <label class="mb-1 block text-xs font-semibold text-ink2">Email</label>
+                <input type="email" id="input-email" class="input-field" />
+                <span class="mt-1 block text-[11px] text-mute">This is your login email.</span>
+              </div>
+              <div id="wrapper-role-specific">
+                <label id="label-role-specific" class="mb-1 block text-xs font-semibold text-ink2">Job title</label>
+                <input type="text" id="input-role-specific" class="input-field" />
+              </div>
+            </div>
+          </section>
+
+          <!-- Company Card (Recruiter only) -->
+          <section id="company-card" class="card space-y-4">
+            <h2 class="text-base font-semibold text-ink">Company</h2>
+            <div class="grid grid-cols-1 gap-4 sm:grid-cols-2">
+              <div>
+                <label class="mb-1 block text-xs font-semibold text-ink2">Company name</label>
+                <input type="text" id="input-company" class="input-field" />
+              </div>
+              <div>
+                <label class="mb-1 block text-xs font-semibold text-ink2">Location</label>
+                <input type="text" id="input-location" class="input-field" />
+              </div>
+            </div>
+            <p class="text-xs text-mute">Applicants see your company name on job pages and application forms.</p>
+          </section>
+
+          <!-- Password Card -->
+          <section class="card flex items-center justify-between gap-4">
+            <div>
+              <h2 class="text-[15px] font-semibold text-ink">Password</h2>
+              <p class="mt-0.5 text-xs text-mute">Use at least 8 characters.</p>
+            </div>
+            <button type="button" onclick="toast('Password reset link sent to your email.')" class="btn h-9 border border-line bg-white px-4 text-xs font-semibold hover:bg-chip">Change password</button>
+          </section>
+
+        </div>
+
+        <!-- Right Column (Account Widgets, Usage & Privacy) -->
+        <div class="flex flex-col gap-6">
+
+          <!-- Your Account card -->
+          <section class="card space-y-3.5">
+            <h2 class="text-base font-semibold text-ink">Your account</h2>
+            <dl class="divide-y divide-line text-xs">
+              <div class="flex items-center justify-between py-2.5"><dt class="text-mute">Role</dt><dd><span id="badge-role" class="rounded-full bg-brand-soft px-2.5 py-0.5 font-semibold text-brand-dark">Recruiter</span></dd></div>
+              <div class="flex items-center justify-between py-2.5"><dt class="text-mute">Email</dt><dd class="font-semibold text-ok flex items-center gap-1"><svg class="ico size-3.5" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg> Verified</dd></div>
+              <div class="flex items-center justify-between py-2.5"><dt class="text-mute">Member since</dt><dd id="text-member-since" class="font-medium text-ink">2 Oct 2026</dd></div>
+            </dl>
+            <p class="text-[11px] text-mute pt-0.5">Your role cannot be changed after you sign up.</p>
+          </section>
+
+          <!-- Daily Analyses Widget (Job Seeker only) -->
+          <section id="seeker-analyses-widget" class="card space-y-3 hidden">
+            <h2 class="text-base font-semibold text-ink">Daily analyses</h2>
+            <p class="text-xs text-mute leading-relaxed">You can run 5 analyses a day. The limit resets at midnight.</p>
+            <div>
+              <div class="flex items-baseline justify-between text-xs font-semibold mb-2">
+                <span class="text-base font-bold text-ink">2 <span class="text-xs font-normal text-mute">of 5 used today</span></span>
+              </div>
+              <div class="h-2 w-full bg-chip rounded-full overflow-hidden">
+                <div class="h-full bg-brand rounded-full" style="width: 40%;"></div>
+              </div>
+            </div>
+          </section>
+
+          <!-- Privacy and Data card -->
+          <section class="card space-y-2">
+            <h2 class="text-base font-semibold text-ink mb-3">Privacy and data</h2>
+            <a href="#" class="flex items-center justify-between py-2 text-xs font-medium text-ink2 hover:text-brand border-b border-line">
+              <span class="flex items-center gap-2"><svg class="ico size-4 text-mute2" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> Privacy notice <span class="text-[11px] text-mute font-normal">How we use your information</span></span>
+              <svg class="ico size-3.5 text-mute2" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+            </a>
+            <a href="#" class="flex items-center justify-between py-2 text-xs font-medium text-ink2 hover:text-brand border-b border-line">
+              <span class="flex items-center gap-2"><svg class="ico size-4 text-mute2" viewBox="0 0 24 24" aria-hidden="true"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> How scoring works <span class="text-[11px] text-mute font-normal">Met, partly met and not found</span></span>
+              <svg class="ico size-3.5 text-mute2" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+            </a>
+            <a href="#" class="flex items-center justify-between py-2 text-xs font-medium text-danger hover:underline">
+              <span class="flex items-center gap-2"><svg class="ico size-4 text-danger" viewBox="0 0 24 24" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg> Ask for my data to be deleted <span class="text-[11px] text-mute font-normal">We remove it on request</span></span>
+              <svg class="ico size-3.5 text-mute2" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 18l6-6-6-6"/></svg>
+            </a>
+          </section>
+
+          <!-- Retention Notice Box -->
+          <div id="retention-notice" class="rounded-[14px] border border-ok-soft bg-ok-soft/50 p-4 text-xs font-medium text-ok leading-relaxed">
+            Applicant data, CVs are deleted 90 days after a job closes.
+          </div>
+
+        </div>
+
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+  // Profile Data States corresponding to Recruiter and Job Seeker references
+  const profiles = {
+    recruiter: {
+      role: "Recruiter",
+      name: "Adaeze Okonkwo",
+      email: "adaeze@sunriselogistics.ng",
+      phone: "0802 555 0119",
+      jobTitle: "HR Manager",
+      companyName: "Sunrise Logistics Ltd",
+      location: "Ikeja, Lagos",
+      memberSince: "2 Oct 2026",
+      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200"
+    },
+    seeker: {
+      role: "Job seeker",
+      name: "Obinna Chukwuemeka",
+      email: "tobi.ogunleye@email.com",
+      phone: "0803 555 0142",
+      jobTitle: "Lagos, Nigeria",
+      companyName: "",
+      location: "",
+      memberSince: "2 Oct 2026",
+      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200"
+    }
+  };
+
+  let currentRole = "recruiter";
+
+  let toastTimer;
+  function toast(msg) {
+    const t = document.getElementById("toast");
+    t.textContent = msg;
+    t.setAttribute("data-show", "");
+    clearTimeout(toastTimer);
+    toastTimer = setTimeout(() => t.removeAttribute("data-show"), 2500);
+  }
+
+  function switchRole(roleKey) {
+    currentRole = roleKey;
+    renderProfile();
+  }
+
+  function renderProfile() {
+    const p = profiles[currentRole];
+
+    // Switcher buttons styling
+    document.getElementById("btn-switch-recruiter").className = currentRole === 'recruiter' ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm font-bold text-brand' : 'text-mute hover:text-ink';
+    document.getElementById("btn-switch-seeker").className = currentRole === 'seeker' ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm font-bold text-brand' : 'text-mute hover:text-ink';
+
+    // Sidebar bindings
+    document.getElementById("sidebar-role-label").textContent = p.role.toUpperCase();
+    document.getElementById("sidebar-name").textContent = p.name;
+    document.getElementById("sidebar-sub").textContent = currentRole === 'recruiter' ? p.companyName : p.role;
+    document.getElementById("sidebar-avatar").src = p.avatar;
+
+    // Topbar bindings
+    document.getElementById("desktop-topbar-name").textContent = p.name.split(" ")[0];
+    document.getElementById("desktop-topbar-avatar").src = p.avatar;
+    document.getElementById("phone-topbar-avatar").src = p.avatar;
+
+    // Form inputs bindings
+    document.getElementById("input-name").value = p.name;
+    document.getElementById("input-phone").value = p.phone;
+    document.getElementById("input-email").value = p.email;
+    document.getElementById("profile-name-header").textContent = p.name;
+    document.getElementById("profile-avatar").src = p.avatar;
+    document.getElementById("badge-role").textContent = p.role;
+    document.getElementById("text-member-since").textContent = p.memberSince;
+
+    // Conditional elements based on active role
+    const navRecruiter = document.getElementById("nav-recruiter");
+    const navSeeker = document.getElementById("nav-seeker");
+    const companyCard = document.getElementById("company-card");
+    const seekerWidget = document.getElementById("seeker-analyses-widget");
+    const retentionNotice = document.getElementById("retention-notice");
+    const labelRoleSpecific = document.getElementById("label-role-specific");
+    const inputRoleSpecific = document.getElementById("input-role-specific");
+
+    if (currentRole === 'recruiter') {
+      navRecruiter.classList.remove("hidden");
+      navSeeker.classList.add("hidden");
+      companyCard.classList.remove("hidden");
+      seekerWidget.classList.add("hidden");
+      retentionNotice.textContent = "Applicant data, CVs are deleted 90 days after a job closes.";
+      labelRoleSpecific.textContent = "Job title";
+      inputRoleSpecific.value = p.jobTitle;
+      document.getElementById("input-company").value = p.companyName;
+      document.getElementById("input-location").value = p.location;
+    } else {
+      navRecruiter.classList.add("hidden");
+      navSeeker.classList.remove("hidden");
+      companyCard.classList.add("hidden");
+      seekerWidget.classList.remove("hidden");
+      retentionNotice.textContent = "Your analysis data and uploaded CVs remain private to your account.";
+      labelRoleSpecific.textContent = "Location (Optional)";
+      inputRoleSpecific.value = p.jobTitle;
+    }
+  }
+
+  function saveProfile() {
+    profiles[currentRole].name = document.getElementById("input-name").value;
+    profiles[currentRole].phone = document.getElementById("input-phone").value;
+    profiles[currentRole].email = document.getElementById("input-email").value;
+    if (currentRole === 'recruiter') {
+      profiles[currentRole].jobTitle = document.getElementById("input-role-specific").value;
+      profiles[currentRole].companyName = document.getElementById("input-company").value;
+      profiles[currentRole].location = document.getElementById("input-location").value;
+    } else {
+      profiles[currentRole].jobTitle = document.getElementById("input-role-specific").value;
+    }
+
+    // Refresh UI text bindings
+    document.getElementById("sidebar-name").textContent = profiles[currentRole].name;
+    document.getElementById("desktop-topbar-name").textContent = profiles[currentRole].name.split(" ")[0];
+    document.getElementById("profile-name-header").textContent = profiles[currentRole].name;
+
+    toast("Profile changes saved successfully!");
+  }
+
+  function resetForm() {
+    renderProfile();
+    toast("Changes discarded.");
+  }
+
+  function previewPhoto(event) {
+    const file = event.target.files[0];
+    if (file) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        document.getElementById("profile-avatar").src = e.target.result;
+        document.getElementById("desktop-topbar-avatar").src = e.target.result;
+        document.getElementById("phone-topbar-avatar").src = e.target.result;
+        document.getElementById("sidebar-avatar").src = e.target.result;
+        profiles[currentRole].avatar = e.target.result;
+      }
+      reader.readAsDataURL(file);
+    }
+  }
+
+  function removePhoto() {
+    const defaultAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200";
+    document.getElementById("profile-avatar").src = defaultAvatar;
+    document.getElementById("desktop-topbar-avatar").src = defaultAvatar;
+    document.getElementById("phone-topbar-avatar").src = defaultAvatar;
+    document.getElementById("sidebar-avatar").src = defaultAvatar;
+    profiles[currentRole].avatar = defaultAvatar;
+  }
+
+  // Mobile menu toggle
+  const menuBtn = document.getElementById("menuBtn");
+  if (menuBtn) {
+    menuBtn.addEventListener("click", () => {
+      const open = document.getElementById("mobileNav").toggleAttribute("data-open");
+      menuBtn.setAttribute("aria-expanded", String(open));
+    });
+  }
+
+  // Initialize view on load
+  renderProfile();
+</script>
+</body>
+</html>
