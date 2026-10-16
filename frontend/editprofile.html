@@ -48,7 +48,7 @@
 
   <!-- Sidebar (desktop only) -->
   <aside class="hidden flex-col border-r border-line bg-white px-4 py-5 app:sticky app:top-0 app:flex app:h-screen">
-    <a href="index.html" aria-label="HireLume home" class="px-1">
+    <a href="landingpage.html" aria-label="HireLume home" class="px-1">
       <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
     </a>
     
@@ -88,9 +88,9 @@
     </nav>
 
     <div class="mt-auto flex items-center gap-2.5 border-t border-line pt-4">
-      <img id="sidebar-avatar" src="" alt="" class="size-8 shrink-0 rounded-full object-cover bg-gray-200">
+      <span id="sidebar-avatar" data-avatar class="grid size-8 shrink-0 place-items-center rounded-full bg-gray-200 text-[11px] font-semibold"></span>
       <div class="min-w-0 leading-tight"><b id="sidebar-name" class="block text-[13px] font-semibold truncate"></b><span id="sidebar-sub" class="text-xs text-mute truncate block"></span></div>
-      <a href="login.html" aria-label="Log out" class="ml-auto rounded-lg p-1.5 text-mute2 hover:bg-chip"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></svg></a>
+      <a href="/logout" aria-label="Log out" class="ml-auto rounded-lg p-1.5 text-mute2 hover:bg-chip"><svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4M16 17l5-5-5-5M21 12H9" /></svg></a>
     </div>
   </aside>
 
@@ -99,11 +99,11 @@
     <!-- Phone top bar -->
     <header class="relative border-b border-line bg-white app:hidden">
       <div class="flex h-16 items-center justify-between px-4">
-        <a href="index.html" aria-label="HireLume home">
+        <a href="landingpage.html" aria-label="HireLume home">
           <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
         </a>
         <div class="flex items-center gap-2.5">
-          <img id="phone-topbar-avatar" src="" alt="" class="size-9 rounded-full object-cover">
+          <span id="phone-topbar-avatar" data-avatar class="grid size-9 place-items-center rounded-full bg-gray-200 text-xs font-semibold"></span>
           <button type="button" id="menuBtn" aria-label="Open menu" aria-expanded="false" aria-controls="mobileNav" class="grid size-10 place-items-center rounded-[10px] border border-line hover:bg-chip">
             <svg class="ico" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16" /></svg>
           </button>
@@ -113,25 +113,20 @@
         <a href="jobs.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Jobs</a>
         <a href="create-job.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Create job</a>
         <a href="applicants.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Applicants</a>
-        <a href="login.html" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Log out</a>
+        <a href="/logout" class="rounded-lg px-3 py-2.5 text-ink2 hover:bg-chip">Log out</a>
       </nav>
     </header>
 
     <!-- Desktop top bar -->
     <header class="hidden h-[60px] items-center justify-between border-b border-line bg-white px-8 app:flex">
       <span class="text-[13px] text-mute font-medium">Profile</span>
-      
-      <!-- Role Switcher for previewing both Recruiter & Job Seeker UIs -->
-      <div class="flex items-center gap-1 bg-chip p-1 rounded-[10px] text-xs font-semibold">
-        <button type="button" onclick="switchRole('recruiter')" id="btn-switch-recruiter" class="px-3 py-1.5 rounded-lg transition-all">Recruiter View</button>
-        <button type="button" onclick="switchRole('seeker')" id="btn-switch-seeker" class="px-3 py-1.5 rounded-lg transition-all">Job Seeker View</button>
-      </div>
+      <div></div>
 
       <div class="flex items-center gap-3.5">
         <a href="help.html" aria-label="Help" class="grid size-9 place-items-center rounded-lg border border-line bg-white text-mute2 hover:bg-chip"><svg class="ico size-[18px]" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M9.5 9.5a2.5 2.5 0 1 1 3.5 2.3c-.6.3-1 .9-1 1.5M12 17h.01" /></svg></a>
         <div class="h-7 w-px bg-line"></div>
         <button type="button" class="flex items-center gap-2.5 rounded-lg px-1.5 py-1 text-[13px] font-medium hover:bg-chip">
-          <img id="desktop-topbar-avatar" src="" alt="" class="size-7 rounded-full object-cover">
+          <span id="desktop-topbar-avatar" data-avatar class="grid size-7 place-items-center rounded-full bg-gray-200 text-[10px] font-semibold"></span>
           <span id="desktop-topbar-name"></span>
           <svg class="ico size-3.5 text-mute2" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9l6 6 6-6" /></svg>
         </button>
@@ -148,7 +143,7 @@
         </div>
         <div class="flex items-center gap-3">
           <button type="button" onclick="resetForm()" class="btn border border-line2 bg-white text-ink2 hover:bg-chip">Cancel</button>
-          <button type="button" onclick="saveProfile()" class="btn bg-brand text-white hover:bg-brand-dark">Save changes</button>
+          <button type="button" id="saveBtn" onclick="saveProfile()" class="btn bg-brand text-white hover:bg-brand-dark">Save changes</button>
         </div>
       </div>
 
@@ -167,16 +162,16 @@
 
             <!-- Avatar upload row -->
             <div class="flex items-center gap-4">
-              <img id="profile-avatar" src="" alt="" class="size-16 rounded-full object-cover border border-line bg-chip">
+              <span id="profile-avatar" data-avatar class="grid size-16 shrink-0 place-items-center rounded-full border border-line bg-chip text-lg font-semibold"></span>
               <div class="min-w-0">
                 <p id="profile-name-header" class="font-semibold text-ink"></p>
-                <p class="text-xs text-mute">JPG or PNG, up to 2 MB.</p>
+                <p class="text-xs text-mute">JPG, PNG or WebP, up to 2 MB.</p>
                 <div class="mt-2 flex items-center gap-3 text-xs font-semibold">
                   <label class="cursor-pointer text-brand hover:underline inline-flex items-center gap-1">
                     <svg class="ico size-3.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M23 19a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h4l2-3h6l2 3h4a2 2 0 0 1 2 2z"/><circle cx="12" cy="13" r="4"/></svg> Change photo
-                    <input type="file" id="avatarInput" accept="image/png, image/jpeg" class="hidden" onchange="previewPhoto(event)">
+                    <input type="file" id="avatarInput" accept="image/png, image/jpeg, image/webp" class="hidden" onchange="previewPhoto(event)">
                   </label>
-                  <button type="button" onclick="removePhoto()" class="text-danger hover:underline">Remove</button>
+                  <button type="button" id="removePhotoBtn" onclick="removePhoto()" class="text-danger hover:underline">Remove</button>
                 </div>
               </div>
             </div>
@@ -185,7 +180,8 @@
             <div class="grid grid-cols-1 gap-4 sm:grid-cols-2 pt-1">
               <div>
                 <label class="mb-1 block text-xs font-semibold text-ink2">Full name</label>
-                <input type="text" id="input-name" class="input-field" />
+                <input type="text" id="input-name" class="input-field disabled:bg-chip disabled:text-mute2" disabled />
+                <span class="mt-1 block text-[11px] text-mute">Set when you signed up.</span>
               </div>
               <div>
                 <label class="mb-1 block text-xs font-semibold text-ink2">Phone number</label>
@@ -193,7 +189,7 @@
               </div>
               <div>
                 <label class="mb-1 block text-xs font-semibold text-ink2">Email</label>
-                <input type="email" id="input-email" class="input-field" />
+                <input type="email" id="input-email" class="input-field disabled:bg-chip disabled:text-mute2" disabled />
                 <span class="mt-1 block text-[11px] text-mute">This is your login email.</span>
               </div>
               <div id="wrapper-role-specific">
@@ -225,7 +221,7 @@
               <h2 class="text-[15px] font-semibold text-ink">Password</h2>
               <p class="mt-0.5 text-xs text-mute">Use at least 8 characters.</p>
             </div>
-            <button type="button" onclick="toast('Password reset link sent to your email.')" class="btn h-9 border border-line bg-white px-4 text-xs font-semibold hover:bg-chip">Change password</button>
+            <button type="button" id="pwBtn" onclick="changePassword()" class="btn h-9 border border-line bg-white px-4 text-xs font-semibold hover:bg-chip">Change password</button>
           </section>
 
         </div>
@@ -239,7 +235,7 @@
             <dl class="divide-y divide-line text-xs">
               <div class="flex items-center justify-between py-2.5"><dt class="text-mute">Role</dt><dd><span id="badge-role" class="rounded-full bg-brand-soft px-2.5 py-0.5 font-semibold text-brand-dark">Recruiter</span></dd></div>
               <div class="flex items-center justify-between py-2.5"><dt class="text-mute">Email</dt><dd class="font-semibold text-ok flex items-center gap-1"><svg class="ico size-3.5" viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M8 12.5l2.7 2.7L16 9.8" /></svg> Verified</dd></div>
-              <div class="flex items-center justify-between py-2.5"><dt class="text-mute">Member since</dt><dd id="text-member-since" class="font-medium text-ink">2 Oct 2026</dd></div>
+              
             </dl>
             <p class="text-[11px] text-mute pt-0.5">Your role cannot be changed after you sign up.</p>
           </section>
@@ -247,13 +243,13 @@
           <!-- Daily Analyses Widget (Job Seeker only) -->
           <section id="seeker-analyses-widget" class="card space-y-3 hidden">
             <h2 class="text-base font-semibold text-ink">Daily analyses</h2>
-            <p class="text-xs text-mute leading-relaxed">You can run 5 analyses a day. The limit resets at midnight.</p>
+            <p id="quota-note" class="text-xs text-mute leading-relaxed">Your daily analyses reset at midnight.</p>
             <div>
               <div class="flex items-baseline justify-between text-xs font-semibold mb-2">
-                <span class="text-base font-bold text-ink">2 <span class="text-xs font-normal text-mute">of 5 used today</span></span>
+                <span class="text-base font-bold text-ink"><span id="quota-used">-</span> <span id="quota-of" class="text-xs font-normal text-mute">analyses used today</span></span>
               </div>
               <div class="h-2 w-full bg-chip rounded-full overflow-hidden">
-                <div class="h-full bg-brand rounded-full" style="width: 40%;"></div>
+                <div id="quota-bar" class="h-full bg-brand rounded-full" style="width: 0%;"></div>
               </div>
             </div>
           </section>
@@ -287,166 +283,133 @@
   </div>
 </div>
 
+<script src="api.js"></script>
 <script>
-  // Profile Data States corresponding to Recruiter and Job Seeker references
-  const profiles = {
-    recruiter: {
-      role: "Recruiter",
-      name: "Adaeze Okonkwo",
-      email: "adaeze@sunriselogistics.ng",
-      phone: "0802 555 0119",
-      jobTitle: "HR Manager",
-      companyName: "Sunrise Logistics Ltd",
-      location: "Ikeja, Lagos",
-      memberSince: "2 Oct 2026",
-      avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200"
-    },
-    seeker: {
-      role: "Job seeker",
-      name: "Obinna Chukwuemeka",
-      email: "tobi.ogunleye@email.com",
-      phone: "0803 555 0142",
-      jobTitle: "Lagos, Nigeria",
-      companyName: "",
-      location: "",
-      memberSince: "2 Oct 2026",
-      avatar: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=200"
-    }
-  };
+  // ---- Profile page: real account + photo from the API ----
+  requireAuth();
+  const user = session.user || {};
+  const role = user.role === "job_seeker" ? "seeker" : "recruiter";
+  const $ = (id) => document.getElementById(id);
 
-  let currentRole = "recruiter";
+  // The server only stores name, email, role and photo. The other fields are kept on this device until
+  // the backend gets a profile-update endpoint.
+  const extraKey = "hl_profile_extra_" + (user.id || "me");
+  function loadExtra() { try { return JSON.parse(localStorage.getItem(extraKey)) || {}; } catch (e) { return {}; } }
+  function saveExtra(o) { try { localStorage.setItem(extraKey, JSON.stringify(o)); } catch (e) {} }
 
   let toastTimer;
   function toast(msg) {
-    const t = document.getElementById("toast");
+    const t = $("toast");
     t.textContent = msg;
     t.setAttribute("data-show", "");
     clearTimeout(toastTimer);
-    toastTimer = setTimeout(() => t.removeAttribute("data-show"), 2500);
+    toastTimer = setTimeout(() => t.removeAttribute("data-show"), 2800);
   }
 
-  function switchRole(roleKey) {
-    currentRole = roleKey;
-    renderProfile();
+  function initials(name) {
+    return String(name || user.email || "").split(/\s+/).map((w) => w[0]).join("").slice(0, 2).toUpperCase();
   }
 
   function renderProfile() {
-    const p = profiles[currentRole];
+    const x = loadExtra();
+    const name = user.name || "";
+    const isRec = role === "recruiter";
+    const ini = initials(name);
 
-    // Switcher buttons styling
-    document.getElementById("btn-switch-recruiter").className = currentRole === 'recruiter' ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm font-bold text-brand' : 'text-mute hover:text-ink';
-    document.getElementById("btn-switch-seeker").className = currentRole === 'seeker' ? 'px-3 py-1.5 rounded-lg bg-white shadow-sm font-bold text-brand' : 'text-mute hover:text-ink';
+    $("sidebar-role-label").textContent = isRec ? "RECRUITER" : "JOB SEEKER";
+    $("sidebar-name").textContent = name;
+    $("sidebar-sub").textContent = isRec ? (x.companyName || user.email || "") : "Job seeker";
+    $("desktop-topbar-name").textContent = name.split(" ")[0];
+    $("profile-name-header").textContent = name;
+    ["sidebar-avatar", "phone-topbar-avatar", "desktop-topbar-avatar", "profile-avatar"].forEach((id) => { $(id).textContent = ini; });
 
-    // Sidebar bindings
-    document.getElementById("sidebar-role-label").textContent = p.role.toUpperCase();
-    document.getElementById("sidebar-name").textContent = p.name;
-    document.getElementById("sidebar-sub").textContent = currentRole === 'recruiter' ? p.companyName : p.role;
-    document.getElementById("sidebar-avatar").src = p.avatar;
+    $("input-name").value = name;
+    $("input-email").value = user.email || "";
+    $("input-phone").value = x.phone || "";
+    $("badge-role").textContent = isRec ? "Recruiter" : "Job seeker";
 
-    // Topbar bindings
-    document.getElementById("desktop-topbar-name").textContent = p.name.split(" ")[0];
-    document.getElementById("desktop-topbar-avatar").src = p.avatar;
-    document.getElementById("phone-topbar-avatar").src = p.avatar;
+    $("nav-recruiter").classList.toggle("hidden", !isRec);
+    $("nav-seeker").classList.toggle("hidden", isRec);
+    $("company-card").classList.toggle("hidden", !isRec);
+    $("seeker-analyses-widget").classList.toggle("hidden", isRec);
 
-    // Form inputs bindings
-    document.getElementById("input-name").value = p.name;
-    document.getElementById("input-phone").value = p.phone;
-    document.getElementById("input-email").value = p.email;
-    document.getElementById("profile-name-header").textContent = p.name;
-    document.getElementById("profile-avatar").src = p.avatar;
-    document.getElementById("badge-role").textContent = p.role;
-    document.getElementById("text-member-since").textContent = p.memberSince;
-
-    // Conditional elements based on active role
-    const navRecruiter = document.getElementById("nav-recruiter");
-    const navSeeker = document.getElementById("nav-seeker");
-    const companyCard = document.getElementById("company-card");
-    const seekerWidget = document.getElementById("seeker-analyses-widget");
-    const retentionNotice = document.getElementById("retention-notice");
-    const labelRoleSpecific = document.getElementById("label-role-specific");
-    const inputRoleSpecific = document.getElementById("input-role-specific");
-
-    if (currentRole === 'recruiter') {
-      navRecruiter.classList.remove("hidden");
-      navSeeker.classList.add("hidden");
-      companyCard.classList.remove("hidden");
-      seekerWidget.classList.add("hidden");
-      retentionNotice.textContent = "Applicant data, CVs are deleted 90 days after a job closes.";
-      labelRoleSpecific.textContent = "Job title";
-      inputRoleSpecific.value = p.jobTitle;
-      document.getElementById("input-company").value = p.companyName;
-      document.getElementById("input-location").value = p.location;
+    if (isRec) {
+      $("retention-notice").textContent = "Applicant data, CVs are deleted 90 days after a job closes.";
+      $("label-role-specific").textContent = "Job title";
+      $("input-role-specific").value = x.jobTitle || "";
+      $("input-company").value = x.companyName || "";
+      $("input-location").value = x.location || "";
     } else {
-      navRecruiter.classList.add("hidden");
-      navSeeker.classList.remove("hidden");
-      companyCard.classList.add("hidden");
-      seekerWidget.classList.remove("hidden");
-      retentionNotice.textContent = "Your analysis data and uploaded CVs remain private to your account.";
-      labelRoleSpecific.textContent = "Location (Optional)";
-      inputRoleSpecific.value = p.jobTitle;
+      $("retention-notice").textContent = "Your analysis data and uploaded CVs remain private to your account.";
+      $("label-role-specific").textContent = "Location (Optional)";
+      $("input-role-specific").value = x.jobTitle || "";
     }
+    hlAvatar.apply();
   }
 
   function saveProfile() {
-    profiles[currentRole].name = document.getElementById("input-name").value;
-    profiles[currentRole].phone = document.getElementById("input-phone").value;
-    profiles[currentRole].email = document.getElementById("input-email").value;
-    if (currentRole === 'recruiter') {
-      profiles[currentRole].jobTitle = document.getElementById("input-role-specific").value;
-      profiles[currentRole].companyName = document.getElementById("input-company").value;
-      profiles[currentRole].location = document.getElementById("input-location").value;
-    } else {
-      profiles[currentRole].jobTitle = document.getElementById("input-role-specific").value;
-    }
-
-    // Refresh UI text bindings
-    document.getElementById("sidebar-name").textContent = profiles[currentRole].name;
-    document.getElementById("desktop-topbar-name").textContent = profiles[currentRole].name.split(" ")[0];
-    document.getElementById("profile-name-header").textContent = profiles[currentRole].name;
-
-    toast("Profile changes saved successfully!");
+    const x = { phone: $("input-phone").value.trim(), jobTitle: $("input-role-specific").value.trim() };
+    if (role === "recruiter") { x.companyName = $("input-company").value.trim(); x.location = $("input-location").value.trim(); }
+    saveExtra(x);
+    $("sidebar-sub").textContent = role === "recruiter" ? (x.companyName || user.email || "") : "Job seeker";
+    toast("Saved on this device.");
   }
 
-  function resetForm() {
-    renderProfile();
-    toast("Changes discarded.");
+  function resetForm() { renderProfile(); toast("Changes discarded."); }
+
+  async function previewPhoto(event) {
+    const input = event.target, file = input.files[0];
+    input.value = "";
+    if (!file) return;
+    if (!/\.(png|jpe?g|webp)$/i.test(file.name)) { toast("Use a PNG, JPG or WebP image."); return; }
+    if (file.size > 2 * 1024 * 1024) { toast("That photo is over 2 MB. Choose a smaller one."); return; }
+    try { await hlAvatar.upload(file); toast("Photo updated."); }
+    catch (e) { toast(e.message); }
   }
 
-  function previewPhoto(event) {
-    const file = event.target.files[0];
-    if (file) {
-      const reader = new FileReader();
-      reader.onload = function(e) {
-        document.getElementById("profile-avatar").src = e.target.result;
-        document.getElementById("desktop-topbar-avatar").src = e.target.result;
-        document.getElementById("phone-topbar-avatar").src = e.target.result;
-        document.getElementById("sidebar-avatar").src = e.target.result;
-        profiles[currentRole].avatar = e.target.result;
-      }
-      reader.readAsDataURL(file);
-    }
+  async function removePhoto() {
+    if (!(session.user && session.user.avatar_url)) { toast("You have no photo to remove."); return; }
+    hlLoader.btn($("removePhotoBtn"), true, "Removing...");
+    try { await hlAvatar.remove(); toast("Photo removed."); }
+    catch (e) { toast(e.message); }
+    finally { hlLoader.btn($("removePhotoBtn"), false); }
   }
 
-  function removePhoto() {
-    const defaultAvatar = "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=200";
-    document.getElementById("profile-avatar").src = defaultAvatar;
-    document.getElementById("desktop-topbar-avatar").src = defaultAvatar;
-    document.getElementById("phone-topbar-avatar").src = defaultAvatar;
-    document.getElementById("sidebar-avatar").src = defaultAvatar;
-    profiles[currentRole].avatar = defaultAvatar;
+  async function changePassword() {
+    const btn = $("pwBtn");
+    hlLoader.btn(btn, true, "Sending...");
+    try {
+      await api(ENDPOINTS.auth + "/forgot-password", { method: "POST", body: { email: user.email }, auth: false });
+      toast("Password reset link sent to " + user.email + ".");
+    } catch (e) { toast(e.message); }
+    finally { hlLoader.btn(btn, false); }
+  }
+
+  // Daily analyses (job seekers)
+  async function loadQuota() {
+    if (role !== "seeker") return;
+    try {
+      const d = await seekerFlow.list(1);
+      const q = d.quota; if (!q) return;
+      const used = Math.max(0, q.limit - q.remaining);
+      $("quota-used").textContent = used;
+      $("quota-of").textContent = "of " + q.limit + " used today";
+      $("quota-bar").style.width = Math.min(100, Math.round((used / (q.limit || 1)) * 100)) + "%";
+      $("quota-note").textContent = "You can run " + q.limit + " analyses a day. The limit resets at midnight.";
+    } catch (e) {}
   }
 
   // Mobile menu toggle
-  const menuBtn = document.getElementById("menuBtn");
+  const menuBtn = $("menuBtn");
   if (menuBtn) {
     menuBtn.addEventListener("click", () => {
-      const open = document.getElementById("mobileNav").toggleAttribute("data-open");
+      const open = $("mobileNav").toggleAttribute("data-open");
       menuBtn.setAttribute("aria-expanded", String(open));
     });
   }
 
-  // Initialize view on load
   renderProfile();
+  hlLoader.wrap(Promise.all([hlAvatar.apply(), loadQuota()]), "Loading your profile...");
 </script>
 </body>
 </html>
