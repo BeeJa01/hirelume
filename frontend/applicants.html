@@ -3,8 +3,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Your jobs | HireLume</title>
-
+ <title>Applicants | HireLume</title>
+<link rel="icon" type="image/png" href="https://res.cloudinary.com/nymcjtq4/image/upload/c_fill,w_64,h_64,f_png/v1792099497/photo_2_2026-10-15_22-21-27_v5dczh.jpg">
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Poppins:wght@600;700&display=swap" rel="stylesheet" />
@@ -59,13 +59,13 @@
 
       <p class="px-6 text-xs font-bold uppercase tracking-wide text-gray-500">Recruiter</p>
       <nav aria-label="Dashboard" class="mt-3 space-y-1 px-4">
-        <a href="/jobs" aria-current="page" class="flex items-center gap-3 rounded-lg border border-brand/30 bg-blue-50 px-3 py-2.5 text-sm font-semibold text-brand">
+        <a href="jobs.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
           <svg class="icon size-5" aria-hidden="true"><use href="#i-briefcase" /></svg>Jobs
         </a>
         <a href="/create-job.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
           <svg class="icon size-5" aria-hidden="true"><use href="#i-plus-circle" /></svg>Create job
         </a>
-        <a href="/applicants.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+        <a href="applicants.html" aria-current="page" class="flex items-center gap-3 rounded-lg border border-brand/30 bg-blue-50 px-3 py-2.5 text-sm font-semibold text-brand">
           <svg class="icon size-5" aria-hidden="true"><use href="#i-users" /></svg>Applicants
         </a>
         <a href="/help.html" class="flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm text-gray-500 hover:bg-[#f8fafc] hover:text-black">
@@ -93,7 +93,7 @@
           <a href="/landingpage.html" class="lg:hidden" aria-label="HireLume home">
             <img src="https://res.cloudinary.com/nymcjtq4/image/upload/v1790869604/HireLume_full_colour_variant_horizontal_iconmark_wordmark_odcptz.png" alt="HireLume" class="h-7 w-auto" width="120" height="28" />
           </a>
-          <p class="font-display hidden text-sm font-semibold lg:block">Jobs</p>
+          <p class="font-display hidden text-sm font-semibold lg:block">Applicants</p>
 
           <div class="flex items-center gap-3">
             <a href="/create-job.html" class="btn-primary hidden lg:inline-flex"><svg class="icon size-4" aria-hidden="true"><use href="#i-plus" /></svg>Create job</a>
@@ -110,15 +110,15 @@
         </div>
 
         <nav id="nav-menu" aria-label="Mobile" class="absolute inset-x-0 top-full z-10 hidden flex-col gap-3 border-b border-line bg-white px-5 py-4 text-sm text-gray-500 sm:px-8 lg:hidden!">
-          <a href="/jobs" class="font-semibold text-brand">Jobs</a>
+          <a href="jobs.html" class="hover:text-black">Jobs</a>
           <a href="/create-job.html" class="hover:text-black">Create job</a>
-          <a href="/applicants.html" class="hover:text-black">Applicants</a>
+          <a href="applicants.html" class="font-semibold text-brand">Applicants</a>
           <a href="/help" class="hover:text-black">Help</a>
           <a href="/logout" class="hover:text-black">Log out</a>
         </nav>
       </header>
 
-      <main class="px-5 py-6 sm:px-8 lg:py-8">
+      <main id="job-view" class="hidden px-5 py-6 sm:px-8 lg:py-8">
         <!-- Breadcrumb -->
         <div class="flex items-center gap-2 text-sm text-gray-500">
           <a href="jobs.html" class="hover:text-black">Jobs</a>
@@ -133,7 +133,7 @@
           <div>
             <div class="flex items-center gap-3">
               <h1 id="job-title" class="font-display text-2xl font-bold lg:text-3xl">Applicants</h1>
-              <span id="job-status" class="rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 border border-emerald-200">Open</span>
+              <span id="job-status" class="capitalize rounded-full bg-emerald-50 px-2.5 py-0.5 text-xs font-semibold text-emerald-600 border border-emerald-200">Open</span>
             </div>
             <p id="job-sub" class="mt-1 text-sm text-gray-500">Loading details...</p>
           </div>
@@ -141,7 +141,7 @@
             <button type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-50">
               <svg class="icon size-4 text-gray-500" aria-hidden="true"><use href="#i-copy"/></svg> Copy link
             </button>
-            <button type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
+            <button id="close-job-btn" type="button" class="inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 py-2 text-sm font-semibold text-red-600 hover:bg-red-50">
               <svg class="icon size-4 text-red-500" aria-hidden="true"><use href="#i-x"/></svg> Close job
             </button>
           </div>
@@ -205,8 +205,60 @@
           </div>
         </div>
       </main>
+
+      <!-- Job openings: shown when no ?job= is given -->
+      <main id="openings-view" class="hidden px-5 py-6 sm:px-8 lg:py-8">
+        <section aria-labelledby="openings-h" class="card overflow-hidden">
+          <div class="flex flex-col gap-3 p-5 sm:flex-row sm:items-center sm:justify-between">
+            <h1 id="openings-h" class="font-display text-lg font-semibold">Job Openings</h1>
+            <div class="relative w-full sm:w-72">
+              <svg class="icon pointer-events-none absolute left-3 top-1/2 size-4 -translate-y-1/2 text-gray-500" aria-hidden="true"><use href="#i-search" /></svg>
+              <label for="job-search" class="sr-only">Search jobs</label>
+              <input id="job-search" type="search" placeholder="Search jobs" class="w-full rounded-lg border border-line bg-white py-2.5 pl-9 pr-3 text-base outline-none focus:border-brand focus:ring-2 focus:ring-brand/20 sm:text-sm" />
+            </div>
+          </div>
+          <div class="overflow-x-auto">
+            <table class="w-full min-w-[760px] border-collapse text-left">
+              <thead>
+                <tr class="border-y border-line bg-[#f8fafc] text-xs font-medium text-gray-500">
+                  <th class="px-5 py-3 font-medium">Job</th>
+                  <th class="px-3 py-3 font-medium">Status</th>
+                  <th class="px-3 py-3 font-medium">Applicants</th>
+                  <th class="px-3 py-3 font-medium">Top match</th>
+                  <th class="px-3 py-3 font-medium">Created</th>
+                  <th class="px-5 py-3"><span class="sr-only">Actions</span></th>
+                </tr>
+              </thead>
+              <tbody id="openings-rows" class="divide-y divide-line text-sm">
+                <tr><td colspan="6" class="p-6 text-center text-sm text-gray-500">Loading jobs...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </section>
+      </main>
     </div>
   </div>
+
+  <!-- Close job confirmation -->
+  <div id="close-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/40 p-4" role="dialog" aria-modal="true" aria-labelledby="cm-title">
+    <div class="relative w-full max-w-md rounded-2xl bg-white p-6 shadow-xl">
+      <button type="button" id="cm-x" aria-label="Close dialog" class="absolute right-4 top-4 grid size-8 place-items-center rounded-lg text-gray-500 hover:bg-[#f8fafc] hover:text-black">
+        <svg class="icon size-5" aria-hidden="true"><use href="#i-x" /></svg>
+      </button>
+      <h2 id="cm-title" class="font-display pr-8 text-lg font-bold"></h2>
+      <p class="mt-2 text-sm text-gray-500">Candidates won't be able to apply anymore. Everything you've collected so far stays put.</p>
+      <ul class="mt-4 space-y-2 rounded-xl bg-[#f8fafc] p-4 text-sm">
+        <li class="flex items-start gap-2"><svg class="icon mt-0.5 size-4 shrink-0 text-teal-600" aria-hidden="true"><use href="#i-check" /></svg><span>The job link shows "This job is closed"</span></li>
+        <li class="flex items-start gap-2"><svg class="icon mt-0.5 size-4 shrink-0 text-teal-600" aria-hidden="true"><use href="#i-check" /></svg><span id="cm-kept"></span></li>
+      </ul>
+      <p id="cm-error" role="alert" class="mt-3 hidden text-sm text-red-600"></p>
+      <div class="mt-6 flex items-center justify-end gap-3">
+        <button type="button" id="cm-cancel" class="rounded-lg px-4 py-2.5 text-sm font-semibold hover:bg-[#f8fafc]">Cancel</button>
+        <button type="button" id="cm-confirm" class="btn-primary">Close Job</button>
+      </div>
+    </div>
+  </div>
+  <div id="toast" role="status" class="fixed bottom-6 left-1/2 z-50 hidden -translate-x-1/2 rounded-lg bg-black px-4 py-2.5 text-sm font-medium text-white shadow-lg"></div>
 
   <script src="api.js"></script>
   <script>
@@ -216,6 +268,7 @@
     let sort = "score";
     let activeFilter = "all";
     let allApplicants = [];
+    let currentJob = null, currentTotal = 0;
 
     function getInitials(name) {
       if (!name) return "??";
@@ -298,14 +351,13 @@
 
         const job = out[0];
         const apps = out[1];
+        currentJob = job; currentTotal = apps.total || 0;
 
         // Update Job Title & Subtitle dynamically
         document.getElementById("job-title").textContent = job.title;
         document.getElementById("breadcrumb-title").textContent = job.title;
         document.getElementById("job-sub").textContent = `${job.company || ''} ${job.location ? '- ' + job.location : ''} - ${apps.total} applicant${apps.total === 1 ? '' : 's'}`;
-        if (job.status) {
-          document.getElementById("job-status").textContent = job.status;
-        }
+        syncJobUi();
 
         allApplicants = apps.applicants || [];
 
@@ -350,10 +402,95 @@
       });
     });
 
-    if (jobId) load();
-    else api(ENDPOINTS.jobs).then(function (list) {
-      location.replace(list.length ? "applicants.html?job=" + list[0].id : "jobs.html");
-    }).catch(function () { location.replace("jobs.html"); });
+    // ---- Close / reopen this job ----
+    const closeBtn = document.getElementById("close-job-btn");
+    const modal = document.getElementById("close-modal"), cmConfirm = document.getElementById("cm-confirm"), cmError = document.getElementById("cm-error");
+    function toast(msg) {
+      const t = document.getElementById("toast"); t.textContent = msg; t.classList.remove("hidden");
+      clearTimeout(toast.t); toast.t = setTimeout(function () { t.classList.add("hidden"); }, 2500);
+    }
+    // Keeps the status badge and the header button in step with the job's status
+    function syncJobUi() {
+      if (!currentJob) return;
+      const closed = currentJob.status === "closed";
+      const badge = document.getElementById("job-status");
+      badge.textContent = closed ? "Closed" : "Open";
+      badge.className = "capitalize rounded-full px-2.5 py-0.5 text-xs font-semibold border " + (closed ? "bg-gray-100 text-gray-500 border-gray-200" : "bg-emerald-50 text-emerald-600 border-emerald-200");
+      closeBtn.className = "inline-flex items-center gap-1.5 rounded-lg border border-line bg-white px-3.5 py-2 text-sm font-semibold " + (closed ? "text-gray-700 hover:bg-gray-50" : "text-red-600 hover:bg-red-50");
+      closeBtn.innerHTML = closed
+        ? '<svg class="icon size-4 text-gray-500" aria-hidden="true"><use href="#i-check"/></svg> Reopen job'
+        : '<svg class="icon size-4 text-red-500" aria-hidden="true"><use href="#i-x"/></svg> Close job';
+    }
+    function hideCloseModal() { modal.classList.add("hidden"); modal.classList.remove("flex"); }
+    async function setStatus(action) {
+      await api(ENDPOINTS.jobs + "/" + currentJob.id + "/" + action, { method: "POST" });
+      currentJob.status = action === "close" ? "closed" : "open";
+      syncJobUi();
+    }
+    closeBtn.addEventListener("click", async function () {
+      if (!currentJob) return;
+      if (currentJob.status === "closed") {
+        closeBtn.disabled = true;
+        try { await setStatus("reopen"); toast(currentJob.title + " is open again"); } catch (err) { toast(err.message); }
+        closeBtn.disabled = false;
+        return;
+      }
+      document.getElementById("cm-title").textContent = "Close " + currentJob.title + "?";
+      document.getElementById("cm-kept").textContent = currentTotal === 0 ? "Nothing is deleted. Your job and its settings are kept" : "The " + currentTotal + " applicant" + (currentTotal === 1 ? "" : "s") + " and their rankings are kept";
+      cmError.classList.add("hidden"); cmConfirm.disabled = false; cmConfirm.textContent = "Close Job";
+      modal.classList.remove("hidden"); modal.classList.add("flex");
+      document.getElementById("cm-cancel").focus();
+    });
+    cmConfirm.addEventListener("click", async function () {
+      cmConfirm.disabled = true; cmConfirm.textContent = "Closing...";
+      try { await setStatus("close"); hideCloseModal(); toast(currentJob.title + " is now closed"); }
+      catch (err) { cmError.textContent = err.message; cmError.classList.remove("hidden"); cmConfirm.disabled = false; cmConfirm.textContent = "Close Job"; }
+    });
+    document.getElementById("cm-cancel").addEventListener("click", hideCloseModal);
+    document.getElementById("cm-x").addEventListener("click", hideCloseModal);
+    modal.addEventListener("click", function (e) { if (e.target === modal) hideCloseModal(); });
+    document.addEventListener("keydown", function (e) { if (e.key === "Escape") hideCloseModal(); });
+
+    // ---- Job openings overview (no ?job=) ----
+    let openings = [];
+    const oStatus = { Open: "bg-teal-50 text-teal-700", Closed: "bg-gray-100 text-gray-500" };
+    const oTag = { Fair: "bg-gray-100 text-gray-500", Strong: "bg-teal-50 text-teal-700", Good: "bg-blue-50 text-brand" };
+    const pill = (t, c) => `<span class="rounded-full px-2.5 py-0.5 text-xs font-semibold ${c}">${t}</span>`;
+    const oRows = document.getElementById("openings-rows");
+
+    function renderOpenings() {
+      const term = document.getElementById("job-search").value.trim().toLowerCase();
+      const list = openings.filter(j => j.title.toLowerCase().includes(term));
+      oRows.innerHTML = list.length ? list.map(j => `
+        <tr>
+          <td class="px-5 py-4"><p class="font-display font-semibold">${esc(j.title)}</p><p class="text-xs text-gray-500">${esc(j.location || (j.blind ? "Blind mode on" : ""))}</p></td>
+          <td class="px-3 py-4">${pill(j.status, oStatus[j.status])}</td>
+          <td class="px-3 py-4 font-semibold">${j.applicants}</td>
+          <td class="px-3 py-4"><span class="flex items-center gap-2"><span class="font-semibold">${j.score == null ? "-" : j.score}</span>${j.tag ? pill(j.tag, oTag[j.tag]) : ""}</span></td>
+          <td class="px-3 py-4 text-gray-500">${j.created}</td>
+          <td class="px-5 py-4 text-right"><a href="applicants.html?job=${encodeURIComponent(j.id)}" class="btn-primary whitespace-nowrap">View Applicants</a></td>
+        </tr>`).join("") : '<tr><td colspan="6" class="p-6 text-center text-sm text-gray-500">No jobs found.</td></tr>';
+    }
+
+    async function loadOpenings() {
+      try {
+        const list = await api(ENDPOINTS.jobs);
+        openings = await Promise.all(list.map(async j => {
+          let a = [];
+          try { a = (await api(ENDPOINTS.jobs + "/" + j.id + "/applications")).applicants || []; } catch (e) {}
+          const top = a.filter(x => x.score != null).sort((x, y) => y.score - x.score)[0];
+          return { id: j.id, title: j.title, location: j.location, blind: j.blind_mode, status: j.status === "closed" ? "Closed" : "Open",
+                   applicants: j.applicants, score: top ? top.score : null, tag: top ? levelOf(top.score) : null, created: fmtDate(j.created_at) };
+        }));
+        renderOpenings();
+      } catch (e) {
+        oRows.innerHTML = `<tr><td colspan="6" class="p-6 text-center text-sm text-red-600">${esc(e.message)}</td></tr>`;
+      }
+    }
+    document.getElementById("job-search").addEventListener("input", renderOpenings);
+
+    if (jobId) { document.getElementById("job-view").classList.remove("hidden"); load(); }
+    else { document.getElementById("openings-view").classList.remove("hidden"); loadOpenings(); }
 
     // Mobile menu toggle
     const menuBtn = document.getElementById("menu-btn");
